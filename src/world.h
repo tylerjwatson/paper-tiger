@@ -21,21 +21,29 @@
 #ifndef _HAVE_WORLD_H
 #define _HAVE_WORLD_H
 
-struct tile {
-	
-};
+#include <talloc.h>
+#include <stdbool.h>
+#include <errno.h>
+#include <stdint.h>
+
+#include "binary_reader.h"
 
 struct world {
 	unsigned long worldID;
 	char *world_name;		/* World name */
 	char *world_path;		/* Fully-qualified path to the world file */
-	FILE *fp;				/* Pointer to the world file opened from world_path */
 	int version;
-	int num_positions;		/* Number of elements in the positions array */
-	int *positions;			/* Array of position data */
-	int num_important;		/* Number of elements in the importance array */
-	unsigned *important;	/* Array of importance data */
-	
+	int16_t num_positions;		/* Number of elements in the positions array */
+	int32_t *positions;			/* Array of position data */
+	int16_t num_important;		/* Number of elements in the importance array */
+	int8_t *important;		/* Array of importance data */
+
+	struct binary_reader_context *reader;
+
+	int _is_loaded;					/* Indicates if world_init has completed */
 };
+
+int world_new(TALLOC_CTX *parent, const char *world_path, struct world **out_world);
+int world_init(struct world *world);
 
 #endif /* _HAVE_WORLD_H */

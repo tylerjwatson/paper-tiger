@@ -20,29 +20,56 @@
 
 #include <talloc.h>
 #include <errno.h>
+#include "unistd.h"
 
 #include "game.h"
-#include "binary_reader.h"
+#include "world.h"
+
+#define GUAC_OPTIONS "w:"
+
+static const char *options_worldPath = NULL;
+
+static int parse_command_line(int argc, char **argv)
+{
+	int c;
+
+	opterr = 0;
+
+	while ((c = getopt(argc, argv, GUAC_OPTIONS)) != -1) {
+		switch (c) {
+		case 'w':
+			options_worldPath = optarg;
+			break;
+		default:
+			break;
+		}
+	}
+
+	return 0;
+}
 
 int main(int argc, char **argv)
 {
 	int ret = 0;
-	struct game_context *gameContext;
+	struct world *world;
 
 	printf("Upgraded Guacamole\n");
 
-	struct binary_reader_context *br;
-	
-	if ((ret = binary_reader_new(NULL, "PTS_150829.wld", &br)) < 0) {
-		printf("binary reader init failed: %d\n", ret);
-	}
-	
-	if (game_new(NULL, &gameContext) < 0) {
-		printf("game init failed.\n");
-		return -1;
+	parse_command_line(argc, argv);
+
+	if (world_new(NULL, options_worldPath, &world) < 0
+		|| world_init(world) < 0) {
+		ret = -1;
+		printf("World init failed: %d\n", ret);
+		goto out;
 	}
 
-	talloc_free(br);
-	talloc_free(gameContext);
+	printf("world->version = %d\n", world->version);
+	printf("world->num_positions = %d\n", world->num_positions);
+	printf("world->num_important = %d\n", world->num_important);
+	
+	talloc_free(world);
+out:
+	return ret;
 }
 

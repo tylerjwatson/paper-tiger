@@ -20,6 +20,7 @@
 
 #include <errno.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "binary_reader.h"
 
@@ -28,13 +29,21 @@ static int __increment_pos(struct binary_reader_context *context, size_t pos)
 	int ret;
 
 	if ((ret = fseek(context->fp, pos, SEEK_CUR)) < 0) {
+		ret = -1;
 		goto done;
 	}
 
 	context->file_pos += pos;
-
+	ret = 0;
 done:
 	return ret;
+}
+
+static int __binary_reader_destructor(TALLOC_CTX *talloc_context)
+{
+	struct binary_reader_context *context = talloc_get_type_abort(talloc_context, struct binary_reader_context);
+
+	binary_reader_close(context);
 }
 
 int binary_reader_new(TALLOC_CTX *parent_context, const char *file_path, 
@@ -57,6 +66,13 @@ int binary_reader_new(TALLOC_CTX *parent_context, const char *file_path,
 	}
 
 	newContext->file_pos = 0;
+	
+	/*
+	 * Destructor callback makes sure the file pointer is closed
+	 * before the structure is deallocated with talloc_free.
+	 */
+	talloc_set_destructor(newContext, __binary_reader_destructor);
+	
 	*out_context = talloc_steal(parent_context, newContext);
 
 failed:
@@ -70,22 +86,75 @@ int binary_reader_open(struct binary_reader_context *context)
 		return -1;
 	}
 
-	context->fp = fopen(context->file_path, "r");
+	if ((context->fp = fopen(context->file_path, "r")) == NULL) {
+		printf("Error opening file %s: %s\n", context->file_path, strerror(errno));
+		return -1;
+	}
+
 	rewind(context->fp);
 	context->file_pos = 0;
 
 	return 0;
 }
 
-int binary_reader_read_boolean(struct binary_reader_context *context, bool *out_value);
+int binary_reader_read_boolean(struct binary_reader_context *context, uint8_t *out_value)
+{
+	*out_value = NULL;
+
+	uint8_t val;
+
+	/*
+	 * Note:
+	 * sizeof(bool) = 4 in this case because bool is typedef to int
+	 * whereas in .net it's a single byte, so it's hard-coded to 1
+	 * for now instead of a sizeof.
+	 */
+
+	if (fread(&val, 1, 1, context->fp) != 1) {
+		return -1;
+	}
+
+	__increment_pos(context, 1);
+
+	*out_value = val;
+	return 0;
+}
 
 int binary_reader_read_decimal(struct binary_reader_context *context, long double *out_value);
 
 int binary_reader_read_double(struct binary_reader_context *context, double *out_value);
 
-int binary_reader_read_int16(struct binary_reader_context *context, int16_t *out_value);
+int binary_reader_read_int16(struct binary_reader_context *context, int16_t *out_value)
+{
+	*out_value = NULL;
 
-int binary_reader_read_int32(struct binary_reader_context *context, int32_t *out_value);
+	int16_t val;
+
+	if (fread(&val, sizeof(int16_t), 1, context->fp) != 1) {
+		return -1;
+	}
+
+	__increment_pos(context, sizeof(int16_t));
+
+	*out_value = val;
+	return 0;
+}
+
+int binary_reader_read_int32(struct binary_reader_context *context, int32_t *out_value)
+{
+	*out_value = NULL;
+
+	int32_t val;
+
+	if (fread(&val, sizeof(int32_t), 1, context->fp) != 1) {
+		return -1;
+	}
+
+	__increment_pos(context, sizeof(int32_t));
+
+	*out_value = val;
+	return 0;
+}
 
 int binary_reader_read_int64(struct binary_reader_context *context, int64_t *out_value);
 
@@ -99,4 +168,12 @@ int binary_reader_read_uint32(struct binary_reader_context *context, uint32_t *o
 
 int binary_reader_read_uint64(struct binary_reader_context *context, uint64_t *out_value);
 
-int binary_reader_close(struct binary_reader_context *context);
+int binary_reader_close(struct binary_reader_context *context)
+{
+	if (context->fp == NULL) {
+		return -1;
+	}
+
+	fclose(context->fp);
+	return 0;
+}
