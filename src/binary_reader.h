@@ -28,14 +28,13 @@
 struct binary_reader_context {
 	char *file_path;
 	FILE *fp;
-	int file_pos;
 };
 
 int binary_reader_new(TALLOC_CTX *parent_context, const char *file_path, struct binary_reader_context **out_context);
 
 int binary_reader_open(struct binary_reader_context *context);
 
-int binary_reader_read_boolean(struct binary_reader_context *context, uint8_t *out_value);
+int binary_reader_read_byte(struct binary_reader_context *context, uint8_t *out_value);
 
 int binary_reader_read_decimal(struct binary_reader_context *context, long double *out_value);
 

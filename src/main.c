@@ -67,6 +67,8 @@ int main(int argc, char **argv)
 	printf("world->version = %d\n", world->version);
 	printf("world->num_positions = %d\n", world->num_positions);
 	printf("world->num_important = %d\n", world->num_important);
+	printf("world->world_name = %s\n", world->world_name);
+	printf("world->worldID = %d\n", world->worldID);
 	
 	talloc_free(world);
 out:

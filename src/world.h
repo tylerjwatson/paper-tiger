@@ -28,6 +28,13 @@
 
 #include "binary_reader.h"
 
+enum relogic_file_type {
+	relogic_file_type_none,
+	relogic_file_type_map,
+	relogic_file_type_world,
+	relogic_file_type_player
+};
+
 struct world {
 	unsigned long worldID;
 	char *world_name;		/* World name */
@@ -38,6 +45,11 @@ struct world {
 	int16_t num_important;		/* Number of elements in the importance array */
 	int8_t *important;		/* Array of importance data */
 
+	float left_world;
+	float right_world;
+	float top_world;
+	float bottom_world;
+	
 	struct binary_reader_context *reader;
 
 	int _is_loaded;					/* Indicates if world_init has completed */

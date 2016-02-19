@@ -24,6 +24,40 @@
 
 #include "binary_reader.h"
 
+static uint16_t le16_to_cpu(const uint8_t *buf)
+{
+	return ((uint16_t)buf[0]) | (((uint16_t)buf[1]) << 8);
+}
+static uint16_t be16_to_cpu(const uint8_t *buf)
+{
+	return ((uint16_t)buf[1]) | (((uint16_t)buf[0]) << 8);
+}
+
+static int __read_7_bit_int(struct binary_reader_context *context, int32_t *out_value)
+{
+	int count = 0, shift = 0;
+	uint8_t byte;
+	
+	*out_value = NULL;
+	
+	do {
+		if (shift == 5 * 7) {
+			return -1;
+		}
+		
+		if (binary_reader_read_byte(context, &byte) < 0) {
+			return -1;
+		}
+		
+		count |= (byte & 0x7F) << shift;
+		shift += 7;
+	} while ((byte & 0x80) != 0);
+	
+	*out_value = count;
+	
+	return 0;
+}
+
 static int __increment_pos(struct binary_reader_context *context, size_t pos)
 {
 	int ret;
@@ -32,8 +66,9 @@ static int __increment_pos(struct binary_reader_context *context, size_t pos)
 		ret = -1;
 		goto done;
 	}
-
-	context->file_pos += pos;
+	
+	printf("%s, seek of %d, now at %d\n", __FUNCTION__, pos, ftell(context->fp));
+	
 	ret = 0;
 done:
 	return ret;
@@ -65,8 +100,6 @@ int binary_reader_new(TALLOC_CTX *parent_context, const char *file_path,
 		goto failed;
 	}
 
-	newContext->file_pos = 0;
-	
 	/*
 	 * Destructor callback makes sure the file pointer is closed
 	 * before the structure is deallocated with talloc_free.
@@ -92,12 +125,11 @@ int binary_reader_open(struct binary_reader_context *context)
 	}
 
 	rewind(context->fp);
-	context->file_pos = 0;
 
 	return 0;
 }
 
-int binary_reader_read_boolean(struct binary_reader_context *context, uint8_t *out_value)
+int binary_reader_read_byte(struct binary_reader_context *context, uint8_t *out_value)
 {
 	*out_value = NULL;
 
@@ -114,8 +146,6 @@ int binary_reader_read_boolean(struct binary_reader_context *context, uint8_t *o
 		return -1;
 	}
 
-	__increment_pos(context, 1);
-
 	*out_value = val;
 	return 0;
 }
@@ -128,15 +158,14 @@ int binary_reader_read_int16(struct binary_reader_context *context, int16_t *out
 {
 	*out_value = NULL;
 
-	int16_t val;
+	uint8_t buffer[2];
 
-	if (fread(&val, sizeof(int16_t), 1, context->fp) != 1) {
+	if (fread(buffer, sizeof(int16_t), 1, context->fp) != 1) {
 		return -1;
 	}
 
-	__increment_pos(context, sizeof(int16_t));
-
-	*out_value = val;
+	*out_value = le16_to_cpu(buffer);
+	
 	return 0;
 }
 
@@ -150,17 +179,67 @@ int binary_reader_read_int32(struct binary_reader_context *context, int32_t *out
 		return -1;
 	}
 
-	__increment_pos(context, sizeof(int32_t));
-
 	*out_value = val;
 	return 0;
 }
 
-int binary_reader_read_int64(struct binary_reader_context *context, int64_t *out_value);
+int binary_reader_read_int64(struct binary_reader_context *context, int64_t *out_value)
+{
+	*out_value = NULL;
+	
+	int64_t val;
+	
+	if (fread(&val, sizeof(int64_t), 1, context->fp) != 1) {
+		return -1;
+	}
+	
+	*out_value = val;
+	return 0;
+}
 
 int binary_reader_read_single(struct binary_reader_context *context, float *out_value);
 
-int binary_reader_read_string(struct binary_reader_context *context, char **out_value);
+int binary_reader_read_string(struct binary_reader_context *context, char **out_value)
+{
+	char *val;
+	int32_t string_length;
+	int ret;
+
+	*out_value = NULL;
+
+	if (__read_7_bit_int(context, &string_length) < 0) {
+		return -1;
+	}
+	
+	/*
+	 * Note:
+	 * 
+	 * .NET strings have a 7-bit encoded length at the start
+	 * and no null terminator.  Must allocate enough room for
+	 * the null terminator at the end of the c string.
+	 */
+	if ((val = (char *)malloc(string_length + 1)) == NULL) {
+		ret = -ENOMEM;
+		goto out;
+	}
+
+	if (fread(val, string_length, 1, context->fp) != 1) {
+		ret = -1;
+		goto failed;
+	}
+
+	val[string_length] = '\0';
+
+	*out_value = val;
+	
+	ret = 0;
+	goto out;
+
+failed:
+	free(val);
+out:
+	return ret;
+}
 
 int binary_reader_read_uint16(struct binary_reader_context *context, uint16_t *out_value);
 
