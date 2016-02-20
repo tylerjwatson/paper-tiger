@@ -33,52 +33,33 @@ static uint16_t be16_to_cpu(const uint8_t *buf)
 	return ((uint16_t)buf[1]) | (((uint16_t)buf[0]) << 8);
 }
 
-static int __read_7_bit_int(struct binary_reader_context *context, int32_t *out_value)
-{
+static int __read_7_bit_int(struct binary_reader_context *context, int32_t *out_value) {
 	int count = 0, shift = 0;
 	uint8_t byte;
-	
-	*out_value = NULL;
-	
+
 	do {
 		if (shift == 5 * 7) {
 			return -1;
 		}
-		
+
 		if (binary_reader_read_byte(context, &byte) < 0) {
 			return -1;
 		}
-		
+
 		count |= (byte & 0x7F) << shift;
 		shift += 7;
 	} while ((byte & 0x80) != 0);
-	
+
 	*out_value = count;
-	
+
 	return 0;
-}
-
-static int __increment_pos(struct binary_reader_context *context, size_t pos)
-{
-	int ret;
-
-	if ((ret = fseek(context->fp, pos, SEEK_CUR)) < 0) {
-		ret = -1;
-		goto done;
-	}
-	
-	printf("%s, seek of %d, now at %d\n", __FUNCTION__, pos, ftell(context->fp));
-	
-	ret = 0;
-done:
-	return ret;
 }
 
 static int __binary_reader_destructor(TALLOC_CTX *talloc_context)
 {
 	struct binary_reader_context *context = talloc_get_type_abort(talloc_context, struct binary_reader_context);
-
 	binary_reader_close(context);
+	return 0;
 }
 
 int binary_reader_new(TALLOC_CTX *parent_context, const char *file_path, 
@@ -105,8 +86,10 @@ int binary_reader_new(TALLOC_CTX *parent_context, const char *file_path,
 	 * before the structure is deallocated with talloc_free.
 	 */
 	talloc_set_destructor(newContext, __binary_reader_destructor);
-	
-	*out_context = talloc_steal(parent_context, newContext);
+
+	if (out_context != NULL) {
+		*out_context = talloc_steal(parent_context, newContext);
+	}
 
 failed:
 	talloc_free(tempContext);
@@ -129,10 +112,13 @@ int binary_reader_open(struct binary_reader_context *context)
 	return 0;
 }
 
+int binary_reader_read_boolean(struct binary_reader_context *context, bool *out_value)
+{
+	return binary_reader_read_byte(context, (uint8_t *)out_value);
+}
+
 int binary_reader_read_byte(struct binary_reader_context *context, uint8_t *out_value)
 {
-	*out_value = NULL;
-
 	uint8_t val;
 
 	/*
@@ -146,18 +132,32 @@ int binary_reader_read_byte(struct binary_reader_context *context, uint8_t *out_
 		return -1;
 	}
 
-	*out_value = val;
+	if (out_value != NULL) {
+		*out_value = val;
+	}
+
 	return 0;
 }
 
 int binary_reader_read_decimal(struct binary_reader_context *context, long double *out_value);
 
-int binary_reader_read_double(struct binary_reader_context *context, double *out_value);
+int binary_reader_read_double(struct binary_reader_context *context, double *out_value)
+{
+	double val;
+
+	if (fread(&val, sizeof(double), 1, context->fp) != 1) {
+		return -1;
+	}
+
+	if (out_value != NULL) {
+		*out_value = val;
+	}
+
+	return 0;
+}
 
 int binary_reader_read_int16(struct binary_reader_context *context, int16_t *out_value)
 {
-	*out_value = NULL;
-
 	uint8_t buffer[2];
 
 	if (fread(buffer, sizeof(int16_t), 1, context->fp) != 1) {
@@ -171,43 +171,56 @@ int binary_reader_read_int16(struct binary_reader_context *context, int16_t *out
 
 int binary_reader_read_int32(struct binary_reader_context *context, int32_t *out_value)
 {
-	*out_value = NULL;
-
 	int32_t val;
 
 	if (fread(&val, sizeof(int32_t), 1, context->fp) != 1) {
 		return -1;
 	}
 
-	*out_value = val;
+	if (out_value != NULL) {
+		*out_value = val;
+	}
+
 	return 0;
 }
 
 int binary_reader_read_int64(struct binary_reader_context *context, int64_t *out_value)
 {
-	*out_value = NULL;
-	
 	int64_t val;
 	
 	if (fread(&val, sizeof(int64_t), 1, context->fp) != 1) {
 		return -1;
 	}
-	
-	*out_value = val;
+
+	if (out_value != NULL) {
+		*out_value = val;
+	}
+
 	return 0;
 }
 
-int binary_reader_read_single(struct binary_reader_context *context, float *out_value);
+int binary_reader_read_single(struct binary_reader_context *context, float *out_value)
+{
+	float val;
+
+	if (fread(&val, sizeof(float), 1, context->fp) != 1) {
+		return -1;
+	}
+
+	if (out_value != NULL) {
+		*out_value = val;
+	}
+
+	return 0;
+}
 
 int binary_reader_read_string(struct binary_reader_context *context, char **out_value)
 {
 	char *val;
-	int32_t string_length;
+	size_t string_length = 0;
 	int ret;
 
-	*out_value = NULL;
-
-	if (__read_7_bit_int(context, &string_length) < 0) {
+	if (__read_7_bit_int(context, (int32_t *)&string_length) < 0) {
 		return -1;
 	}
 	
@@ -230,7 +243,9 @@ int binary_reader_read_string(struct binary_reader_context *context, char **out_
 
 	val[string_length] = '\0';
 
-	*out_value = val;
+	if (out_value != NULL) {
+		*out_value = val;
+	}
 	
 	ret = 0;
 	goto out;
