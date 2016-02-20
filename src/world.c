@@ -73,7 +73,7 @@ static int __world_read_file_header(struct world *world)
 		printf("%s: world file metadata read failed.", __FUNCTION__);
 	}
 
-	if (binary_reader_read_int16(world->reader, &world->num_positions) < 0) {
+	if (binary_reader_read_uint16(world->reader, &world->num_positions) < 0) {
 		goto error;
 	}
 
@@ -86,7 +86,7 @@ static int __world_read_file_header(struct world *world)
 		printf("%s: world->positions[%d] = %d\n", __FUNCTION__, i, world->positions[i]);
 	}
 
-	if (binary_reader_read_int16(world->reader, &world->num_important) < 0) {
+	if (binary_reader_read_uint16(world->reader, &world->num_important) < 0) {
 		goto error;
 	}
 
@@ -151,6 +151,35 @@ static int __world_read_anglers(struct world *world)
 		free(angler_finished);
 	}
 
+out:
+	return ret;
+}
+
+static int __world_read_npc_killcounts(struct world *world)
+{
+	int ret = -1;
+
+	if (binary_reader_read_int16(world->reader, &world->num_kill_counts) < 0) {
+		printf("%s: binary reader error reading world->num_kill_counts\n", __FUNCTION__);
+		ret = -1;
+		goto out;
+	}
+
+	if ((world->kill_counts = talloc_array(world, int32_t, (uint32_t)world->num_kill_counts)) == NULL) {
+		printf("%s: out of memory allocating world->kill_counts\n", __FUNCTION__);
+		ret = -1;
+		goto out;
+	}
+
+	for (int i = 0; i < world->num_kill_counts; i++) {
+		if (binary_reader_read_int32(world->reader, &world->kill_counts[i]) < 0) {
+			printf("%s: binary reader error reading world->num_kill_counts\n", __FUNCTION__);
+			ret = -1;
+			goto out;
+		}
+	}
+
+	ret = 0;
 out:
 	return ret;
 }
@@ -514,7 +543,125 @@ static int __world_read_header(struct world *world)
 		goto out;
 	}
 
+	if (world->version < 95) {
+		ret = 0;
+		goto out;
+	}
+
 	__world_read_anglers(world);
+
+	if (world->version < 99) {
+		ret = 0;
+		goto out;
+	}
+
+	if (binary_reader_read_boolean(world->reader, &world->flags.saved_angler) < 0) {
+		printf("%s: binary reader error reading world->flags.saved_angler\n", __FUNCTION__);
+		ret = -1;
+		goto out;
+	}
+
+	if (world->version < 101) {
+		ret = 0;
+		goto out;
+	}
+
+	if (binary_reader_read_int32(world->reader, &world->angler_quest) < 0) {
+		printf("%s: binary reader error reading world->angler_quest\n", __FUNCTION__);
+		ret = -1;
+		goto out;
+	}
+
+	if (world->version < 104) {
+		ret = 0;
+		goto out;
+	}
+
+	if (binary_reader_read_boolean(world->reader, &world->flags.saved_stylist) < 0) {
+		printf("%s: binary reader error reading world->flags.saved_stylist\n", __FUNCTION__);
+		ret = -1;
+		goto out;
+	}
+
+	if (world->version >= 129) {
+		if (binary_reader_read_boolean(world->reader, &world->flags.saved_tax_collector) < 0) {
+			printf("%s: binary reader error reading world->flags.saved_tax_collector\n", __FUNCTION__);
+			ret = -1;
+			goto out;
+		}
+	}
+
+	if (world->version >= 107) {
+		if (binary_reader_read_int32(world->reader, &world->invasion_size_start) < 0) {
+			printf("%s: binary reader error reading world->invasion_size_start\n", __FUNCTION__);
+			ret = -1;
+			goto out;
+		}
+	}
+
+	if (world->version >= 108) {
+		if (binary_reader_read_int32(world->reader, &world->cultist_delay) < 0) {
+			printf("%s: binary reader error reading world->cultist_delay\n", __FUNCTION__);
+			ret = -1;
+			goto out;
+		}
+	}
+
+	if (world->version < 109) {
+		ret = 0;
+		goto out;
+	}
+
+	__world_read_npc_killcounts(world);
+
+	if (world->version < 128) {
+		ret = 0;
+		goto out;
+	}
+
+	if (binary_reader_read_boolean(world->reader, &world->flags.fast_forward_time) < 0) {
+		printf("%s: binary reader error reading world->flags.fast_forward_time\n", __FUNCTION__);
+		ret = -1;
+		goto out;
+	}
+
+	if (world->version < 131) {
+		ret = 0;
+		goto out;
+	}
+
+	if (binary_reader_read_boolean(world->reader, &world->flags.downed_fishron) < 0
+		|| binary_reader_read_boolean(world->reader, &world->flags.downed_martians) < 0
+		|| binary_reader_read_boolean(world->reader, &world->flags.downed_ancient_cultist) < 0
+		|| binary_reader_read_boolean(world->reader, &world->flags.downed_moonlord) < 0
+		|| binary_reader_read_boolean(world->reader, &world->flags.downed_halloween_king) < 0
+		|| binary_reader_read_boolean(world->reader, &world->flags.downed_halloween_tree) < 0
+		|| binary_reader_read_boolean(world->reader, &world->flags.downed_christmas_ice_queen) < 0
+		|| binary_reader_read_boolean(world->reader, &world->flags.downed_christmas_santank) < 0
+		|| binary_reader_read_boolean(world->reader, &world->flags.downed_christmas_tree) < 0) {
+		printf("%s: binary reader error reading world->flags.downed_*\n", __FUNCTION__);
+		ret = -1;
+		goto out;
+	}
+
+	if (world->version < 140) {
+		ret = 0;
+		goto out;
+	}
+
+	if (binary_reader_read_boolean(world->reader, &world->flags.downed_tower_solar) < 0
+			|| binary_reader_read_boolean(world->reader, &world->flags.downed_tower_vortex) < 0
+			|| binary_reader_read_boolean(world->reader, &world->flags.downed_tower_nebula) < 0
+			|| binary_reader_read_boolean(world->reader, &world->flags.downed_tower_stardust) < 0
+			|| binary_reader_read_boolean(world->reader, &world->flags.active_tower_solar) < 0
+			|| binary_reader_read_boolean(world->reader, &world->flags.active_tower_vortex) < 0
+			|| binary_reader_read_boolean(world->reader, &world->flags.active_tower_nebula) < 0
+			|| binary_reader_read_boolean(world->reader, &world->flags.active_tower_stardust) < 0
+			|| binary_reader_read_boolean(world->reader, &world->flags.lunar_apocalypse_up) < 0) {
+		printf("%s: binary reader error reading world->flags.downed_fishron\n", __FUNCTION__);
+		ret = -1;
+		goto out;
+	}
 
 	ret = 0;
 out:
@@ -537,7 +684,9 @@ int world_init(struct world *world)
 		printf("Reading world file headers failed: %d\n", ret);
 	}
 
-	__world_read_header(world);
+	if ((ret = __world_read_header(world)) < 0) {
+		printf("Reading world headers failed: %d\n", ret);
+	}
 
 out:
 	return ret;

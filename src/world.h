@@ -66,10 +66,14 @@ struct world_flags {
 	bool saved_goblin;
 	bool saved_wizard;
 	bool saved_mech;
+	bool saved_angler;
+	bool saved_stylist;
+	bool saved_tax_collector;
 	bool shadow_orb_smashed;
 	bool spawn_meteor;
 	bool hard_mode;
 	bool raining;
+	bool fast_forward_time;
 };
 
 struct vector_2d {
@@ -146,6 +150,7 @@ struct world {
 
 	float wind_speed;
 
+	int32_t cultist_delay;
 	int32_t angler_quest;
 	int32_t num_anglers;
 	char **anglers;

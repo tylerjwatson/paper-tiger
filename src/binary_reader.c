@@ -256,11 +256,50 @@ out:
 	return ret;
 }
 
-int binary_reader_read_uint16(struct binary_reader_context *context, uint16_t *out_value);
+int binary_reader_read_uint16(struct binary_reader_context *context, uint16_t *out_value)
+{
+	uint16_t val;
 
-int binary_reader_read_uint32(struct binary_reader_context *context, uint32_t *out_value);
+	if (fread(&val, sizeof(uint16_t), 1, context->fp) != 1) {
+		return -1;
+	}
 
-int binary_reader_read_uint64(struct binary_reader_context *context, uint64_t *out_value);
+	if (out_value != NULL) {
+		*out_value = val;
+	}
+
+	return 0;
+}
+
+int binary_reader_read_uint32(struct binary_reader_context *context, uint32_t *out_value)
+{
+	uint32_t val;
+
+	if (fread(&val, sizeof(uint32_t), 1, context->fp) != 1) {
+		return -1;
+	}
+
+	if (out_value != NULL) {
+		*out_value = val;
+	}
+
+	return 0;
+}
+
+int binary_reader_read_uint64(struct binary_reader_context *context, uint64_t *out_value)
+{
+	uint64_t val;
+
+	if (fread(&val, sizeof(uint64_t), 1, context->fp) != 1) {
+		return -1;
+	}
+
+	if (out_value != NULL) {
+		*out_value = val;
+	}
+
+	return 0;
+}
 
 int binary_reader_close(struct binary_reader_context *context)
 {
