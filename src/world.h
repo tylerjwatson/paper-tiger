@@ -36,19 +36,24 @@ enum relogic_file_type {
 };
 
 struct world {
-	unsigned long worldID;
+	int32_t worldID;
 	char *world_name;		/* World name */
 	char *world_path;		/* Fully-qualified path to the world file */
 	int version;
-	int16_t num_positions;		/* Number of elements in the positions array */
+	uint16_t num_positions;		/* Number of elements in the positions array */
 	int32_t *positions;			/* Array of position data */
-	int16_t num_important;		/* Number of elements in the importance array */
+	uint16_t num_important;		/* Number of elements in the importance array */
 	int8_t *important;		/* Array of importance data */
 
 	float left_world;
 	float right_world;
 	float top_world;
 	float bottom_world;
+
+	int32_t max_tiles_x;
+	int32_t max_tiles_y;
+
+	bool expert_mode;
 	
 	struct binary_reader_context *reader;
 

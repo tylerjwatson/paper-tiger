@@ -56,7 +56,7 @@ int main(int argc, char **argv)
 	printf("Upgraded Guacamole\n");
 
 	parse_command_line(argc, argv);
-
+    
 	if (world_new(NULL, options_worldPath, &world) < 0
 		|| world_init(world) < 0) {
 		ret = -1;
@@ -69,7 +69,9 @@ int main(int argc, char **argv)
 	printf("world->num_important = %d\n", world->num_important);
 	printf("world->world_name = %s\n", world->world_name);
 	printf("world->worldID = %d\n", world->worldID);
-	
+	printf("world->max_tiles_x = %d\n", world->max_tiles_x);
+	printf("world->max_tiles_y = %d\n", world->max_tiles_y);
+
 	talloc_free(world);
 out:
 	return ret;

@@ -39,7 +39,7 @@ static int __world_read_file_metadata(struct world *world)
 		goto error;
 	}
 
-	type = (enum relogic_file_type)(magic >> 56 & 0xFF);
+	type = (enum relogic_file_type) (magic >> 56 & 0xFF);
 
 	if (type != relogic_file_type_world) {
 		return -1;
@@ -48,7 +48,7 @@ static int __world_read_file_metadata(struct world *world)
 	if (binary_reader_read_int32(world->reader, &revision) < 0) {
 		goto error;
 	}
-	
+
 	if (binary_reader_read_int64(world->reader, &temp) < 0) {
 		goto error;
 	}
@@ -67,11 +67,11 @@ static int __world_read_file_header(struct world *world)
 	if (binary_reader_read_int32(world->reader, &world->version) < 0) {
 		goto error;
 	}
-	
+
 	if (__world_read_file_metadata(world) < 0) {
 		printf("%s: world file metadata read failed.", __FUNCTION__);
 	}
-	
+
 	if (binary_reader_read_int16(world->reader, &world->num_positions) < 0) {
 		goto error;
 	}
@@ -89,7 +89,7 @@ static int __world_read_file_header(struct world *world)
 		goto error;
 	}
 
-	world->important = talloc_array(world, uint8_t, world->num_important);
+	world->important = talloc_array(world, int8_t, world->num_important);
 
 	/*
 	 * Note:
@@ -124,30 +124,68 @@ static int __world_read_header(struct world *world)
 {
 	char *world_name;
 	int ret;
-	
+
 	/*
 	 * World header information is at position[0] in the positions
 	 * table.
 	 */
-	
+
 	fseek(world->reader->fp, world->positions[0], SEEK_SET);
-	
+
 	if (binary_reader_read_string(world->reader, &world_name) < 0) {
 		return -1;
 	}
-	
+
 	world->world_name = talloc_strdup(world, world_name);
-	
+
 	if (binary_reader_read_int32(world->reader, &world->worldID) < 0) {
 		ret = -1;
 		goto out;
 	}
 
-	if (binary_reader_read_int32(world->reader, &world->worldID) < 0) {
+	if (binary_reader_read_int32(world->reader, &world->left_world) < 0) {
+		ret = -1;
+		goto out;
 	}
+
+	if (binary_reader_read_int32(world->reader, &world->right_world) < 0) {
+		ret = -1;
+		goto out;
+	}
+
+	if (binary_reader_read_int32(world->reader, &world->top_world) < 0) {
+		ret = -1;
+		goto out;
+	}
+
+	if (binary_reader_read_int32(world->reader, &world->bottom_world) < 0) {
+		ret = -1;
+		goto out;
+	}
+
+	if (binary_reader_read_int32(world->reader, &world->max_tiles_x) < 0) {
+		ret = -1;
+		goto out;
+	}
+
+	if (binary_reader_read_int32(world->reader, &world->max_tiles_y) < 0) {
+		ret = -1;
+		goto out;
+	}
+
+	if (world->version < 112) {
+		world->expert_mode = false;
+	} else {
+		if (binary_reader_read_byte(world->reader, (uint8_t *)&world->expert_mode) < 0) {
+			ret = -1;
+			goto out;
+		}
+	}
+
+	ret = 0;
 out:
 	free(world_name);
-	
+
 	return ret;
 }
 
@@ -164,14 +202,14 @@ int world_init(struct world *world)
 	if ((ret = __world_read_file_header(world)) < 0) {
 		printf("Reading world file headers failed: %d\n", ret);
 	}
-	
+
 	__world_read_header(world);
 
 out:
 	return ret;
 }
 
-int world_new(TALLOC_CTX *parent_context, const char *world_path, 
+int world_new(TALLOC_CTX *parent_context, const char *world_path,
 			  struct world **out_world)
 {
 	int ret = 0;
@@ -198,6 +236,7 @@ int world_new(TALLOC_CTX *parent_context, const char *world_path,
 
 	*out_world = talloc_steal(parent_context, world);
 	ret = 0;
+
 failed:
 	talloc_free(tempContext);
 	return ret;
