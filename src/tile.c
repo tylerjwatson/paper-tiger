@@ -110,6 +110,29 @@ void tile_set_lava(struct tile *tile, bool lava)
 	}
 }
 
-void tile_set_wire(struct tile *tile, bool tile_val);
-void tile_set_wire_2(struct tile *tile, bool tile2);
-void tile_set_wire_3(struct tile *tile, bool tile3);
+void tile_set_wire(struct tile *tile, bool tile_val)
+{
+	if (tile_val) {
+		tile->s_tile_header |= S_TILE_HEADER_WIRE;
+	} else {
+		tile->s_tile_header &= ~S_TILE_HEADER_WIRE;
+	}
+}
+
+void tile_set_wire_2(struct tile *tile, bool tile2)
+{
+	if (tile2) {
+		tile->s_tile_header |= S_TILE_HEADER_WIRE_2;
+	} else {
+		tile->s_tile_header &= ~S_TILE_HEADER_WIRE_2;
+	}
+}
+
+void tile_set_wire_3(struct tile *tile, bool tile3)
+{
+	if (tile3) {
+		tile->s_tile_header |= S_TILE_HEADER_WIRE_3;
+	} else {
+		tile->s_tile_header &= ~S_TILE_HEADER_WIRE_3;
+	}
+}
