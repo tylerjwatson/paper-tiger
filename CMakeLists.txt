@@ -12,7 +12,7 @@ include(FindTalloc)
 
 include_directories(${TALLOC_INCLUDE_DIRS})
 
-add_executable(upgraded-guacamole src/world.c src/binary_reader.c src/game.c src/main.c)
+add_executable(upgraded-guacamole src/world.c src/tile.c src/binary_reader.c src/game.c src/main.c)
 
 target_link_libraries(upgraded-guacamole ${TALLOC_LIBRARIES})
 

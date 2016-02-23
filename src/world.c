@@ -22,8 +22,10 @@
 #include <string.h>
 
 #include "world.h"
+#include "util.h"
 
 #define RELOGIC_MAGIC_NUMBER 27981915666277746
+
 
 static int __world_read_file_metadata(struct world *world)
 {
@@ -70,7 +72,7 @@ static int __world_read_file_header(struct world *world)
 	}
 
 	if (__world_read_file_metadata(world) < 0) {
-		printf("%s: world file metadata read failed.", __FUNCTION__);
+		_ERROR("%s: world file metadata read failed.", __FUNCTION__);
 	}
 
 	if (binary_reader_read_uint16(world->reader, &world->num_positions) < 0) {
@@ -83,7 +85,7 @@ static int __world_read_file_header(struct world *world)
 		if (binary_reader_read_int32(world->reader, &world->positions[i]) < 0) {
 			goto error;
 		}
-		printf("%s: world->positions[%d] = %d\n", __FUNCTION__, i, world->positions[i]);
+		_ERROR("%s: world->positions[%d] = %d\n", __FUNCTION__, i, world->positions[i]);
 	}
 
 	if (binary_reader_read_uint16(world->reader, &world->num_important) < 0) {
@@ -117,7 +119,7 @@ static int __world_read_file_header(struct world *world)
 	return 0;
 
 error:
-	printf("Reading the world file failed: %d\n", -1);
+	_ERROR("Reading the world file failed: %d\n", -1);
 	return -1;
 }
 
@@ -126,7 +128,7 @@ static int __world_read_anglers(struct world *world)
 	int ret = -1;
 
 	if (binary_reader_read_int32(world->reader, &world->num_anglers) < 0) {
-		printf("%s: binary reader error reading world->num_anglers\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->num_anglers\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
@@ -142,7 +144,7 @@ static int __world_read_anglers(struct world *world)
 		}
 
 		if ((world->anglers[i] = talloc_strdup(world->anglers, angler_finished)) == NULL) {
-			printf("%s: out of memory copying angler text from world file.\n", __FUNCTION__);
+			_ERROR("%s: out of memory copying angler text from world file.\n", __FUNCTION__);
 			free(angler_finished);
 			ret = -ENOMEM;
 			goto out;
@@ -160,20 +162,20 @@ static int __world_read_npc_killcounts(struct world *world)
 	int ret = -1;
 
 	if (binary_reader_read_int16(world->reader, &world->num_kill_counts) < 0) {
-		printf("%s: binary reader error reading world->num_kill_counts\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->num_kill_counts\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 
 	if ((world->kill_counts = talloc_array(world, int32_t, (uint32_t)world->num_kill_counts)) == NULL) {
-		printf("%s: out of memory allocating world->kill_counts\n", __FUNCTION__);
+		_ERROR("%s: out of memory allocating world->kill_counts\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 
 	for (int i = 0; i < world->num_kill_counts; i++) {
 		if (binary_reader_read_int32(world->reader, &world->kill_counts[i]) < 0) {
-			printf("%s: binary reader error reading world->num_kill_counts\n", __FUNCTION__);
+			_ERROR("%s: binary reader error reading world->num_kill_counts\n", __FUNCTION__);
 			ret = -1;
 			goto out;
 		}
@@ -182,6 +184,157 @@ static int __world_read_npc_killcounts(struct world *world)
 	ret = 0;
 out:
 	return ret;
+}
+
+static int __world_load_tile(struct world *world, uint32_t x, uint32_t y)
+{
+	int ret = -1;
+	int liquid_type = 0;
+	uint8_t tile_flags_1, tile_wire_flags = 0, tile_colour_flags = 0;
+	struct tile *tile = world_tile_at(world, x, y);
+
+	/*
+	 * num6 = tile_flags_1
+	 * num5 = tile_wire_flags
+	 * num4 = tile_colour_flags
+	 */
+
+	if (binary_reader_read_byte(world->reader, &tile_flags_1) < 0) {
+		_ERROR("%s: binary reader error reading tile_flags_1", __FUNCTION__);
+		ret = -1;
+		goto out;
+	}
+
+	if ((tile_flags_1 & 1) == 1) {
+		if (binary_reader_read_byte(world->reader, &tile_wire_flags) < 0) {
+			_ERROR("%s: binary reader error reading tile_wire_flags", __FUNCTION__);
+			ret = -1;
+			goto out;
+		}
+
+		if ((tile_wire_flags & 1) == 1) {
+			if (binary_reader_read_byte(world->reader, &tile_colour_flags) < 0) {
+				_ERROR("%s: binary reader error reading tile_colour_flags", __FUNCTION__);
+				ret = -1;
+				goto out;
+			}
+
+		}
+	}
+
+	if ((tile_flags_1 & WORLD_FILE_TILE_ACTIVE) == WORLD_FILE_TILE_ACTIVE) {
+		tile_set_active(tile, true);
+
+		if ((tile_flags_1 & WORLD_FILE_TYPE_BYTE) == WORLD_FILE_TYPE_BYTE) {
+			ret = binary_reader_read_byte(world->reader, (uint8_t *)&tile->type);
+		} else {
+			ret = binary_reader_read_uint16(world->reader, &tile->type);
+		}
+
+		if (ret < 0) {
+			goto out;
+		}
+
+		if (world->important[tile->type] == false) {
+			tile->frame_x = tile->frame_y = -1;
+		} else {
+			if (binary_reader_read_int16(world->reader, &tile->frame_x) < 0
+					|| binary_reader_read_int16(world->reader, &tile->frame_y) < 0) {
+				_ERROR("%s: binary reader error reading tile->frame_[xy]", __FUNCTION__);
+				ret = -1;
+				goto out;
+			}
+
+			if (tile->type == 144) {
+				tile->frame_y = 0;
+			}
+		}
+
+		/*
+		 * ??????
+		 */
+		if ((tile_colour_flags & WORLD_FILE_TILE_COLOUR) == WORLD_FILE_TILE_COLOUR) {
+			uint8_t colour;
+
+			if (binary_reader_read_byte(world->reader, &colour) < 0) {
+				_ERROR("%s: binary reader error reading tile colour", __FUNCTION__);
+				ret = -1;
+				goto out;
+			}
+
+			tile_set_colour(tile, colour);
+		}
+	}
+
+	if ((tile_flags_1 & WORLD_FILE_TILE_IS_WALL) == WORLD_FILE_TILE_IS_WALL) {
+		if (binary_reader_read_byte(world->reader, &tile->wall) < 0) {
+			_ERROR("%s: binary reader error reading tile->wall", __FUNCTION__);
+			ret = -1;
+			goto out;
+		}
+
+		if ((tile_colour_flags & WORLD_FILE_WALL_COLOUR) == WORLD_FILE_WALL_COLOUR) {
+			uint8_t wall_colour;
+
+			if (binary_reader_read_byte(world->reader, &wall_colour) < 0) {
+				_ERROR("%s: binary reader error reading tile->wall_colour", __FUNCTION__);
+				ret = -1;
+				goto out;
+			}
+
+			tile_set_wall_colour(tile, wall_colour);
+		}
+	}
+
+	if ((liquid_type = (tile_flags_1 & 24) >> 3) != 0) {
+		if (binary_reader_read_byte(world->reader, &tile->liquid) < 0) {
+			_ERROR("%s: binary reader error reading tile->liquid", __FUNCTION__);
+			ret = -1;
+			goto out;
+		}
+
+		if (liquid_type != 2) {
+			tile_set_honey(tile, true);
+		} else {
+			tile_set_lava(tile, true);
+		}
+	}
+
+ 	if (tile_wire_flags > 1) {
+		tile_set_wire(tile, (tile_wire_flags & TILE_WIRE_1) == TILE_WIRE_1);
+		tile_set_wire_2(tile, (tile_wire_flags & TILE_WIRE_2) == TILE_WIRE_2);
+		tile_set_wire_3(tile, (tile_wire_flags & TILE_WIRE_3) == TILE_WIRE_3);
+	}
+
+out:
+	return ret;
+}
+
+static int __world_read_tile(struct world *world)
+{
+	int ret = 0;
+
+
+	if (fseek(world->reader->fp, world->positions[1], SEEK_SET) < 0) {
+		_ERROR("%s: could not seek to position %d in world file.\n", __FUNCTION__, world->positions[1]);
+		ret = -1;
+		goto out;
+	}
+
+	if (tile_heap_new(world, (uint32_t)world->max_tiles_x, (uint32_t)world->max_tiles_y, &world->tiles) < 0) {
+		_ERROR("%s: cannot allocate the tile heap.\n", __FUNCTION__);
+		ret = -1;
+		goto out;
+	}
+
+	for(int x = 0; x < world->max_tiles_x; x++) {
+		for(int y = 0; y < world->max_tiles_x; y++) {
+
+		}
+	}
+
+out:
+	return ret;	
 }
 
 static int __world_read_header(struct world *world)
@@ -196,59 +349,59 @@ static int __world_read_header(struct world *world)
 	fseek(world->reader->fp, world->positions[0], SEEK_SET);
 
 	if (binary_reader_read_string(world->reader, &world_name) < 0) {
-		printf("%s: binary reader error reading world->world_name\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->world_name\n", __FUNCTION__);
 		return -1;
 	}
 
 	if ((world->world_name = talloc_strdup(world, world_name)) == NULL) {
-		printf("%s: out of memory copying %d bytes for world name.\n", __FUNCTION__, (int)strlen(world_name));
+		_ERROR("%s: out of memory copying %d bytes for world name.\n", __FUNCTION__, (int)strlen(world_name));
 
 		ret = -ENOMEM;
 		goto out;
 	}
 
 	if (binary_reader_read_int32(world->reader, &world->worldID) < 0) {
-		printf("%s: binary reader error reading world->worldID\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->worldID\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 
 	if (binary_reader_read_single(world->reader, &world->left_world) < 0) {
-		printf("%s: binary reader error reading world->left_world\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->left_world\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 
 	if (binary_reader_read_single(world->reader, &world->right_world) < 0) {
-		printf("%s: binary reader error reading world->right_world\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->right_world\n", __FUNCTION__);
 
 		ret = -1;
 		goto out;
 	}
 
 	if (binary_reader_read_single(world->reader, &world->top_world) < 0) {
-		printf("%s: binary reader error reading world->top_world\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->top_world\n", __FUNCTION__);
 
 		ret = -1;
 		goto out;
 	}
 
 	if (binary_reader_read_single(world->reader, &world->bottom_world) < 0) {
-		printf("%s: binary reader error reading world->bottom_world\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->bottom_world\n", __FUNCTION__);
 
 		ret = -1;
 		goto out;
 	}
 
 	if (binary_reader_read_int32(world->reader, &world->max_tiles_x) < 0) {
-		printf("%s: binary reader error reading world->max_tiles_x\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->max_tiles_x\n", __FUNCTION__);
 
 		ret = -1;
 		goto out;
 	}
 
 	if (binary_reader_read_int32(world->reader, &world->max_tiles_y) < 0) {
-		printf("%s: binary reader error reading world->max_tiles_y\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->max_tiles_y\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
@@ -257,7 +410,7 @@ static int __world_read_header(struct world *world)
 		world->expert_mode = false;
 	} else {
 		if (binary_reader_read_byte(world->reader, (uint8_t *)&world->expert_mode) < 0) {
-			printf("%s: binary reader error reading world->expert_mode\n", __FUNCTION__);
+			_ERROR("%s: binary reader error reading world->expert_mode\n", __FUNCTION__);
 
 			ret = -1;
 			goto out;
@@ -266,14 +419,14 @@ static int __world_read_header(struct world *world)
 
 	if (world->version >= 141) {
 		if (binary_reader_read_int64(world->reader, &world->creation_time) < 0) {
-			printf("%s: binary reader error reading world->creation_time\n", __FUNCTION__);
+			_ERROR("%s: binary reader error reading world->creation_time\n", __FUNCTION__);
 			ret = -1;
 			goto out;
 		}
 	}
 
 	if (binary_reader_read_byte(world->reader, (uint8_t *)&world->moon_type) < 0) {
-		printf("%s: binary reader error reading world->moon_type\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->moon_type\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
@@ -281,7 +434,7 @@ static int __world_read_header(struct world *world)
 	if (binary_reader_read_int32(world->reader, &world->tree_x[0]) < 0
 			|| binary_reader_read_int32(world->reader, &world->tree_x[1]) < 0
 			|| binary_reader_read_int32(world->reader, &world->tree_x[2]) < 0) {
-		printf("%s: binary reader error reading world->tree_x\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->tree_x\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
@@ -290,7 +443,7 @@ static int __world_read_header(struct world *world)
 			|| binary_reader_read_int32(world->reader, &world->tree_style[1]) < 0
 			|| binary_reader_read_int32(world->reader, &world->tree_style[2]) < 0
 			|| binary_reader_read_int32(world->reader, &world->tree_style[3]) < 0) {
-		printf("%s: binary reader error reading world->tree_style\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->tree_style\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
@@ -298,7 +451,7 @@ static int __world_read_header(struct world *world)
 	if (binary_reader_read_int32(world->reader, &world->cave_back_x[0]) < 0
 		|| binary_reader_read_int32(world->reader, &world->cave_back_x[1]) < 0
 		|| binary_reader_read_int32(world->reader, &world->cave_back_x[2]) < 0) {
-		printf("%s: binary reader error reading world->cave_back_x\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->cave_back_x\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
@@ -307,7 +460,7 @@ static int __world_read_header(struct world *world)
 		|| binary_reader_read_int32(world->reader, &world->cave_back_style[1]) < 0
 		|| binary_reader_read_int32(world->reader, &world->cave_back_style[2]) < 0
 		|| binary_reader_read_int32(world->reader, &world->cave_back_style[3]) < 0) {
-		printf("%s: binary reader error reading world->cave_back_style\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->cave_back_style\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
@@ -315,7 +468,7 @@ static int __world_read_header(struct world *world)
 	if (binary_reader_read_int32(world->reader, &world->ice_back_style) < 0
 			|| binary_reader_read_int32(world->reader, &world->jungle_back_style) < 0
 			|| binary_reader_read_int32(world->reader, &world->hell_back_style) < 0) {
-		printf("%s: binary reader error reading world->back_styles\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->back_styles\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
@@ -327,61 +480,61 @@ static int __world_read_header(struct world *world)
 	}
 
 	if (binary_reader_read_double(world->reader, &world->world_surface) < 0) {
-		printf("%s: binary reader error reading world->world_surface\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->world_surface\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 
 	if (binary_reader_read_double(world->reader, &world->rock_layer) < 0) {
-		printf("%s: binary reader error reading world->rock_layer\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->rock_layer\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 
 	if (binary_reader_read_double(world->reader, &world->temp_time) < 0) {
-		printf("%s: binary reader error reading world->temp_time\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->temp_time\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 
 	if (binary_reader_read_boolean(world->reader, &world->temp_day_time) < 0) {
-		printf("%s: binary reader error reading world->temp_day_time\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->temp_day_time\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 
 	if (binary_reader_read_int32(world->reader, &world->temp_moon_phase) < 0) {
-		printf("%s: binary reader error reading world->temp_moon_phase\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->temp_moon_phase\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 
 	if (binary_reader_read_boolean(world->reader, &world->temp_blood_moon) < 0) {
-		printf("%s: binary reader error reading world->temp_blood_moon\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->temp_blood_moon\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 
 	if (binary_reader_read_boolean(world->reader, &world->temp_eclipse) < 0) {
-		printf("%s: binary reader error reading world->temp_time\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->temp_time\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 
 	if (binary_reader_read_int32(world->reader, &world->dungeon.x) < 0
 			|| binary_reader_read_int32(world->reader, &world->dungeon.y) < 0) {
-		printf("%s: binary reader error reading world->dungeon\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->dungeon\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 
 	if (binary_reader_read_boolean(world->reader, &world->flags.crimson) < 0) {
-		printf("%s: binary reader error reading world->flags.crimson\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->flags.crimson\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 
-	printf("pos %li\n", ftell(world->reader->fp));
+	_ERROR("pos %li\n", ftell(world->reader->fp));
 
 	if (binary_reader_read_boolean(world->reader, &world->flags.downed_boss_1) < 0
 			|| binary_reader_read_boolean(world->reader, &world->flags.downed_boss_2) < 0
@@ -393,7 +546,7 @@ static int __world_read_header(struct world *world)
 			|| binary_reader_read_boolean(world->reader, &world->flags.downed_mech_any) < 0
 			|| binary_reader_read_boolean(world->reader, &world->flags.downed_plant) < 0
 			|| binary_reader_read_boolean(world->reader, &world->flags.downed_golem) < 0) {
-		printf("%s: binary reader error reading world->flags.downed_*\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->flags.downed_*\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
@@ -402,7 +555,7 @@ static int __world_read_header(struct world *world)
 
 	if (world->version >= 118) {
 		if (binary_reader_read_boolean(world->reader, &world->flags.downed_slime_king) < 0) {
-			printf("%s: binary reader error reading world->flags.downed_slime_king\n", __FUNCTION__);
+			_ERROR("%s: binary reader error reading world->flags.downed_slime_king\n", __FUNCTION__);
 			ret = -1;
 			goto out;
 		}
@@ -411,7 +564,7 @@ static int __world_read_header(struct world *world)
 	if (binary_reader_read_boolean(world->reader, &world->flags.saved_goblin) < 0
 			|| binary_reader_read_boolean(world->reader, &world->flags.saved_wizard) < 0
 			|| binary_reader_read_boolean(world->reader, &world->flags.saved_mech) < 0) {
-		printf("%s: binary reader error reading world->flags.saved_*\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->flags.saved_*\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
@@ -422,57 +575,57 @@ static int __world_read_header(struct world *world)
 			|| binary_reader_read_boolean(world->reader, &world->flags.downed_pirates) < 0
 			|| binary_reader_read_boolean(world->reader, &world->flags.shadow_orb_smashed) < 0
 			|| binary_reader_read_boolean(world->reader, &world->flags.spawn_meteor) < 0) {
-		printf("%s: binary reader error reading world->flags.downed_*\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->flags.downed_*\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 
 	if (binary_reader_read_byte(world->reader, &world->shadow_orb_count) < 0) {
-		printf("%s: binary reader error reading world->shadow_orb_count\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->shadow_orb_count\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 
 
 	if (binary_reader_read_int32(world->reader, &world->altar_count) < 0) {
-		printf("%s: binary reader error reading world->altar_count\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->altar_count\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 
 	if (binary_reader_read_boolean(world->reader, &world->flags.hard_mode) < 0) {
-		printf("%s: binary reader error reading world->flags.hard_mode\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->flags.hard_mode\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 
 	if (binary_reader_read_int32(world->reader, &world->invasion_delay) < 0) {
-		printf("%s: binary reader error reading world->invasion_delay\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->invasion_delay\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 
 	if (binary_reader_read_int32(world->reader, &world->invasion_size) < 0) {
-		printf("%s: binary reader error reading world->invasion_size\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->invasion_size\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 
 	if (binary_reader_read_int32(world->reader, &world->invasion_type) < 0) {
-		printf("%s: binary reader error reading world->invasion_type\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->invasion_type\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 
 	if (binary_reader_read_double(world->reader, &world->invasion_x) < 0) {
-		printf("%s: binary reader error reading world->invasion_x\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->invasion_x\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 
 	if (world->version >= 118) {
 		if (binary_reader_read_double(world->reader, &world->slime_rain_time) < 0) {
-			printf("%s: binary reader error reading world->slime_rain_time\n", __FUNCTION__);
+			_ERROR("%s: binary reader error reading world->slime_rain_time\n", __FUNCTION__);
 			ret = -1;
 			goto out;
 		}
@@ -480,26 +633,26 @@ static int __world_read_header(struct world *world)
 
 	if (world->version >= 113) {
 		if (binary_reader_read_byte(world->reader, &world->sundial_cooldown) < 0) {
-			printf("%s: binary reader error reading world->sundial_cooldown\n", __FUNCTION__);
+			_ERROR("%s: binary reader error reading world->sundial_cooldown\n", __FUNCTION__);
 			ret = -1;
 			goto out;
 		}
 	}
 
 	if (binary_reader_read_boolean(world->reader, &world->flags.raining) < 0) {
-		printf("%s: binary reader error reading world->flags.hard_mode\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->flags.hard_mode\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 
 	if (binary_reader_read_int32(world->reader, &world->rain_time) < 0) {
-		printf("%s: binary reader error reading world->rain_time\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->rain_time\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 
 	if (binary_reader_read_single(world->reader, &world->max_rain) < 0) {
-		printf("%s: binary reader error reading world->max_rain\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->max_rain\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
@@ -507,7 +660,7 @@ static int __world_read_header(struct world *world)
 	if (binary_reader_read_int32(world->reader, &world->ore_tiers[0]) < 0
 			|| binary_reader_read_int32(world->reader, &world->ore_tiers[1]) < 0
 			|| binary_reader_read_int32(world->reader, &world->ore_tiers[2]) < 0) {
-		printf("%s: binary reader error reading world->ore_tiers\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->ore_tiers\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
@@ -520,25 +673,25 @@ static int __world_read_header(struct world *world)
 			|| binary_reader_read_byte(world->reader, &world->bg[5]) < 0
 			|| binary_reader_read_byte(world->reader, &world->bg[6]) < 0
 			|| binary_reader_read_byte(world->reader, &world->bg[7]) < 0) {
-		printf("%s: binary reader error reading world->bg\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->bg\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 
 	if (binary_reader_read_single(world->reader, &world->cloud_bg_active) < 0) {
-		printf("%s: binary reader error reading world->rain_time\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->rain_time\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 
 	if (binary_reader_read_int16(world->reader, &world->num_clouds) < 0) {
-		printf("%s: binary reader error reading world->num_clouds\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->num_clouds\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 
 	if (binary_reader_read_single(world->reader, &world->wind_speed) < 0) {
-		printf("%s: binary reader error reading world->wind_speed\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->wind_speed\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
@@ -556,7 +709,7 @@ static int __world_read_header(struct world *world)
 	}
 
 	if (binary_reader_read_boolean(world->reader, &world->flags.saved_angler) < 0) {
-		printf("%s: binary reader error reading world->flags.saved_angler\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->flags.saved_angler\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
@@ -567,7 +720,7 @@ static int __world_read_header(struct world *world)
 	}
 
 	if (binary_reader_read_int32(world->reader, &world->angler_quest) < 0) {
-		printf("%s: binary reader error reading world->angler_quest\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->angler_quest\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
@@ -578,14 +731,14 @@ static int __world_read_header(struct world *world)
 	}
 
 	if (binary_reader_read_boolean(world->reader, &world->flags.saved_stylist) < 0) {
-		printf("%s: binary reader error reading world->flags.saved_stylist\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->flags.saved_stylist\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 
 	if (world->version >= 129) {
 		if (binary_reader_read_boolean(world->reader, &world->flags.saved_tax_collector) < 0) {
-			printf("%s: binary reader error reading world->flags.saved_tax_collector\n", __FUNCTION__);
+			_ERROR("%s: binary reader error reading world->flags.saved_tax_collector\n", __FUNCTION__);
 			ret = -1;
 			goto out;
 		}
@@ -593,7 +746,7 @@ static int __world_read_header(struct world *world)
 
 	if (world->version >= 107) {
 		if (binary_reader_read_int32(world->reader, &world->invasion_size_start) < 0) {
-			printf("%s: binary reader error reading world->invasion_size_start\n", __FUNCTION__);
+			_ERROR("%s: binary reader error reading world->invasion_size_start\n", __FUNCTION__);
 			ret = -1;
 			goto out;
 		}
@@ -601,7 +754,7 @@ static int __world_read_header(struct world *world)
 
 	if (world->version >= 108) {
 		if (binary_reader_read_int32(world->reader, &world->cultist_delay) < 0) {
-			printf("%s: binary reader error reading world->cultist_delay\n", __FUNCTION__);
+			_ERROR("%s: binary reader error reading world->cultist_delay\n", __FUNCTION__);
 			ret = -1;
 			goto out;
 		}
@@ -620,7 +773,7 @@ static int __world_read_header(struct world *world)
 	}
 
 	if (binary_reader_read_boolean(world->reader, &world->flags.fast_forward_time) < 0) {
-		printf("%s: binary reader error reading world->flags.fast_forward_time\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->flags.fast_forward_time\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
@@ -639,7 +792,7 @@ static int __world_read_header(struct world *world)
 		|| binary_reader_read_boolean(world->reader, &world->flags.downed_christmas_ice_queen) < 0
 		|| binary_reader_read_boolean(world->reader, &world->flags.downed_christmas_santank) < 0
 		|| binary_reader_read_boolean(world->reader, &world->flags.downed_christmas_tree) < 0) {
-		printf("%s: binary reader error reading world->flags.downed_*\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->flags.downed_*\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
@@ -658,7 +811,7 @@ static int __world_read_header(struct world *world)
 			|| binary_reader_read_boolean(world->reader, &world->flags.active_tower_nebula) < 0
 			|| binary_reader_read_boolean(world->reader, &world->flags.active_tower_stardust) < 0
 			|| binary_reader_read_boolean(world->reader, &world->flags.lunar_apocalypse_up) < 0) {
-		printf("%s: binary reader error reading world->flags.downed_fishron\n", __FUNCTION__);
+		_ERROR("%s: binary reader error reading world->flags.downed_fishron\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
@@ -675,17 +828,17 @@ int world_init(struct world *world)
 	int ret = 0;
 
 	if ((ret = binary_reader_open(world->reader)) < 0) {
-		printf("Opening world file failed: %d\n", ret);
+		_ERROR("Opening world file failed: %d\n", ret);
 		ret = -1;
 		goto out;
 	}
 
 	if ((ret = __world_read_file_header(world)) < 0) {
-		printf("Reading world file headers failed: %d\n", ret);
+		_ERROR("Reading world file headers failed: %d\n", ret);
 	}
 
 	if ((ret = __world_read_header(world)) < 0) {
-		printf("Reading world headers failed: %d\n", ret);
+		_ERROR("Reading world headers failed: %d\n", ret);
 	}
 
 out:
@@ -712,7 +865,7 @@ int world_new(TALLOC_CTX *parent_context, const char *world_path,
 	}
 
 	if (binary_reader_new(world, world->world_path, &world->reader) < 0) {
-		printf("world - could not allocate a binary reader for the world.");
+		_ERROR("world - could not allocate a binary reader for the world.");
 		ret = -ENOMEM;
 		goto failed;
 	}
@@ -723,4 +876,10 @@ int world_new(TALLOC_CTX *parent_context, const char *world_path,
 failed:
 	talloc_free(tempContext);
 	return ret;
+}
+
+struct tile *world_tile_at(struct world *world, const uint32_t x, const uint32_t y)
+{
+	size_t offset = (world->max_tiles_y * x + y) * sizeof(struct tile);
+	return world->tiles + offset;
 }

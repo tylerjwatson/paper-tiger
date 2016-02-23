@@ -26,6 +26,7 @@
 #include <errno.h>
 #include <stdint.h>
 
+#include "tile.h"
 #include "binary_reader.h"
 
 struct world_flags {
@@ -164,11 +165,14 @@ struct world {
 
 	bool fast_forward_time;
 
+	struct tile *tiles;
+
 	struct binary_reader_context *reader;
 	int _is_loaded;					/* Indicates if world_init has completed */
 };
 
 int world_new(TALLOC_CTX *parent, const char *world_path, struct world **out_world);
 int world_init(struct world *world);
+struct tile *world_tile_at(struct world *world, const uint32_t x, const uint32_t y);
 
 #endif /* _HAVE_WORLD_H */

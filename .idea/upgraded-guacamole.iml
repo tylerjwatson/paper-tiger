@@ -5,8 +5,10 @@
       <sourceFolder url="file://$MODULE_DIR$/src/main.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/game.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/binary_reader.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/tile.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/world.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/game.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/tile.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/world.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/binary_reader.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/CMakeModules/FindTalloc.cmake" isTestSource="false" />
