@@ -34,9 +34,13 @@ enum {
 };
 
 enum {
-	S_TILE_HEADER_ACTIVE = 1 << 5,
+	B_TILE_HEADER_HONEY = 1 << 6
+};
+
+enum {
 	S_TILE_HEADER_LAVA = 1 << 4,
-	S_TILE_HEADER_HONEY = 1 << 6,
+	S_TILE_HEADER_ACTIVE = 1 << 5,
+	S_TILE_HEADER_INACTIVE = 1 << 6,
 	S_TILE_HEADER_WIRE = 1 << 7,
 	S_TILE_HEADER_WIRE_2 = 1 << 8,
 	S_TILE_HEADER_WIRE_3 = 1 << 9,
@@ -51,6 +55,8 @@ enum {
 };
 
 enum {
+	WORLD_FILE_TILE_COLOUR_ACTUATOR = 1 << 1,
+	WORLD_FILE_TILE_COLOUR_INACTIVE = 1 << 2,
 	WORLD_FILE_TILE_COLOUR = 1 << 3,
 	WORLD_FILE_WALL_COLOUR = 1 << 4
 };
@@ -86,5 +92,9 @@ void tile_set_lava(struct tile *tile, bool lava);
 void tile_set_wire(struct tile *tile, bool tile_val);
 void tile_set_wire_2(struct tile *tile, bool tile2);
 void tile_set_wire_3(struct tile *tile, bool tile3);
+
+void tile_set_inactive(struct tile *tile, bool val);
+void tile_set_actuator(struct tile *tile, bool val);
+
 
 #endif

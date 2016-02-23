@@ -306,6 +306,27 @@ static int __world_load_tile(struct world *world, uint32_t x, uint32_t y)
 		tile_set_wire_3(tile, (tile_wire_flags & TILE_WIRE_3) == TILE_WIRE_3);
 	}
 
+	//TODO: tile slope
+
+	tile_set_actuator(tile, (tile_colour_flags & WORLD_FILE_TILE_COLOUR_ACTUATOR) == WORLD_FILE_TILE_COLOUR_ACTUATOR);
+	tile_set_inactive(tile, (tile_colour_flags & WORLD_FILE_TILE_COLOUR_INACTIVE) == WORLD_FILE_TILE_COLOUR_INACTIVE);
+
+	int32_t i_dono_lol;
+
+	i_dono_lol = (tile_flags_1 & 192) >> 6;
+
+	if (i_dono_lol != 1) {
+		if (binary_reader_read_int16(world->reader, &i_dono_lol) < 0) {
+			_ERROR("%s: binary error reading i dunno from tile", __FUNCTION__);
+		}
+	} else {
+		if (binary_reader_read_byte(world->reader, (uint8_t *)&i_dono_lol) < 0) {
+			_ERROR("%s: binary error reading i dunno from tile", __FUNCTION__);
+		}
+	}
+
+	//TODO: some WorldGen.TileCounts bullshit
+
 out:
 	return ret;
 }
@@ -327,9 +348,13 @@ static int __world_read_tile(struct world *world)
 		goto out;
 	}
 
-	for(int x = 0; x < world->max_tiles_x; x++) {
-		for(int y = 0; y < world->max_tiles_x; y++) {
-
+	for(unsigned int x = 0; x < world->max_tiles_x; x++) {
+		for(unsigned int y = 0; y < world->max_tiles_x; y++) {
+			if (__world_load_tile(world, x, y) < 0) {
+				_ERROR("%s: tile error in %d,%d.\n", __FUNCTION__, x, y);
+				ret = -1;
+				goto out;
+			}
 		}
 	}
 
@@ -835,9 +860,15 @@ int world_init(struct world *world)
 
 	if ((ret = __world_read_file_header(world)) < 0) {
 		_ERROR("Reading world file headers failed: %d\n", ret);
+		goto out;
 	}
 
 	if ((ret = __world_read_header(world)) < 0) {
+		_ERROR("Reading world headers failed: %d\n", ret);
+		goto out;
+	}
+
+	if ((ret = __world_read_tile(world)) < 0) {
 		_ERROR("Reading world headers failed: %d\n", ret);
 	}
 

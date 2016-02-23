@@ -22,11 +22,11 @@
 #include "world.h"
 #include "util.h"
 
-int tile_heap_new(TALLOC_CTX *context, const uint32_t size_x, const uint32_t size_y, struct tile **out_tiles)
+int tile_heap_new(TALLOC_CTX *context, const uint32_t size_x, const uint32_t size_y, struct tile ***out_tiles)
 {
 	 TALLOC_CTX *temp_context;
 	 int ret;
-	 struct tile *tile_heap;
+	 struct tile **tile_heap;
 	 uint32_t tile_length = (size_x + 1) * (size_y + 1);
  
 	 if ((temp_context = talloc_new(NULL)) == NULL) {
@@ -35,8 +35,8 @@ int tile_heap_new(TALLOC_CTX *context, const uint32_t size_x, const uint32_t siz
 		goto out;
 	 }
 
-	 if ((tile_heap = talloc_array(temp_context, struct tile, tile_length)) == NULL) {
-		_ERROR("%s: Could not allocate tile heap of size %ld", __FUNCTION__, sizeof(struct tile) * tile_length);
+	 if ((tile_heap = talloc_array(temp_context, struct tile *, tile_length)) == NULL) {
+		_ERROR("%s: Could not allocate tile heap of size %ld\n", __FUNCTION__, sizeof(struct tile) * tile_length);
 		ret = -1;
 		goto out;
 	 }
@@ -84,13 +84,13 @@ void tile_set_wall_colour(struct tile *tile, uint8_t colour)
 
 bool tile_honey(struct tile *tile)
 {
-	return (tile->b_tile_header & S_TILE_HEADER_HONEY) == S_TILE_HEADER_HONEY;
+	return (tile->b_tile_header & B_TILE_HEADER_HONEY) == B_TILE_HEADER_HONEY;
 }
 
 void tile_set_honey(struct tile *tile, bool honey)
 {
 	if (honey) {
-		tile->b_tile_header &= (159 | S_TILE_HEADER_HONEY);
+		tile->b_tile_header &= (159 | B_TILE_HEADER_HONEY);
 	} else {
 		tile->b_tile_header &= 191;
 	}
@@ -104,7 +104,7 @@ bool tile_lava(struct tile *tile)
 void tile_set_lava(struct tile *tile, bool lava)
 {
 	if (lava) {
-		tile->b_tile_header &= (159 | S_TILE_HEADER_HONEY);
+		tile->b_tile_header &= (159 | B_TILE_HEADER_HONEY);
 	} else {
 		tile->b_tile_header &= 223;
 	}
@@ -134,5 +134,23 @@ void tile_set_wire_3(struct tile *tile, bool tile3)
 		tile->s_tile_header |= S_TILE_HEADER_WIRE_3;
 	} else {
 		tile->s_tile_header &= ~S_TILE_HEADER_WIRE_3;
+	}
+}
+
+void tile_set_actuator(struct tile *tile, bool val)
+{
+	if (val) {
+		tile->s_tile_header |= S_TILE_ACTUATOR;
+	} else {
+		tile->s_tile_header &= ~S_TILE_ACTUATOR;
+	}
+}
+
+void tile_set_inactive(struct tile *tile, bool val)
+{
+	if (val) {
+		tile->s_tile_header |= S_TILE_ACTUATOR;
+	} else {
+		tile->s_tile_header &= 65471;
 	}
 }
