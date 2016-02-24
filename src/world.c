@@ -300,7 +300,7 @@ static int __world_load_tile(struct world *world, uint32_t x, uint32_t y)
 		}
 	}
 
- 	if (tile_wire_flags > 1) {
+	if (tile_wire_flags > 1) {
 		tile_set_wire(tile, (tile_wire_flags & TILE_WIRE_1) == TILE_WIRE_1);
 		tile_set_wire_2(tile, (tile_wire_flags & TILE_WIRE_2) == TILE_WIRE_2);
 		tile_set_wire_3(tile, (tile_wire_flags & TILE_WIRE_3) == TILE_WIRE_3);

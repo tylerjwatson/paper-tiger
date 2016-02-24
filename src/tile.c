@@ -22,11 +22,11 @@
 #include "world.h"
 #include "util.h"
 
-int tile_heap_new(TALLOC_CTX *context, const uint32_t size_x, const uint32_t size_y, struct tile ***out_tiles)
+int tile_heap_new(TALLOC_CTX *context, const uint32_t size_x, const uint32_t size_y, struct tile **out_tiles)
 {
 	 TALLOC_CTX *temp_context;
 	 int ret;
-	 struct tile **tile_heap;
+	 struct tile *tile_heap;
 	 uint32_t tile_length = (size_x + 1) * (size_y + 1);
  
 	 if ((temp_context = talloc_new(NULL)) == NULL) {
@@ -35,7 +35,7 @@ int tile_heap_new(TALLOC_CTX *context, const uint32_t size_x, const uint32_t siz
 		goto out;
 	 }
 
-	 if ((tile_heap = talloc_array(temp_context, struct tile *, tile_length)) == NULL) {
+	 if ((tile_heap = talloc_array(temp_context, struct tile, tile_length)) == NULL) {
 		_ERROR("%s: Could not allocate tile heap of size %ld\n", __FUNCTION__, sizeof(struct tile) * tile_length);
 		ret = -1;
 		goto out;
