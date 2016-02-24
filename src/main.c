@@ -18,7 +18,7 @@
  * along with upgraded-guacamole.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <talloc.h>
+#include "ccan/talloc/talloc.h"
 #include <errno.h>
 #include "unistd.h"
 

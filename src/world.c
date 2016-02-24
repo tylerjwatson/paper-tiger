@@ -327,6 +327,7 @@ static int __world_load_tile(struct world *world, uint32_t x, uint32_t y)
 
 	//TODO: some WorldGen.TileCounts bullshit
 
+	ret = 0;
 out:
 	return ret;
 }

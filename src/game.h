@@ -22,7 +22,7 @@
 #define _HAVE_GAME_H
 
 #include <errno.h>
-#include <talloc.h>
+#include "ccan/talloc/talloc.h"
 
 struct game_context {
   

@@ -22,9 +22,11 @@
 #ifndef _HAVE_TILE_H
 #define _HAVE_TILE_H
 
-#include <talloc.h>
+#include "ccan/talloc/talloc.h"
 #include <stdint.h>
 #include "binary_reader.h"
+
+#define TILE_SECTION_WIDTH 100
 
 enum {
 	WORLD_FILE_TILE_HAS_FLAGS = 1,

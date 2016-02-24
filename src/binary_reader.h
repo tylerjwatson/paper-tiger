@@ -22,7 +22,7 @@
 #define HAVE_BINARY_READER_H
 
 #include <stdbool.h>
-#include <talloc.h>
+#include "ccan/talloc/talloc.h"
 #include <stdint.h>
 
 struct binary_reader_context {

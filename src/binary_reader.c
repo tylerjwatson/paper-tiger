@@ -55,10 +55,10 @@ static int __read_7_bit_int(struct binary_reader_context *context, int32_t *out_
 	return 0;
 }
 
-static int __binary_reader_destructor(TALLOC_CTX *talloc_context)
+static int __binary_reader_destructor(struct binary_reader_context *talloc_context)
 {
-	struct binary_reader_context *context = talloc_get_type_abort(talloc_context, struct binary_reader_context);
-	binary_reader_close(context);
+	//struct binary_reader_context *context = talloc_get_type_abort(talloc_context, struct binary_reader_context);
+	binary_reader_close(talloc_context);
 	return 0;
 }
 

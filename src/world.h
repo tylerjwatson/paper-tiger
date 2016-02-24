@@ -21,7 +21,7 @@
 #ifndef _HAVE_WORLD_H
 #define _HAVE_WORLD_H
 
-#include <talloc.h>
+#include "ccan/talloc/talloc.h"
 #include <stdbool.h>
 #include <errno.h>
 #include <stdint.h>
@@ -165,7 +165,7 @@ struct world {
 
 	bool fast_forward_time;
 
-	struct tile **tiles;
+	struct tile *tiles;
 
 	struct binary_reader_context *reader;
 	int _is_loaded;					/* Indicates if world_init has completed */
