@@ -72,6 +72,8 @@ int main(int argc, char **argv)
 	printf("world->max_tiles_x = %d\n", world->max_tiles_x);
 	printf("world->max_tiles_y = %d\n", world->max_tiles_y);
 
+//	talloc_report_full(world, stderr);
+
 	talloc_free(world);
 out:
 	return ret;

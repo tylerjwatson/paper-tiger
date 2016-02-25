@@ -32,7 +32,7 @@ enum {
 	WORLD_FILE_TILE_HAS_FLAGS = 1,
 	WORLD_FILE_TILE_ACTIVE = 1 << 1,
 	WORLD_FILE_TILE_IS_WALL = 1 << 2,
-	WORLD_FILE_TYPE_BYTE = 1 << 5
+	WORLD_FILE_TYPE_SHORT = 1 << 5
 };
 
 enum {
@@ -61,6 +61,11 @@ enum {
 	WORLD_FILE_TILE_COLOUR_INACTIVE = 1 << 2,
 	WORLD_FILE_TILE_COLOUR = 1 << 3,
 	WORLD_FILE_WALL_COLOUR = 1 << 4
+};
+
+struct tile_row {
+	int x;
+	struct tile *tiles;
 };
 
 struct tile {
@@ -98,5 +103,6 @@ void tile_set_wire_3(struct tile *tile, bool tile3);
 void tile_set_inactive(struct tile *tile, bool val);
 void tile_set_actuator(struct tile *tile, bool val);
 
+void tile_copy(const struct tile *src, struct tile *dest);
 
 #endif

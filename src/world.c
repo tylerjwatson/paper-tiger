@@ -186,12 +186,17 @@ out:
 	return ret;
 }
 
-static int __world_load_tile(struct world *world, uint32_t x, uint32_t y)
+static int __world_load_tile(struct world *world, uint32_t x, uint32_t y, uint16_t *out_tile_copies)
 {
 	int ret = -1;
 	int liquid_type = 0;
-	uint8_t tile_flags_1, tile_wire_flags = 0, tile_colour_flags = 0;
+	uint16_t tile_copies = 0;
+	uint8_t tile_flags_1 = 0, tile_wire_flags = 0, tile_colour_flags = 0;
 	struct tile *tile = world_tile_at(world, x, y);
+
+	tile->type = 0;
+
+	//_ERROR("tile %d,%d @ pos %ld\n", x, y, ftell(world->reader->fp));
 
 	/*
 	 * num6 = tile_flags_1
@@ -225,10 +230,10 @@ static int __world_load_tile(struct world *world, uint32_t x, uint32_t y)
 	if ((tile_flags_1 & WORLD_FILE_TILE_ACTIVE) == WORLD_FILE_TILE_ACTIVE) {
 		tile_set_active(tile, true);
 
-		if ((tile_flags_1 & WORLD_FILE_TYPE_BYTE) == WORLD_FILE_TYPE_BYTE) {
-			ret = binary_reader_read_byte(world->reader, (uint8_t *)&tile->type);
-		} else {
+		if ((tile_flags_1 & WORLD_FILE_TYPE_SHORT) == WORLD_FILE_TYPE_SHORT) {
 			ret = binary_reader_read_uint16(world->reader, &tile->type);
+		} else {
+			ret = binary_reader_read_byte(world->reader, (uint8_t *)&tile->type);
 		}
 
 		if (ret < 0) {
@@ -311,22 +316,24 @@ static int __world_load_tile(struct world *world, uint32_t x, uint32_t y)
 	tile_set_actuator(tile, (tile_colour_flags & WORLD_FILE_TILE_COLOUR_ACTUATOR) == WORLD_FILE_TILE_COLOUR_ACTUATOR);
 	tile_set_inactive(tile, (tile_colour_flags & WORLD_FILE_TILE_COLOUR_INACTIVE) == WORLD_FILE_TILE_COLOUR_INACTIVE);
 
-	int32_t i_dono_lol;
+	tile_copies = (uint16_t)(tile_flags_1 & 192) >> 6;
 
-	i_dono_lol = (tile_flags_1 & 192) >> 6;
+	if (tile_copies > 0) {
+		if (tile_copies != 1) {
+			if (binary_reader_read_uint16(world->reader, &tile_copies) < 0) {
+				_ERROR("%s: binary error reading tile_copies from tile", __FUNCTION__);
+			}
+		} else {
+			if (binary_reader_read_byte(world->reader, (uint8_t *) &tile_copies) < 0) {
+				_ERROR("%s: binary error reading tile_copies from tile", __FUNCTION__);
+			}
 
-	if (i_dono_lol != 1) {
-		if (binary_reader_read_int16(world->reader, &i_dono_lol) < 0) {
-			_ERROR("%s: binary error reading i dunno from tile", __FUNCTION__);
-		}
-	} else {
-		if (binary_reader_read_byte(world->reader, (uint8_t *)&i_dono_lol) < 0) {
-			_ERROR("%s: binary error reading i dunno from tile", __FUNCTION__);
 		}
 	}
 
 	//TODO: some WorldGen.TileCounts bullshit
 
+	*out_tile_copies = tile_copies;
 	ret = 0;
 out:
 	return ret;
@@ -351,13 +358,25 @@ static int __world_read_tile(struct world *world)
 
 	for (unsigned int x = 0; x < world->max_tiles_x; x++) {
 		for (unsigned int y = 0; y < world->max_tiles_y; y++) {
-			if (__world_load_tile(world, x, y) < 0) {
+			uint16_t num_copies = 0;
+			const struct tile *src_tile;
+
+			if (__world_load_tile(world, x, y, &num_copies) < 0) {
 				_ERROR("%s: tile error in %d,%d.\n", __FUNCTION__, x, y);
-				//asm("int3");
 				ret = -1;
 				goto out;
 			}
+
+			src_tile = world_tile_at(world, x, y);
+
+			for(unsigned y_copy = 1; y_copy <= num_copies; y_copy++) {
+				tile_copy(src_tile, world_tile_at(world, x, y + y_copy));
+			}
+
+			y += num_copies;
 		}
+
+		//return -2;
 	}
 
 out:
@@ -420,15 +439,15 @@ static int __world_read_header(struct world *world)
 		goto out;
 	}
 
-	if (binary_reader_read_int32(world->reader, &world->max_tiles_x) < 0) {
-		_ERROR("%s: binary reader error reading world->max_tiles_x\n", __FUNCTION__);
-
+	if (binary_reader_read_int32(world->reader, &world->max_tiles_y) < 0) {
+		_ERROR("%s: binary reader error reading world->max_tiles_y\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 
-	if (binary_reader_read_int32(world->reader, &world->max_tiles_y) < 0) {
-		_ERROR("%s: binary reader error reading world->max_tiles_y\n", __FUNCTION__);
+	if (binary_reader_read_int32(world->reader, &world->max_tiles_x) < 0) {
+		_ERROR("%s: binary reader error reading world->max_tiles_x\n", __FUNCTION__);
+
 		ret = -1;
 		goto out;
 	}

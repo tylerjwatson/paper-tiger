@@ -23,6 +23,7 @@
 #include <string.h>
 
 #include "binary_reader.h"
+#include "util.h"
 
 static uint16_t le16_to_cpu(const uint8_t *buf)
 {
@@ -129,6 +130,13 @@ int binary_reader_read_byte(struct binary_reader_context *context, uint8_t *out_
 	 */
 
 	if (fread(&val, 1, 1, context->fp) != 1) {
+		if (feof(context->fp)) {
+			_ERROR("%s: EOF reading file %s at position %d\n", __FUNCTION__,
+				   context->file_path, ftell(context->fp));
+		} else if (ferror(context->fp)) {
+			_ERROR("%s: IO error reading file %s at position %d\n", __FUNCTION__,
+				   context->file_path, ftell(context->fp));
+		}
 		return -1;
 	}
 
