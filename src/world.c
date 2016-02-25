@@ -349,10 +349,11 @@ static int __world_read_tile(struct world *world)
 		goto out;
 	}
 
-	for(unsigned int x = 0; x < world->max_tiles_x; x++) {
-		for(unsigned int y = 0; y < world->max_tiles_x; y++) {
+	for (unsigned int x = 0; x < world->max_tiles_x; x++) {
+		for (unsigned int y = 0; y < world->max_tiles_y; y++) {
 			if (__world_load_tile(world, x, y) < 0) {
 				_ERROR("%s: tile error in %d,%d.\n", __FUNCTION__, x, y);
+				//asm("int3");
 				ret = -1;
 				goto out;
 			}
