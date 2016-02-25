@@ -6,7 +6,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/CMakeModules")
 
 include_directories("/usr/local/include" "${PROJECT_SOURCE_DIR}") 
 
-message(STATUS "${PROJECT_SOURCE_DIR}")
 
 # include(FindTalloc)
 
@@ -15,8 +14,8 @@ message(STATUS "${PROJECT_SOURCE_DIR}")
 add_library(talloc SHARED ccan/talloc/talloc.c)
 
 add_executable(upgraded-guacamole src/world.c src/tile.c src/binary_reader.c src/game.c src/main.c)
-
-target_link_libraries(upgraded-guacamole "${PROJECT_BINARY_DIR}/libtalloc.so")
+set_property(TARGET upgraded-guacamole PROPERTY C_STANDARD 11)
+target_link_libraries(upgraded-guacamole talloc)
 
 install(TARGETS upgraded-guacamole RUNTIME DESTINATION bin)
 

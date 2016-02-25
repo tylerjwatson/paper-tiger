@@ -7,3 +7,9 @@ cmake_install.cmake
 install_manifest.txt
 .DS_Store
 guac
+.vcxproj
+.vs/
+Win32/
+.filters
+.dir/
+.sdf
