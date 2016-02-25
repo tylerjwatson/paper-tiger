@@ -147,7 +147,7 @@ struct world {
 
 	float cloud_bg_active;
 
-	int32_t num_clouds;
+	int16_t num_clouds;
 
 	float wind_speed;
 
