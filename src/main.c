@@ -18,9 +18,9 @@
  * along with upgraded-guacamole.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ccan/talloc/talloc.h"
+#include "talloc/talloc.h"
 #include <errno.h>
-#include "unistd.h"
+#include "getopt.h"
 
 #include "game.h"
 #include "world.h"
@@ -56,7 +56,7 @@ int main(int argc, char **argv)
 	printf("Upgraded Guacamole\n");
 
 	parse_command_line(argc, argv);
-    
+	
 	if (world_new(NULL, options_worldPath, &world) < 0
 		|| world_init(world) < 0) {
 		ret = -1;

@@ -21,7 +21,7 @@
 #ifndef _HAVE_WORLD_H
 #define _HAVE_WORLD_H
 
-#include "ccan/talloc/talloc.h"
+#include "talloc/talloc.h"
 #include <stdbool.h>
 #include <errno.h>
 #include <stdint.h>

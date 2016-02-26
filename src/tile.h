@@ -22,7 +22,7 @@
 #ifndef _HAVE_TILE_H
 #define _HAVE_TILE_H
 
-#include "ccan/talloc/talloc.h"
+#include "talloc/talloc.h"
 #include <stdint.h>
 #include "binary_reader.h"
 

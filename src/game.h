@@ -22,10 +22,10 @@
 #define _HAVE_GAME_H
 
 #include <errno.h>
-#include "ccan/talloc/talloc.h"
+#include "talloc/talloc.h"
 
 struct game_context {
-  
+	int __padding;
 };
 
 int game_new(TALLOC_CTX *context, struct game_context **out_context);

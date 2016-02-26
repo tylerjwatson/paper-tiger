@@ -791,7 +791,10 @@ static int __world_read_header(struct world *world)
 		goto out;
 	}
 
-	__world_read_npc_killcounts(world);
+	if (__world_read_npc_killcounts(world) < 0) {
+		ret = -1;
+		goto out;
+	}
 
 	if (world->version < 128) {
 		ret = 0;

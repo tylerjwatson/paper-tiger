@@ -11,9 +11,9 @@ include_directories("/usr/local/include" "${PROJECT_SOURCE_DIR}")
 
 # include_directories(${TALLOC_INCLUDE_DIRS})
 
-add_library(talloc SHARED ccan/talloc/talloc.c)
+add_library(talloc STATIC src/talloc/talloc.c)
 
-add_executable(upgraded-guacamole src/world.c src/tile.c src/binary_reader.c src/game.c src/main.c)
+add_executable(upgraded-guacamole src/getopt.c src/world.c src/tile.c src/binary_reader.c src/game.c src/main.c)
 set_property(TARGET upgraded-guacamole PROPERTY C_STANDARD 11)
 target_link_libraries(upgraded-guacamole talloc)
 

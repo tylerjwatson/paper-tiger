@@ -40,7 +40,7 @@ int tile_heap_new(TALLOC_CTX *context, const uint32_t size_x, const uint32_t siz
 		goto out;
 	 }
 
-	 for(int column = 0; column < size_x; column++) {
+	 for(unsigned column = 0; column < size_x; column++) {
 		 if ((tile_heap[column] = talloc_array(tile_heap, struct tile, size_y)) == NULL) {
 			_ERROR("%s: Could not allocate Y tile heap of size %ld\n", __FUNCTION__, size_y);
 			ret = -1;
@@ -60,7 +60,7 @@ inline bool tile_active(struct tile *tile)
 	return (tile->s_tile_header & S_TILE_HEADER_ACTIVE) == S_TILE_HEADER_ACTIVE;
 }
 
-inline void tile_set_active(struct tile *tile, bool val)
+void tile_set_active(struct tile *tile, bool val)
 {
 	if (val) {
 		tile->s_tile_header |= S_TILE_HEADER_ACTIVE;
@@ -76,7 +76,7 @@ uint8_t tile_colour(struct tile *tile)
 
 void tile_set_colour(struct tile *tile, uint8_t colour)
 {
-	tile->s_tile_header &= (65504 | colour > 30 ? 30 : colour);
+	tile->s_tile_header &= (65504 | (colour > 30 ? 30 : colour));
 }
 
 uint8_t tile_wall_colour(struct tile *tile)
@@ -86,7 +86,7 @@ uint8_t tile_wall_colour(struct tile *tile)
 
 void tile_set_wall_colour(struct tile *tile, uint8_t colour)
 {
-	tile->s_tile_header &= (224 | colour > 30 ? 30 : colour);
+	tile->s_tile_header &= (224 | (colour > 30 ? 30 : colour));
 }
 
 bool tile_honey(struct tile *tile)
