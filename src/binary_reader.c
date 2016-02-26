@@ -127,13 +127,6 @@ int binary_reader_read_byte(struct binary_reader_context *context, uint8_t *out_
 {
 	uint8_t val;
 
-	/*
-	 * Note:
-	 * sizeof(bool) = 4 in this case because bool is typedef to int
-	 * whereas in .net it's a single byte, so it's hard-coded to 1
-	 * for now instead of a sizeof.
-	 */
-
 	if (fread(&val, 1, 1, context->fp) != 1) {
 		if (feof(context->fp)) {
 			_ERROR("%s: EOF reading file %s at position %d\n", __FUNCTION__,

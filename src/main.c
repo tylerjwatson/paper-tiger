@@ -51,7 +51,7 @@ static int parse_command_line(int argc, char **argv)
 int main(int argc, char **argv)
 {
 	int ret = 0;
-	struct world *world;
+	struct game_context *game;
 
 	printf("Upgraded Guacamole\n");
 
@@ -59,8 +59,10 @@ int main(int argc, char **argv)
 
 	clock_t start = clock(), diff;
 
-	if (world_new(NULL, options_worldPath, &world) < 0
-		|| world_init(world) < 0) {
+	game_new(NULL, &game);
+
+	if (world_new(game, options_worldPath, &game->world) < 0
+		|| world_init(game->world) < 0) {
 		ret = -1;
 		printf("World init failed: %d\n", ret);
 		goto out;
@@ -70,7 +72,7 @@ int main(int argc, char **argv)
 	printf("%s: world loaded in %dms\n", __FUNCTION__, diff * 1000 / CLOCKS_PER_SEC);
 
 //	talloc_report_full(world, stderr);
-	talloc_free(world);
+	talloc_free(game);
 out:
 	return ret;
 }

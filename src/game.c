@@ -19,6 +19,42 @@
  */
 
 #include "game.h"
+#include "util.h"
+#include <time.h>
+
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+
+#define FRAMES_PER_SEC 60
+
+static int __game_update(struct game_context *context)
+{
+	return 0;
+}
+
+int game_run(struct game_context *context)
+{
+	int msec;
+	int ret;
+	clock_t start, diff;
+
+	do {
+		start = clock();
+
+		if ((ret = __game_update(context)) < 0) {
+			_ERROR("%s: game has existed with code %d", __FUNCTION__, ret);
+			return ret;
+		}
+
+		diff = clock() - start;
+		msec = diff * 1000 / CLOCKS_PER_SEC;
+
+		Sleep(msec);
+	} while (context->is_exited == false);
+
+	return 0;
+}
 
 int game_new(TALLOC_CTX *context, struct game_context **out_context)
 {
@@ -34,6 +70,8 @@ int game_new(TALLOC_CTX *context, struct game_context **out_context)
 	/*
 	 * Init game stuff here
 	 */
+
+	gameContext->ms_per_frame = 1000. / FRAMES_PER_SEC;
 
 	*out_context = talloc_steal(context, gameContext);
 
