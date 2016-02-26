@@ -3,17 +3,17 @@
  * Copyright (C) 2016  Tyler Watson <tyler@tw.id.au>
  *
  * This file is part of upgraded-guacamole.
- * 
+ *
  * upgraded-guacamole is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * upgraded-guacamole is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with upgraded-guacamole.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -63,8 +63,8 @@ static int __binary_reader_destructor(struct binary_reader_context *talloc_conte
 	return 0;
 }
 
-int binary_reader_new(TALLOC_CTX *parent_context, const char *file_path, 
-					  struct binary_reader_context **out_context)
+int binary_reader_new(TALLOC_CTX *parent_context, const char *file_path,
+struct binary_reader_context **out_context)
 {
 	int ret = 0;
 	TALLOC_CTX *tempContext;
@@ -97,13 +97,18 @@ failed:
 	return ret;
 }
 
+size_t binary_reader_pos(struct binary_reader_context *context)
+{
+	return ftell(context->fp);
+}
+
 int binary_reader_open(struct binary_reader_context *context)
 {
 	if (context->fp != NULL) {
 		return -1;
 	}
 
-	if ((context->fp = fopen(context->file_path, "r")) == NULL) {
+	if ((context->fp = fopen(context->file_path, "r+b")) == NULL) {
 		printf("Error opening file %s: %s\n", context->file_path, strerror(errno));
 		return -1;
 	}
@@ -132,10 +137,11 @@ int binary_reader_read_byte(struct binary_reader_context *context, uint8_t *out_
 	if (fread(&val, 1, 1, context->fp) != 1) {
 		if (feof(context->fp)) {
 			_ERROR("%s: EOF reading file %s at position %d\n", __FUNCTION__,
-				   context->file_path, ftell(context->fp));
-		} else if (ferror(context->fp)) {
+				context->file_path, ftell(context->fp));
+		}
+		else if (ferror(context->fp)) {
 			_ERROR("%s: IO error reading file %s at position %d\n", __FUNCTION__,
-				   context->file_path, ftell(context->fp));
+				context->file_path, ftell(context->fp));
 		}
 		return -1;
 	}
@@ -173,15 +179,25 @@ int binary_reader_read_int16(struct binary_reader_context *context, int16_t *out
 	}
 
 	*out_value = le16_to_cpu(buffer);
-	
+
 	return 0;
 }
 
 int binary_reader_read_int32(struct binary_reader_context *context, int32_t *out_value)
 {
 	int32_t val;
+	size_t items;
 
-	if (fread(&val, sizeof(int32_t), 1, context->fp) != 1) {
+	if ((items = fread(&val, sizeof(int32_t), 1, context->fp)) != 1) {
+		if (feof(context->fp)) {
+			_ERROR("%s: EOF reading file %s at position %d\n", __FUNCTION__,
+				context->file_path, ftell(context->fp));
+		}
+		else if (ferror(context->fp)) {
+			_ERROR("%s: IO error reading file %s at position %d\n", __FUNCTION__,
+				context->file_path, ftell(context->fp));
+		};
+
 		return -1;
 	}
 
@@ -195,7 +211,7 @@ int binary_reader_read_int32(struct binary_reader_context *context, int32_t *out
 int binary_reader_read_int64(struct binary_reader_context *context, int64_t *out_value)
 {
 	int64_t val;
-	
+
 	if (fread(&val, sizeof(int64_t), 1, context->fp) != 1) {
 		return -1;
 	}
@@ -231,10 +247,10 @@ int binary_reader_read_string(struct binary_reader_context *context, char **out_
 	if (__read_7_bit_int(context, (int32_t *)&string_length) < 0) {
 		return -1;
 	}
-	
+
 	/*
 	 * Note:
-	 * 
+	 *
 	 * .NET strings have a 7-bit encoded length at the start
 	 * and no null terminator.  Must allocate enough room for
 	 * the null terminator at the end of the c string.
@@ -254,7 +270,7 @@ int binary_reader_read_string(struct binary_reader_context *context, char **out_
 	if (out_value != NULL) {
 		*out_value = val;
 	}
-	
+
 	ret = 0;
 	goto out;
 

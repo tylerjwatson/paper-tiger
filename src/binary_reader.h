@@ -32,6 +32,8 @@ struct binary_reader_context {
 
 int binary_reader_new(TALLOC_CTX *parent_context, const char *file_path, struct binary_reader_context **out_context);
 
+size_t binary_reader_pos(struct binary_reader_context *context);
+
 int binary_reader_open(struct binary_reader_context *context);
 
 int binary_reader_read_boolean(struct binary_reader_context *context, bool *out_value);
