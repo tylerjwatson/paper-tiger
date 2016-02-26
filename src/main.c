@@ -21,7 +21,7 @@
 #include "talloc/talloc.h"
 #include <errno.h>
 #include "getopt.h"
-
+#include <time.h>
 #include "game.h"
 #include "world.h"
 
@@ -56,21 +56,23 @@ int main(int argc, char **argv)
 	printf("Upgraded Guacamole\n");
 
 	parse_command_line(argc, argv);
+<<<<<<< HEAD
 	
+=======
+
+	clock_t start = clock(), diff;
+>>>>>>> 9ee0b066a03d9a997f473aa1a86da60c39b095a1
 	if (world_new(NULL, options_worldPath, &world) < 0
 		|| world_init(world) < 0) {
 		ret = -1;
 		printf("World init failed: %d\n", ret);
 		goto out;
 	}
+	diff = clock() - start;
 
-	printf("world->version = %d\n", world->version);
-	printf("world->num_positions = %d\n", world->num_positions);
-	printf("world->num_important = %d\n", world->num_important);
-	printf("world->world_name = %s\n", world->world_name);
-	printf("world->worldID = %d\n", world->worldID);
-	printf("world->max_tiles_x = %d\n", world->max_tiles_x);
-	printf("world->max_tiles_y = %d\n", world->max_tiles_y);
+	printf("%s: world loaded in %dms\n", __FUNCTION__, diff * 1000 / CLOCKS_PER_SEC);
+
+//	talloc_report_full(world, stderr);
 
 	talloc_free(world);
 out:

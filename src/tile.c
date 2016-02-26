@@ -18,36 +18,57 @@
  * along with upgraded-guacamole.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <string.h>
 #include "tile.h"
 #include "world.h"
 #include "util.h"
 
-int tile_heap_new(TALLOC_CTX *context, const uint32_t size_x, const uint32_t size_y, struct tile ***out_tiles)
+int tile_heap_new(TALLOC_CTX *context, uint32_t size_x, uint32_t size_y, struct tile ***out_tiles)
 {
-	 TALLOC_CTX *temp_context;
-	 int ret;
-	 struct tile **tile_heap;
+	TALLOC_CTX *temp_context;
+	int ret;
+	struct tile **tile_heap;
 
-	 if ((temp_context = talloc_new(NULL)) == NULL) {
+//	size_x++;
+//	size_y++;
+
+	if ((temp_context = talloc_new(NULL)) == NULL) {
 		_ERROR("%s: Could not allocate talloc context for tile heap.", __FUNCTION__);
 		ret = -1;
 		goto out;
-	 }
+	}
 
-	 if ((tile_heap = talloc_array(temp_context, struct tile *, size_x)) == NULL) {
-		_ERROR("%s: Could not allocate X tile heap of size %ld\n", __FUNCTION__, size_x);
+//	 if ((tile_heap = calloc(size_x, sizeof(struct tile *))) == NULL) {
+//		_ERROR("%s: Could not allocate X tile heap of size %d\n", __FUNCTION__, size_x);
+//		ret = -1;
+//		goto out;
+//	 }
+//
+//	 for(int column = 0; column < size_x; column++) {
+//		 if ((tile_heap[column] = calloc(1, size_y * sizeof(struct tile))) == NULL) {
+//			_ERROR("%s: Could not allocate Y tile heap of size %d\n", __FUNCTION__, size_y);
+//			ret = -1;
+//			goto out;
+//		 }
+//
+//		 //bzero(tile_heap[column], sizeof(struct tile) * size_y);
+//	 }
+
+	if ((tile_heap = talloc_array(temp_context, struct tile *, size_x)) == NULL) {
+		_ERROR("%s: Could not allocate X tile heap of size %d\n", __FUNCTION__, size_x);
 		ret = -1;
 		goto out;
-	 }
+	}
 
 	 for(unsigned column = 0; column < size_x; column++) {
 		 if ((tile_heap[column] = talloc_array(tile_heap, struct tile, size_y)) == NULL) {
 			_ERROR("%s: Could not allocate Y tile heap of size %ld\n", __FUNCTION__, size_y);
 			ret = -1;
 			goto out;
-		 }	 
-	 }
+		}
+	}
 
+//	*out_tiles = tile_heap;
 	 *out_tiles = talloc_steal(context, tile_heap);
 	 ret = 0;
 out:
@@ -160,4 +181,9 @@ void tile_set_inactive(struct tile *tile, bool val)
 	} else {
 		tile->s_tile_header &= 65471;
 	}
+}
+
+void tile_copy(const struct tile *src, struct tile *dest)
+{
+	memcpy(dest, src, sizeof(struct tile));
 }
