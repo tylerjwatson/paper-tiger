@@ -56,12 +56,9 @@ int main(int argc, char **argv)
 	printf("Upgraded Guacamole\n");
 
 	parse_command_line(argc, argv);
-<<<<<<< HEAD
-	
-=======
 
 	clock_t start = clock(), diff;
->>>>>>> 9ee0b066a03d9a997f473aa1a86da60c39b095a1
+
 	if (world_new(NULL, options_worldPath, &world) < 0
 		|| world_init(world) < 0) {
 		ret = -1;
