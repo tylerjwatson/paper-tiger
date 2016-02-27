@@ -24,6 +24,8 @@
 
 #ifdef _WIN32
 #include <Windows.h>
+#else
+#include <unistd.h>
 #endif
 
 #define FRAMES_PER_SEC 60
@@ -31,6 +33,16 @@
 #define TIME_NOON 27000
 #define TIME_MIDNIGHT 16200
 #define TIME_DUSK 0
+
+static inline void __sleep(double msec)
+{
+#if _WIN32
+	Sleep((DWORD)msec);
+#else
+	usleep(msec * 1000);
+#endif
+	
+}
 
 static int __game_update(struct game_context *context)
 {
@@ -54,9 +66,9 @@ int game_run(struct game_context *context)
 		diff = clock() - start;
 		msec = diff * 1000. / CLOCKS_PER_SEC;
 
-		printf("%s: frame took %d ms\n", __FUNCTION__, msec);
+		//printf("%s: frame took %f ms\n", __FUNCTION__, msec);
 		if (context->ms_per_frame - msec > 0) {
-			Sleep((DWORD)(context->ms_per_frame - msec));
+			__sleep(context->ms_per_frame - msec);
 		}
 	} while (context->is_exited == false);
 
