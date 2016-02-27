@@ -64,7 +64,7 @@ static int __binary_reader_destructor(struct binary_reader_context *talloc_conte
 }
 
 int binary_reader_new(TALLOC_CTX *parent_context, const char *file_path,
-struct binary_reader_context **out_context)
+						struct binary_reader_context **out_context)
 {
 	int ret = 0;
 	TALLOC_CTX *tempContext;

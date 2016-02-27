@@ -23,7 +23,7 @@
 #include "world.h"
 #include "util.h"
 
-int tile_heap_new(TALLOC_CTX *context, uint32_t size_x, uint32_t size_y, struct tile ***out_tiles)
+int tile_heap_new(TALLOC_CTX *context, const uint32_t size_x, const uint32_t size_y, struct tile ***out_tiles)
 {
 	TALLOC_CTX *temp_context;
 	int ret;

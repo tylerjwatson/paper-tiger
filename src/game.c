@@ -28,6 +28,10 @@
 
 #define FRAMES_PER_SEC 60
 
+#define TIME_NOON 27000
+#define TIME_MIDNIGHT 16200
+#define TIME_DUSK 0
+
 static int __game_update(struct game_context *context)
 {
 	return 0;
@@ -35,7 +39,7 @@ static int __game_update(struct game_context *context)
 
 int game_run(struct game_context *context)
 {
-	int msec;
+	float msec;
 	int ret;
 	clock_t start, diff;
 
@@ -48,9 +52,12 @@ int game_run(struct game_context *context)
 		}
 
 		diff = clock() - start;
-		msec = diff * 1000 / CLOCKS_PER_SEC;
+		msec = diff * 1000. / CLOCKS_PER_SEC;
 
-		Sleep(msec);
+		printf("%s: frame took %d ms\n", __FUNCTION__, msec);
+		if (context->ms_per_frame - msec > 0) {
+			Sleep((DWORD)(context->ms_per_frame - msec));
+		}
 	} while (context->is_exited == false);
 
 	return 0;

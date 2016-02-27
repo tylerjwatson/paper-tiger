@@ -71,6 +71,8 @@ int main(int argc, char **argv)
 
 	printf("%s: world loaded in %dms\n", __FUNCTION__, diff * 1000 / CLOCKS_PER_SEC);
 
+	game_run(game);
+
 //	talloc_report_full(world, stderr);
 	talloc_free(game);
 out:

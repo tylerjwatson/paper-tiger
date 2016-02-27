@@ -32,6 +32,8 @@ struct game_context {
 	struct world *world;
 };
 
+int game_run(struct game_context *context);
+
 int game_new(TALLOC_CTX *context, struct game_context **out_context);
 
 #endif /* _HAVE_GAME_H */
