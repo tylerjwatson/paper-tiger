@@ -18,9 +18,12 @@
  * along with upgraded-guacamole.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
+#include <time.h>
+#include <uv.h>
+
 #include "game.h"
 #include "util.h"
-#include <time.h>
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -39,7 +42,7 @@ static inline void __sleep(double msec)
 #if _WIN32
 	Sleep((DWORD)msec);
 #else
-	usleep(msec * 1000);
+	usleep((useconds_t)(msec * 1000));
 #endif
 	
 }
@@ -49,9 +52,42 @@ static int __game_update(struct game_context *context)
 	return 0;
 }
 
+static void *__game_thread(void *data)
+{
+	struct game_context *context = (struct game_context *)data;
+
+	game_run(context);
+    
+    return NULL;
+}
+
+static void __game_destructor(struct game_context *context)
+{
+	context->is_exited = true;
+	pthread_join(context->game_thread, NULL);
+    pthread_mutex_destroy(&context->game_mutex);
+    
+    uv_loop_close(context->event_loop);
+}
+
+int game_start_event_loop(struct game_context *context)
+{
+    return uv_run(context->event_loop, UV_RUN_DEFAULT);
+}
+
+int game_start_thread(struct game_context *context)
+{
+	if (pthread_create(&context->game_thread, NULL, __game_thread, (void *)context) < 0) {
+		_ERROR("%s: Could not create game thread.\n", __FUNCTION__);
+		return -1;
+	}
+    
+    return 0;
+}
+
 int game_run(struct game_context *context)
 {
-	float msec;
+	double msec;
 	int ret;
 	clock_t start, diff;
 
@@ -66,7 +102,7 @@ int game_run(struct game_context *context)
 		diff = clock() - start;
 		msec = diff * 1000. / CLOCKS_PER_SEC;
 
-		//printf("%s: frame took %f ms\n", __FUNCTION__, msec);
+		printf("%s: frame took %f ms\n", __FUNCTION__, msec);
 		if (context->ms_per_frame - msec > 0) {
 			__sleep(context->ms_per_frame - msec);
 		}
@@ -77,6 +113,7 @@ int game_run(struct game_context *context)
 
 int game_new(TALLOC_CTX *context, struct game_context **out_context)
 {
+	int ret = -1;
 	struct game_context *gameContext = NULL;
 	TALLOC_CTX *tempContext;
 
@@ -85,15 +122,34 @@ int game_new(TALLOC_CTX *context, struct game_context **out_context)
 	}
 
 	gameContext = talloc_zero(tempContext, struct game_context);
-
+    
 	/*
 	 * Init game stuff here
 	 */
 
 	gameContext->ms_per_frame = 1000. / FRAMES_PER_SEC;
 
+    if ((gameContext->event_loop = talloc_zero(gameContext, uv_loop_t)) == NULL) {
+        _ERROR("%s: Could not allocate a game event loop.\n", __FUNCTION__);
+        ret = -1;
+        goto out;
+    }
+    
+
+	if (pthread_mutex_init(&gameContext->game_mutex, NULL) < 0) {
+		_ERROR("%s: Could not initialize game thread mutex\n", __FUNCTION__);
+		ret = -1;
+		goto out;
+	}
+    
+    uv_loop_init(gameContext->event_loop);
+
+	talloc_set_destructor(gameContext, __game_destructor);
+
 	*out_context = talloc_steal(context, gameContext);
 
+	ret = 0;
+out:
 	talloc_free(tempContext);
-	return 0;
+	return ret;
 }

@@ -18,10 +18,17 @@
  * along with upgraded-guacamole.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "talloc/talloc.h"
-#include <errno.h>
-#include "getopt.h"
 #include <time.h>
+#include <errno.h>
+#include <uv.h>
+
+#ifndef _WIN32
+#include <unistd.h>
+#endif
+
+#include "talloc/talloc.h"
+#include "util.h"
+#include "getopt.h"
 #include "game.h"
 #include "world.h"
 
@@ -48,16 +55,25 @@ static int parse_command_line(int argc, char **argv)
 	return 0;
 }
 
+static int __run_loop_init()
+{
+    return 0;
+}
+
 int main(int argc, char **argv)
 {
 	int ret = 0;
 	struct game_context *game;
+	clock_t start;
+	clock_t diff;
 
 	printf("Upgraded Guacamole\n");
 
 	parse_command_line(argc, argv);
+	talloc_enable_leak_report_full();
+	talloc_set_log_stderr();
 
-	clock_t start = clock(), diff;
+	start = clock();
 
 	game_new(NULL, &game);
 
@@ -67,15 +83,23 @@ int main(int argc, char **argv)
 		printf("World init failed: %d\n", ret);
 		goto out;
 	}
+
 	diff = clock() - start;
 
-	printf("%s: world loaded in %dms\n", __FUNCTION__, diff * 1000 / CLOCKS_PER_SEC);
+	printf("%s: world loaded in %dms\n", __FUNCTION__, (int)(diff * 1000 / CLOCKS_PER_SEC));
 
-	game_run(game);
-
-//	talloc_report_full(world, stderr);
-	talloc_free(game);
+    if (server_new(game, "0.0.0.0", 7777, game, &game->server) < 0) {
+        _ERROR("Initializing TCP server for game context failed.");
+        ret = -1;
+        goto out;
+    }
+    
+    server_start(game->server);
+    
+    game_start_event_loop(game);
+    
 out:
+    talloc_free(game);
 	return ret;
 }
 

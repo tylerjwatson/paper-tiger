@@ -29,30 +29,11 @@ int tile_heap_new(TALLOC_CTX *context, const uint32_t size_x, const uint32_t siz
 	int ret;
 	struct tile **tile_heap;
 
-//	size_x++;
-//	size_y++;
-
 	if ((temp_context = talloc_new(NULL)) == NULL) {
 		_ERROR("%s: Could not allocate talloc context for tile heap.", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
-
-//	 if ((tile_heap = calloc(size_x, sizeof(struct tile *))) == NULL) {
-//		_ERROR("%s: Could not allocate X tile heap of size %d\n", __FUNCTION__, size_x);
-//		ret = -1;
-//		goto out;
-//	 }
-//
-//	 for(int column = 0; column < size_x; column++) {
-//		 if ((tile_heap[column] = calloc(1, size_y * sizeof(struct tile))) == NULL) {
-//			_ERROR("%s: Could not allocate Y tile heap of size %d\n", __FUNCTION__, size_y);
-//			ret = -1;
-//			goto out;
-//		 }
-//
-//		 //bzero(tile_heap[column], sizeof(struct tile) * size_y);
-//	 }
 
 	if ((tile_heap = talloc_array(temp_context, struct tile *, size_x)) == NULL) {
 		_ERROR("%s: Could not allocate X tile heap of size %d\n", __FUNCTION__, size_x);
@@ -62,7 +43,7 @@ int tile_heap_new(TALLOC_CTX *context, const uint32_t size_x, const uint32_t siz
 
 	 for(unsigned column = 0; column < size_x; column++) {
 		 if ((tile_heap[column] = talloc_array(tile_heap, struct tile, size_y)) == NULL) {
-			_ERROR("%s: Could not allocate Y tile heap of size %ld\n", __FUNCTION__, size_y);
+			_ERROR("%s: Could not allocate Y tile heap of size %d\n", __FUNCTION__, size_y);
 			ret = -1;
 			goto out;
 		}
