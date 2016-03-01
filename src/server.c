@@ -24,11 +24,33 @@
 #include "util.h"
 #include "server.h"
 
-void __on_connection(uv_stream_t *server, int status)
+void __on_connection(uv_stream_t *handle, int status)
 {
+    struct sockaddr_in peer;
+    struct server *server = (struct server *)handle->data;
+    int name_len = sizeof(peer);
+    char remote_addr[16] = {};
+    
+    uv_tcp_t client_handle;
+    
     if (status < 0) {
-        
+        return;
     }
+    
+    /*
+     * Re-listen for more clients
+     */
+    uv_tcp_init(server->game->event_loop, &client_handle);
+    
+    if (uv_accept(handle, (uv_stream_t *)&client_handle)) {
+        _ERROR("%s: Could not accept socket.", __FUNCTION__);
+        return;
+    }
+    
+    uv_tcp_getpeername((uv_tcp_t *)&client_handle, (struct sockaddr *)&peer, &name_len);
+    uv_inet_ntop(AF_INET, &peer.sin_addr, remote_addr, sizeof(remote_addr));
+    
+    _ERROR("%s: new connection from %s\n", __FUNCTION__, remote_addr);
 }
 
 int server_new(TALLOC_CTX *context, const char *listen_address, const uint16_t port,
@@ -61,14 +83,18 @@ out:
 int server_start(struct server *server)
 {
     struct sockaddr_in server_addr;
-    uv_tcp_init(server->game->event_loop, server->tcp);
+    uv_tcp_init(server->game->event_loop, &server->tcp);
     uv_ip4_addr(server->listen_address, server->port, &server_addr);
-    uv_tcp_bind(server->tcp, (const struct sockaddr *)&server_addr, 0);
+    uv_tcp_bind(&server->tcp, (const struct sockaddr *)&server_addr, 0);
     
-    if (uv_listen((uv_stream_t *)server->tcp, 128, __on_connection) != 0) {
+    server->tcp.data = server;
+    
+    if (uv_listen((uv_stream_t *)&server->tcp, 128, __on_connection) != 0) {
         _ERROR("%s: listen failure.\n", __FUNCTION__);
         return -1;
     }
+    
+    
     
     return 0;
 }
