@@ -24,13 +24,27 @@
 
 int player_new(TALLOC_CTX *context, const struct game_context *game, int id, struct player **out_player)
 {
-    int res = -1;
+    int ret = -1;
     TALLOC_CTX *temp_context;
     struct player *player;
     
     if ((temp_context = talloc_new(NULL)) == NULL) {
         _ERROR("%s: allocating temporary talloc context failed.\n", __FUNCTION__);
-        res = -1;
+        return -1;
     }
     
+    if ((player = talloc_zero(temp_context, struct player)) == NULL) {
+        _ERROR("%s: allocating player object failed.\n", __FUNCTION__);
+        ret = -1;
+        goto out;
+    }
+    
+    player->id = id;
+    
+    *out_player = talloc_steal(context, player);
+    ret = 0;
+out:
+    talloc_free(context);
+    
+    return ret;
 }
