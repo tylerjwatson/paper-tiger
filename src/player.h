@@ -29,23 +29,24 @@
 #include "game.h"
 
 enum {
-	PLAYER_SOCKET_STATE_HEADER,
-	PLAYER_SOCKET_STATE_PAYLOAD
+    PLAYER_SOCKET_STATE_HEADER,
+    PLAYER_SOCKET_STATE_PAYLOAD
 } PLAYER_SOCKET_STATE;
 
 struct player {
     uint32_t id;
-	char *name;
-	char *remote_addr;
-	uint16_t remote_port;
-	struct game_context *game;
+    char *name;
+    char *remote_addr;
+    uint16_t remote_port;
+    struct game_context *game;
     uv_tcp_t *handle;
-	
-	int state;
+
+    int state;
 };
 
-int player_new(TALLOC_CTX *context, const struct game_context *game, int id, struct player **out_player);
+int player_new(TALLOC_CTX * context, const struct game_context *game,
+	       int id, struct player **out_player);
 
 void player_close(struct player *player);
 
-#endif /* _HAVE_PLAYER_H */
+#endif				/* _HAVE_PLAYER_H */

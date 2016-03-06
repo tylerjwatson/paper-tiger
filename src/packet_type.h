@@ -22,7 +22,7 @@
 #define _PACKET_TYPE_H
 
 enum packet_type {
-	PACKET_TYPE_CONNECT_REQUEST = 0x01
+    PACKET_TYPE_CONNECT_REQUEST = 0x01
 };
 
-#endif /* _PACKET_TYPE_H */
+#endif				/* _PACKET_TYPE_H */
