@@ -33,12 +33,15 @@ include_directories("/usr/local/include" "${PROJECT_SOURCE_DIR}" "${LIBUV_INCLUD
 add_executable(upgraded-guacamole
 	src/binary_reader.c
 	src/binary_reader.h
+	src/packet_type.h
 	src/bitmap.h
 	src/game.c
 	src/game.h
 	src/getopt.c
 	src/getopt.h
 	src/main.c
+	src/packet.c
+	src/packet.h
 	src/player.c
 	src/player.h
 	src/server.c

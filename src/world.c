@@ -85,7 +85,7 @@ static int __world_read_file_header(struct world *world)
 		if (binary_reader_read_int32(world->reader, &world->positions[i]) < 0) {
 			goto error;
 		}
-		_ERROR("%s: world->positions[%d] = %d\n", __FUNCTION__, i, world->positions[i]);
+		//_ERROR("%s: world->positions[%d] = %d\n", __FUNCTION__, i, world->positions[i]);
 	}
 
 	if (binary_reader_read_uint16(world->reader, &world->num_important) < 0) {
@@ -580,7 +580,7 @@ static int __world_read_header(struct world *world)
 		goto out;
 	}
 
-	_ERROR("pos %li\n", ftell(world->reader->fp));
+	//_ERROR("pos %li\n", ftell(world->reader->fp));
 
 	if (binary_reader_read_boolean(world->reader, &world->flags.downed_boss_1) < 0
 			|| binary_reader_read_boolean(world->reader, &world->flags.downed_boss_2) < 0

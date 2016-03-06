@@ -57,7 +57,7 @@ out:
 	 return ret;
 }
 
-inline bool tile_active(struct tile *tile)
+bool tile_active(struct tile *tile)
 {
 	return (tile->s_tile_header & S_TILE_HEADER_ACTIVE) == S_TILE_HEADER_ACTIVE;
 }

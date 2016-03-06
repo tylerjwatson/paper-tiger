@@ -75,18 +75,20 @@ int main(int argc, char **argv)
 
 	start = clock();
 
+	printf("%s: initializing game context... ", __FUNCTION__);
 	game_new(NULL, &game);
+	printf("done.\n");
 
+	printf("%s: loading world from %s... ", __FUNCTION__, options_worldPath);
 	if (world_new(game, options_worldPath, &game->world) < 0
 		|| world_init(game->world) < 0) {
 		ret = -1;
 		printf("World init failed: %d\n", ret);
 		goto out;
 	}
-
+	
 	diff = clock() - start;
-
-	printf("%s: world loaded in %dms\n", __FUNCTION__, (int)(diff * 1000 / CLOCKS_PER_SEC));
+	printf("done (%dms).\n", (int)(diff * 1000 / CLOCKS_PER_SEC));
 
     if (server_new(game, "0.0.0.0", 7777, game, &game->server) < 0) {
         _ERROR("Initializing TCP server for game context failed.");
@@ -95,7 +97,9 @@ int main(int argc, char **argv)
     }
     
     server_start(game->server);
-    
+	
+	printf("server started.\n");
+	
     game_start_event_loop(game);
     
 out:
