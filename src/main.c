@@ -79,10 +79,8 @@ int main(int argc, char **argv)
     game_new(NULL, &game);
     printf("done.\n");
 
-    printf("%s: loading world from %s... ", __FUNCTION__,
-	   options_worldPath);
-    if (world_new(game, options_worldPath, &game->world) < 0
-	|| world_init(game->world) < 0) {
+    printf("%s: loading world from %s... ", __FUNCTION__, options_worldPath);
+    if (world_new(game, options_worldPath, &game->world) < 0 || world_init(game->world) < 0) {
 	ret = -1;
 	printf("World init failed: %d\n", ret);
 	goto out;

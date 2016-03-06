@@ -89,9 +89,7 @@ int game_start_event_loop(struct game_context *context)
 
 int game_start_thread(struct game_context *context)
 {
-    if (pthread_create
-	(&context->game_thread, NULL, __game_thread,
-	 (void *) context) < 0) {
+    if (pthread_create(&context->game_thread, NULL, __game_thread, (void *) context) < 0) {
 	_ERROR("%s: Could not create game thread.\n", __FUNCTION__);
 	return -1;
     }
@@ -143,27 +141,22 @@ int game_new(TALLOC_CTX * context, struct game_context **out_context)
 
     gameContext->ms_per_frame = 1000. / FRAMES_PER_SEC;
 
-    if ((gameContext->event_loop =
-	 talloc_zero(gameContext, uv_loop_t)) == NULL) {
-	_ERROR("%s: Could not allocate a game event loop.\n",
-	       __FUNCTION__);
+    if ((gameContext->event_loop = talloc_zero(gameContext, uv_loop_t)) == NULL) {
+	_ERROR("%s: Could not allocate a game event loop.\n", __FUNCTION__);
 	ret = -1;
 	goto out;
     }
 
 
     if (pthread_mutex_init(&gameContext->game_mutex, NULL) < 0) {
-	_ERROR("%s: Could not initialize game thread mutex\n",
-	       __FUNCTION__);
+	_ERROR("%s: Could not initialize game thread mutex\n", __FUNCTION__);
 	ret = -1;
 	goto out;
     }
 
     uv_loop_init(gameContext->event_loop);
 
-    gameContext->player_slots =
-	talloc_array(gameContext, word_t,
-		     GAME_MAX_PLAYERS / sizeof(word_t));
+    gameContext->player_slots = talloc_array(gameContext, word_t, GAME_MAX_PLAYERS / sizeof(word_t));
 
     talloc_set_destructor(gameContext, __game_destructor);
 

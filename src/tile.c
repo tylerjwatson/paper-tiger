@@ -23,33 +23,27 @@
 #include "world.h"
 #include "util.h"
 
-int tile_heap_new(TALLOC_CTX * context, const uint32_t size_x,
-		  const uint32_t size_y, struct tile ***out_tiles)
+int tile_heap_new(TALLOC_CTX * context, const uint32_t size_x, const uint32_t size_y, struct tile ***out_tiles)
 {
     TALLOC_CTX *temp_context;
     int ret;
     struct tile **tile_heap;
 
     if ((temp_context = talloc_new(NULL)) == NULL) {
-	_ERROR("%s: Could not allocate talloc context for tile heap.",
-	       __FUNCTION__);
+	_ERROR("%s: Could not allocate talloc context for tile heap.", __FUNCTION__);
 	ret = -1;
 	goto out;
     }
 
-    if ((tile_heap =
-	 talloc_array(temp_context, struct tile *, size_x)) == NULL) {
-	_ERROR("%s: Could not allocate X tile heap of size %d\n",
-	       __FUNCTION__, size_x);
+    if ((tile_heap = talloc_array(temp_context, struct tile *, size_x)) == NULL) {
+	_ERROR("%s: Could not allocate X tile heap of size %d\n", __FUNCTION__, size_x);
 	ret = -1;
 	goto out;
     }
 
     for (unsigned column = 0; column < size_x; column++) {
-	if ((tile_heap[column] =
-	     talloc_array(tile_heap, struct tile, size_y)) == NULL) {
-	    _ERROR("%s: Could not allocate Y tile heap of size %d\n",
-		   __FUNCTION__, size_y);
+	if ((tile_heap[column] = talloc_array(tile_heap, struct tile, size_y)) == NULL) {
+	    _ERROR("%s: Could not allocate Y tile heap of size %d\n", __FUNCTION__, size_y);
 	    ret = -1;
 	    goto out;
 	}
@@ -65,8 +59,7 @@ int tile_heap_new(TALLOC_CTX * context, const uint32_t size_x,
 
 bool tile_active(struct tile * tile)
 {
-    return (tile->s_tile_header & S_TILE_HEADER_ACTIVE) ==
-	S_TILE_HEADER_ACTIVE;
+    return (tile->s_tile_header & S_TILE_HEADER_ACTIVE) == S_TILE_HEADER_ACTIVE;
 }
 
 void tile_set_active(struct tile *tile, bool val)
@@ -100,8 +93,7 @@ void tile_set_wall_colour(struct tile *tile, uint8_t colour)
 
 bool tile_honey(struct tile *tile)
 {
-    return (tile->b_tile_header & B_TILE_HEADER_HONEY) ==
-	B_TILE_HEADER_HONEY;
+    return (tile->b_tile_header & B_TILE_HEADER_HONEY) == B_TILE_HEADER_HONEY;
 }
 
 void tile_set_honey(struct tile *tile, bool honey)
