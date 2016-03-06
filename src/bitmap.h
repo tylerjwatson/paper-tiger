@@ -21,9 +21,9 @@
 #ifndef _HAVE_BITMAP_H
 #define _HAVE_BITMAP_H
 
-#include <limit.h>    /* for CHAR_BIT */
+#include <limits.h>    /* for CHAR_BIT */
 #include <stdint.h>   /* for uint32_t */
-
+#include <stdbool.h>
 typedef uint64_t word_t;
 
 enum {
@@ -33,17 +33,17 @@ enum {
 #define WORD_OFFSET(b) ((b) / BITS_PER_WORD)
 #define BIT_OFFSET(b)  ((b) % BITS_PER_WORD)
 
-inline void bitmap_set(word_t *words, int n)
+static inline void bitmap_set(word_t *words, int n)
 {
     words[WORD_OFFSET(n)] |= (1 << BIT_OFFSET(n));
 }
 
-inline void bitmap_clear(word_t *words, int n)
+static inline void bitmap_clear(word_t *words, int n)
 {
     words[WORD_OFFSET(n)] &= ~(1 << BIT_OFFSET(n));
 }
 
-inline int bitmap_get(word_t *words, int n)
+static inline bool bitmap_get(word_t *words, int n)
 {
     word_t bit = words[WORD_OFFSET(n)] & (1 << BIT_OFFSET(n));
     return bit != 0;

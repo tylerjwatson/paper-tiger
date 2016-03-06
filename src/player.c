@@ -22,6 +22,12 @@
 #include "player.h"
 #include "util.h"
 
+static void __player_destructor(struct player *player)
+{
+	uv_close((uv_handle_t *)&player->handle, NULL);
+	bitmap_clear(player->game->player_slots, player->id);
+}
+
 int player_new(TALLOC_CTX *context, const struct game_context *game, int id, struct player **out_player)
 {
     int ret = -1;
@@ -40,11 +46,18 @@ int player_new(TALLOC_CTX *context, const struct game_context *game, int id, str
     }
     
     player->id = id;
+	player->game = (struct game_context *)game;
+	talloc_set_destructor(player, __player_destructor);
     
     *out_player = talloc_steal(context, player);
     ret = 0;
+	
 out:
-    talloc_free(context);
-    
+    talloc_free(temp_context);
     return ret;
+}
+
+void player_close(struct player *player)
+{
+	talloc_free(player);
 }

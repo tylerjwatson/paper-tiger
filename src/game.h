@@ -27,8 +27,11 @@
 #include <uv.h>
 
 #include "talloc/talloc.h"
+#include "bitmap.h"
 #include "server.h"
 #include "player.h"
+
+#define GAME_MAX_PLAYERS 255
 
 struct game_context {
 	bool is_exited;
@@ -37,11 +40,15 @@ struct game_context {
 	struct world *world;
     struct server *server;
     struct player *players[256];
-    
+	
+	word_t *player_slots;
+	
     uv_loop_t *event_loop;
 	pthread_t game_thread;
 	pthread_mutex_t game_mutex;
 };
+
+int game_find_next_slot(struct game_context *context);
 
 int game_start_event_loop(struct game_context *context);
 

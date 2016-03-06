@@ -70,6 +70,18 @@ static void __game_destructor(struct game_context *context)
     uv_loop_close(context->event_loop);
 }
 
+int game_find_next_slot(struct game_context *context)
+{
+	for (unsigned i = 0; i < GAME_MAX_PLAYERS; i++) {
+		if (bitmap_get(context->player_slots, i) == false) {
+			bitmap_set(context->player_slots, i);
+			return i;
+		}
+	}
+	
+	return -1;
+}
+
 int game_start_event_loop(struct game_context *context)
 {
     return uv_run(context->event_loop, UV_RUN_DEFAULT);
@@ -143,7 +155,9 @@ int game_new(TALLOC_CTX *context, struct game_context **out_context)
 	}
     
     uv_loop_init(gameContext->event_loop);
-
+	
+	gameContext->player_slots = talloc_array(gameContext, word_t, GAME_MAX_PLAYERS / sizeof(word_t));
+	
 	talloc_set_destructor(gameContext, __game_destructor);
 
 	*out_context = talloc_steal(context, gameContext);

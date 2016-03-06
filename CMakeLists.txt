@@ -29,7 +29,27 @@ endif()
 add_library(talloc STATIC src/talloc/talloc.c)
 
 include_directories("/usr/local/include" "${PROJECT_SOURCE_DIR}" "${LIBUV_INCLUDE_DIRS}") 
-add_executable(upgraded-guacamole src/getopt.c src/world.c src/tile.c src/binary_reader.c src/server.c src/game.c src/player.c src/main.c)
+
+add_executable(upgraded-guacamole
+	src/binary_reader.c
+	src/binary_reader.h
+	src/bitmap.h
+	src/game.c
+	src/game.h
+	src/getopt.c
+	src/getopt.h
+	src/main.c
+	src/player.c
+	src/player.h
+	src/server.c
+	src/server.h
+	src/tile.c
+	src/tile.h
+	src/util.h
+	src/world.c
+	src/world.h)
+
+
 set_property(TARGET upgraded-guacamole PROPERTY C_STANDARD 11)
 
 
