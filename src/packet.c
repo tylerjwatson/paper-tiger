@@ -20,7 +20,8 @@
 
 #include "packet.h"
 
-static int handle_connect_request(const struct player *player, const struct packet_buffer *buf)
+static int handle_connect_request(const struct player *player,
+				  const struct packet_buffer *buf)
 {
     return 0;
 }
@@ -29,7 +30,8 @@ static struct packet_handler packet_handlers[] = {
     {.type = PACKET_TYPE_CONNECT_REQUEST,.handler = handle_connect_request}
 };
 
-int packet_read_header(const uv_buf_t * buf, uint8_t * out_type, uint16_t * out_len)
+int packet_read_header(const uv_buf_t * buf, uint8_t * out_type,
+		       uint16_t * out_len)
 {
     if (buf->len <= 3) {
 	return -1;

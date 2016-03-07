@@ -35,7 +35,8 @@ struct server {
 };
 
 int server_new(TALLOC_CTX * context, const char *listen_address,
-	       const uint16_t port, struct game_context *game, struct server **out_server);
+	       const uint16_t port, struct game_context *game,
+	       struct server **out_server);
 
 int server_start(struct server *server);
 

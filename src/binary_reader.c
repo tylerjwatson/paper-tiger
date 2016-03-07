@@ -35,7 +35,8 @@ static uint16_t be16_to_cpu(const uint8_t * buf)
     return ((uint16_t) buf[1]) | (((uint16_t) buf[0]) << 8);
 }
 
-static int __read_7_bit_int(struct binary_reader_context *context, int32_t * out_value)
+static int __read_7_bit_int(struct binary_reader_context *context,
+			    int32_t * out_value)
 {
     int count = 0, shift = 0;
     uint8_t byte;
@@ -66,7 +67,8 @@ static int __binary_reader_destructor(struct binary_reader_context
     return 0;
 }
 
-int binary_reader_new(TALLOC_CTX * parent_context, const char *file_path, struct binary_reader_context **out_context)
+int binary_reader_new(TALLOC_CTX * parent_context, const char *file_path,
+		      struct binary_reader_context **out_context)
 {
     int ret = 0;
     TALLOC_CTX *tempContext;
@@ -79,7 +81,8 @@ int binary_reader_new(TALLOC_CTX * parent_context, const char *file_path, struct
 
     newContext = talloc_zero(tempContext, struct binary_reader_context);
 
-    if ((newContext->file_path = talloc_strdup(newContext, file_path)) == NULL) {
+    if ((newContext->file_path =
+	 talloc_strdup(newContext, file_path)) == NULL) {
 	ret = -ENOMEM;
 	goto failed;
     }
@@ -111,7 +114,8 @@ int binary_reader_open(struct binary_reader_context *context)
     }
 
     if ((context->fp = fopen(context->file_path, "r+b")) == NULL) {
-	printf("Error opening file %s: %s\n", context->file_path, strerror(errno));
+	printf("Error opening file %s: %s\n", context->file_path,
+	       strerror(errno));
 	return -1;
     }
 
@@ -120,18 +124,21 @@ int binary_reader_open(struct binary_reader_context *context)
     return 0;
 }
 
-int binary_reader_read_boolean(struct binary_reader_context *context, bool * out_value)
+int binary_reader_read_boolean(struct binary_reader_context *context,
+			       bool * out_value)
 {
     return binary_reader_read_byte(context, (uint8_t *) out_value);
 }
 
-int binary_reader_read_byte(struct binary_reader_context *context, uint8_t * out_value)
+int binary_reader_read_byte(struct binary_reader_context *context,
+			    uint8_t * out_value)
 {
     uint8_t val;
 
     if (fread(&val, 1, 1, context->fp) != 1) {
 	if (feof(context->fp)) {
-	    _ERROR("%s: EOF reading file %s at position %ld\n", __FUNCTION__, context->file_path, ftell(context->fp));
+	    _ERROR("%s: EOF reading file %s at position %ld\n",
+		   __FUNCTION__, context->file_path, ftell(context->fp));
 	} else if (ferror(context->fp)) {
 	    _ERROR("%s: IO error reading file %s at position %ld\n",
 		   __FUNCTION__, context->file_path, ftell(context->fp));
@@ -146,9 +153,11 @@ int binary_reader_read_byte(struct binary_reader_context *context, uint8_t * out
     return 0;
 }
 
-int binary_reader_read_decimal(struct binary_reader_context *context, long double *out_value);
+int binary_reader_read_decimal(struct binary_reader_context *context,
+			       long double *out_value);
 
-int binary_reader_read_double(struct binary_reader_context *context, double *out_value)
+int binary_reader_read_double(struct binary_reader_context *context,
+			      double *out_value)
 {
     double val;
 
@@ -163,7 +172,8 @@ int binary_reader_read_double(struct binary_reader_context *context, double *out
     return 0;
 }
 
-int binary_reader_read_int16(struct binary_reader_context *context, int16_t * out_value)
+int binary_reader_read_int16(struct binary_reader_context *context,
+			     int16_t * out_value)
 {
     uint8_t buffer[2];
 
@@ -176,14 +186,16 @@ int binary_reader_read_int16(struct binary_reader_context *context, int16_t * ou
     return 0;
 }
 
-int binary_reader_read_int32(struct binary_reader_context *context, int32_t * out_value)
+int binary_reader_read_int32(struct binary_reader_context *context,
+			     int32_t * out_value)
 {
     int32_t val;
     size_t items;
 
     if ((items = fread(&val, sizeof(int32_t), 1, context->fp)) != 1) {
 	if (feof(context->fp)) {
-	    _ERROR("%s: EOF reading file %s at position %ld\n", __FUNCTION__, context->file_path, ftell(context->fp));
+	    _ERROR("%s: EOF reading file %s at position %ld\n",
+		   __FUNCTION__, context->file_path, ftell(context->fp));
 	} else if (ferror(context->fp)) {
 	    _ERROR("%s: IO error reading file %s at position %ld\n",
 		   __FUNCTION__, context->file_path, ftell(context->fp));
@@ -199,7 +211,8 @@ int binary_reader_read_int32(struct binary_reader_context *context, int32_t * ou
     return 0;
 }
 
-int binary_reader_read_int64(struct binary_reader_context *context, int64_t * out_value)
+int binary_reader_read_int64(struct binary_reader_context *context,
+			     int64_t * out_value)
 {
     int64_t val;
 
@@ -214,7 +227,8 @@ int binary_reader_read_int64(struct binary_reader_context *context, int64_t * ou
     return 0;
 }
 
-int binary_reader_read_single(struct binary_reader_context *context, float *out_value)
+int binary_reader_read_single(struct binary_reader_context *context,
+			      float *out_value)
 {
     float val;
 
@@ -229,7 +243,8 @@ int binary_reader_read_single(struct binary_reader_context *context, float *out_
     return 0;
 }
 
-int binary_reader_read_string(struct binary_reader_context *context, char **out_value)
+int binary_reader_read_string(struct binary_reader_context *context,
+			      char **out_value)
 {
     char *val;
     size_t string_length = 0;
@@ -271,7 +286,8 @@ int binary_reader_read_string(struct binary_reader_context *context, char **out_
     return ret;
 }
 
-int binary_reader_read_uint16(struct binary_reader_context *context, uint16_t * out_value)
+int binary_reader_read_uint16(struct binary_reader_context *context,
+			      uint16_t * out_value)
 {
     uint16_t val;
 
@@ -286,7 +302,8 @@ int binary_reader_read_uint16(struct binary_reader_context *context, uint16_t * 
     return 0;
 }
 
-int binary_reader_read_uint32(struct binary_reader_context *context, uint32_t * out_value)
+int binary_reader_read_uint32(struct binary_reader_context *context,
+			      uint32_t * out_value)
 {
     uint32_t val;
 
@@ -301,7 +318,8 @@ int binary_reader_read_uint32(struct binary_reader_context *context, uint32_t * 
     return 0;
 }
 
-int binary_reader_read_uint64(struct binary_reader_context *context, uint64_t * out_value)
+int binary_reader_read_uint64(struct binary_reader_context *context,
+			      uint64_t * out_value)
 {
     uint64_t val;
 

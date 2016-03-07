@@ -25,19 +25,22 @@
 #include "server.h"
 #include "player.h"
 
-static void __on_read(uv_stream_t * stream, ssize_t len, const uv_buf_t * buf)
+static void __on_read(uv_stream_t * stream, ssize_t len,
+		      const uv_buf_t * buf)
 {
     struct player *player = (struct player *) stream->data;
 
     if (len < 0) {
 	if (len == UV_EOF) {
-	    _ERROR("%s: EOF while reading from slot %d\n", __FUNCTION__, player->id);
+	    _ERROR("%s: EOF while reading from slot %d\n", __FUNCTION__,
+		   player->id);
 	}
 
 	goto player_out;
     }
 
-    _ERROR("%s: Read %ld bytes from client at slot %d\n", __FUNCTION__, len, player->id);
+    _ERROR("%s: Read %ld bytes from client at slot %d\n", __FUNCTION__,
+	   len, player->id);
 
     goto out;
 
@@ -49,7 +52,8 @@ static void __on_read(uv_stream_t * stream, ssize_t len, const uv_buf_t * buf)
     talloc_free(buf->base);
 }
 
-static void __alloc_buffer(uv_handle_t * handle, size_t size, uv_buf_t * out_buf)
+static void __alloc_buffer(uv_handle_t * handle, size_t size,
+			   uv_buf_t * out_buf)
 {
     struct player *player = (struct player *) handle->data;
 
@@ -85,7 +89,8 @@ void __on_connection(uv_stream_t * handle, int status)
     }
 
     if (player_new(server->game, server->game, player_id, &player) < 0) {
-	_ERROR("%s: Allocating a player object for ID %d failed.", __FUNCTION__, player_id);
+	_ERROR("%s: Allocating a player object for ID %d failed.",
+	       __FUNCTION__, player_id);
 	uv_close((uv_handle_t *) & client_handle, NULL);
 	return;
     }
@@ -103,27 +108,33 @@ void __on_connection(uv_stream_t * handle, int status)
     player->handle = client_handle;
     player->handle->data = player;
 
-    uv_tcp_getpeername((uv_tcp_t *) & client_handle, (struct sockaddr *) &peer, &name_len);
-    uv_inet_ntop(AF_INET, &peer.sin_addr, remote_addr, sizeof(remote_addr));
+    uv_tcp_getpeername((uv_tcp_t *) & client_handle,
+		       (struct sockaddr *) &peer, &name_len);
+    uv_inet_ntop(AF_INET, &peer.sin_addr, remote_addr,
+		 sizeof(remote_addr));
 
     player->remote_addr = talloc_strdup(player, remote_addr);
     player->remote_port = peer.sin_port;
 
-    _ERROR("%s: %s has connected to slot %d\n", __FUNCTION__, remote_addr, player_id);
+    _ERROR("%s: %s has connected to slot %d\n", __FUNCTION__, remote_addr,
+	   player_id);
 
     // start read
     server->game->players[player_id] = player;
-    uv_read_start((uv_stream_t *) player->handle, __alloc_buffer, __on_read);
+    uv_read_start((uv_stream_t *) player->handle, __alloc_buffer,
+		  __on_read);
 }
 
 int server_new(TALLOC_CTX * context, const char *listen_address,
-	       const uint16_t port, struct game_context *game, struct server **out_server)
+	       const uint16_t port, struct game_context *game,
+	       struct server **out_server)
 {
     int ret = -1;
     TALLOC_CTX *temp_context;
     struct server *server;
 
-    if ((temp_context = talloc_new(NULL)) == NULL || (server = talloc_zero(temp_context, struct server)) == NULL) {
+    if ((temp_context = talloc_new(NULL)) == NULL
+	|| (server = talloc_zero(temp_context, struct server)) == NULL) {
 	_ERROR("%s: Cannot allocate a server object.\n", __FUNCTION__);
 	ret = -ENOMEM;
 	goto out;
@@ -152,7 +163,8 @@ int server_start(struct server *server)
 
     server->tcp.data = server;
 
-    if (uv_listen((uv_stream_t *) & server->tcp, 128, __on_connection) != 0) {
+    if (uv_listen((uv_stream_t *) & server->tcp, 128, __on_connection) !=
+	0) {
 	_ERROR("%s: listen failure.\n", __FUNCTION__);
 	return -1;
     }

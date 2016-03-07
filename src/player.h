@@ -44,7 +44,8 @@ struct player {
     int state;
 };
 
-int player_new(TALLOC_CTX * context, const struct game_context *game, int id, struct player **out_player);
+int player_new(TALLOC_CTX * context, const struct game_context *game,
+	       int id, struct player **out_player);
 
 void player_close(struct player *player);
 

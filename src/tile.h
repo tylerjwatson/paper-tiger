@@ -80,7 +80,8 @@ struct tile {
     int16_t frame_y;
 };
 
-int tile_heap_new(TALLOC_CTX * context, const uint32_t size_x, const uint32_t size_y, struct tile ***out_tiles);
+int tile_heap_new(TALLOC_CTX * context, const uint32_t size_x,
+		  const uint32_t size_y, struct tile ***out_tiles);
 bool tile_active(struct tile *tile);
 void tile_set_active(struct tile *tile, bool val);
 
