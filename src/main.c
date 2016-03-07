@@ -38,21 +38,21 @@ static const char *options_worldPath = NULL;
 
 static int parse_command_line(int argc, char **argv)
 {
-    int c;
+	int c;
 
-    opterr = 0;
+	opterr = 0;
 
-    while ((c = getopt(argc, argv, GUAC_OPTIONS)) != -1) {
-	switch (c) {
-	case 'w':
-	    options_worldPath = optarg;
-	    break;
-	default:
-	    break;
+	while ((c = getopt(argc, argv, GUAC_OPTIONS)) != -1) {
+		switch (c) {
+		case 'w':
+			options_worldPath = optarg;
+			break;
+		default:
+			break;
+		}
 	}
-    }
 
-    return 0;
+	return 0;
 }
 
 static int __run_loop_init()
@@ -62,48 +62,48 @@ static int __run_loop_init()
 
 int main(int argc, char **argv)
 {
-    int ret = 0;
-    struct game_context *game;
-    clock_t start;
-    clock_t diff;
+	int ret = 0;
+	struct game_context *game;
+	clock_t start;
+	clock_t diff;
 
-    printf("Upgraded Guacamole\n");
+	printf("Upgraded Guacamole\n");
 
-    parse_command_line(argc, argv);
-    talloc_enable_leak_report_full();
-    talloc_set_log_stderr();
+	parse_command_line(argc, argv);
+	talloc_enable_leak_report_full();
+	talloc_set_log_stderr();
 
-    start = clock();
+	start = clock();
 
-    printf("%s: initializing game context... ", __FUNCTION__);
-    game_new(NULL, &game);
-    printf("done.\n");
+	printf("%s: initializing game context... ", __FUNCTION__);
+	game_new(NULL, &game);
+	printf("done.\n");
 
-    printf("%s: loading world from %s... ", __FUNCTION__,
-	   options_worldPath);
-    if (world_new(game, options_worldPath, &game->world) < 0
-	|| world_init(game->world) < 0) {
-	ret = -1;
-	printf("World init failed: %d\n", ret);
-	goto out;
-    }
-
-    diff = clock() - start;
-    printf("done (%dms).\n", (int) (diff * 1000 / CLOCKS_PER_SEC));
+	printf("%s: loading world from %s... ", __FUNCTION__, options_worldPath);
+	if (world_new(game, options_worldPath, &game->world) < 0
+		|| world_init(game->world) < 0) {
+		ret = -1;
+		printf("World init failed: %d\n", ret);
+		goto out;
+	}
+	
+	diff = clock() - start;
+	printf("done (%dms).\n", (int)(diff * 1000 / CLOCKS_PER_SEC));
 
     if (server_new(game, "0.0.0.0", 7777, game, &game->server) < 0) {
-	_ERROR("Initializing TCP server for game context failed.");
-	ret = -1;
-	goto out;
+        _ERROR("Initializing TCP server for game context failed.");
+        ret = -1;
+        goto out;
     }
-
+    
     server_start(game->server);
-
-    printf("server started.\n");
-
+	
+	printf("server started.\n");
+	
     game_start_event_loop(game);
-
-  out:
+    
+out:
     talloc_free(game);
-    return ret;
+	return ret;
 }
+

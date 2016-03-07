@@ -26,53 +26,40 @@
 #include <stdint.h>
 
 struct binary_reader_context {
-    char *file_path;
-    FILE *fp;
+	char *file_path;
+	FILE *fp;
 };
 
-int binary_reader_new(TALLOC_CTX * parent_context, const char *file_path,
-		      struct binary_reader_context **out_context);
+int binary_reader_new(TALLOC_CTX *parent_context, const char *file_path, struct binary_reader_context **out_context);
 
 size_t binary_reader_pos(struct binary_reader_context *context);
 
 int binary_reader_open(struct binary_reader_context *context);
 
-int binary_reader_read_boolean(struct binary_reader_context *context,
-			       bool * out_value);
+int binary_reader_read_boolean(struct binary_reader_context *context, bool *out_value);
 
-int binary_reader_read_byte(struct binary_reader_context *context,
-			    uint8_t * out_value);
+int binary_reader_read_byte(struct binary_reader_context *context, uint8_t *out_value);
 
-int binary_reader_read_decimal(struct binary_reader_context *context,
-			       long double *out_value);
+int binary_reader_read_decimal(struct binary_reader_context *context, long double *out_value);
 
-int binary_reader_read_double(struct binary_reader_context *context,
-			      double *out_value);
+int binary_reader_read_double(struct binary_reader_context *context, double *out_value);
 
-int binary_reader_read_int16(struct binary_reader_context *context,
-			     int16_t * out_value);
+int binary_reader_read_int16(struct binary_reader_context *context, int16_t *out_value);
 
-int binary_reader_read_int32(struct binary_reader_context *context,
-			     int32_t * out_value);
+int binary_reader_read_int32(struct binary_reader_context *context, int32_t *out_value);
 
-int binary_reader_read_int64(struct binary_reader_context *context,
-			     int64_t * out_value);
+int binary_reader_read_int64(struct binary_reader_context *context, int64_t *out_value);
 
-int binary_reader_read_single(struct binary_reader_context *context,
-			      float *out_value);
+int binary_reader_read_single(struct binary_reader_context *context, float *out_value);
 
-int binary_reader_read_string(struct binary_reader_context *context,
-			      char **out_value);
+int binary_reader_read_string(struct binary_reader_context *context, char **out_value);
 
-int binary_reader_read_uint16(struct binary_reader_context *context,
-			      uint16_t * out_value);
+int binary_reader_read_uint16(struct binary_reader_context *context, uint16_t *out_value);
 
-int binary_reader_read_uint32(struct binary_reader_context *context,
-			      uint32_t * out_value);
+int binary_reader_read_uint32(struct binary_reader_context *context, uint32_t *out_value);
 
-int binary_reader_read_uint64(struct binary_reader_context *context,
-			      uint64_t * out_value);
+int binary_reader_read_uint64(struct binary_reader_context *context, uint64_t *out_value);
 
 int binary_reader_close(struct binary_reader_context *context);
 
-#endif				/* HAVE_BINARY_READER_H */
+#endif /* HAVE_BINARY_READER_H */

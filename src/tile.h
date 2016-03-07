@@ -29,59 +29,58 @@
 #define TILE_SECTION_WIDTH 100
 
 enum {
-    WORLD_FILE_TILE_HAS_FLAGS = 1,
-    WORLD_FILE_TILE_ACTIVE = 1 << 1,
-    WORLD_FILE_TILE_IS_WALL = 1 << 2,
-    WORLD_FILE_TYPE_SHORT = 1 << 5
+	WORLD_FILE_TILE_HAS_FLAGS = 1,
+	WORLD_FILE_TILE_ACTIVE = 1 << 1,
+	WORLD_FILE_TILE_IS_WALL = 1 << 2,
+	WORLD_FILE_TYPE_SHORT = 1 << 5
 };
 
 enum {
-    B_TILE_HEADER_HONEY = 1 << 6
+	B_TILE_HEADER_HONEY = 1 << 6
 };
 
 enum {
-    S_TILE_HEADER_LAVA = 1 << 4,
-    S_TILE_HEADER_ACTIVE = 1 << 5,
-    S_TILE_HEADER_INACTIVE = 1 << 6,
-    S_TILE_HEADER_WIRE = 1 << 7,
-    S_TILE_HEADER_WIRE_2 = 1 << 8,
-    S_TILE_HEADER_WIRE_3 = 1 << 9,
-    S_TILE_ACTUATOR = 1 << 11
+	S_TILE_HEADER_LAVA = 1 << 4,
+	S_TILE_HEADER_ACTIVE = 1 << 5,
+	S_TILE_HEADER_INACTIVE = 1 << 6,
+	S_TILE_HEADER_WIRE = 1 << 7,
+	S_TILE_HEADER_WIRE_2 = 1 << 8,
+	S_TILE_HEADER_WIRE_3 = 1 << 9,
+	S_TILE_ACTUATOR = 1 << 11
 };
 
 enum {
-    TILE_IS_WIRE = 1,
-    TILE_WIRE_1 = 1 << 1,
-    TILE_WIRE_2 = 1 << 2,
-    TILE_WIRE_3 = 1 << 3,
+	TILE_IS_WIRE = 1,
+	TILE_WIRE_1 = 1 << 1,
+	TILE_WIRE_2 = 1 << 2,
+	TILE_WIRE_3 = 1 << 3,
 };
 
 enum {
-    WORLD_FILE_TILE_COLOUR_ACTUATOR = 1 << 1,
-    WORLD_FILE_TILE_COLOUR_INACTIVE = 1 << 2,
-    WORLD_FILE_TILE_COLOUR = 1 << 3,
-    WORLD_FILE_WALL_COLOUR = 1 << 4
+	WORLD_FILE_TILE_COLOUR_ACTUATOR = 1 << 1,
+	WORLD_FILE_TILE_COLOUR_INACTIVE = 1 << 2,
+	WORLD_FILE_TILE_COLOUR = 1 << 3,
+	WORLD_FILE_WALL_COLOUR = 1 << 4
 };
 
 struct tile_row {
-    int x;
-    struct tile *tiles;
+	int x;
+	struct tile *tiles;
 };
 
 struct tile {
-    uint16_t type;
-    uint8_t wall;
-    uint8_t liquid;
-    int16_t s_tile_header;
-    int8_t b_tile_header;
-    int8_t b_tile_header_2;
-    int8_t b_tile_header_3;
-    int16_t frame_x;
-    int16_t frame_y;
+	uint16_t type;
+	uint8_t wall;
+	uint8_t liquid;
+	int16_t s_tile_header;
+	int8_t b_tile_header;
+	int8_t b_tile_header_2;
+	int8_t b_tile_header_3;
+	int16_t frame_x;
+	int16_t frame_y;
 };
 
-int tile_heap_new(TALLOC_CTX * context, const uint32_t size_x,
-		  const uint32_t size_y, struct tile ***out_tiles);
+int tile_heap_new(TALLOC_CTX *context, const uint32_t size_x, const uint32_t size_y, struct tile ***out_tiles);
 bool tile_active(struct tile *tile);
 void tile_set_active(struct tile *tile, bool val);
 

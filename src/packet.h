@@ -28,21 +28,19 @@
 #include "packet_type.h"
 
 struct packet_buffer {
-    uint16_t len;
-    enum packet_type type;
-
-    char *data;
+	uint16_t len;
+	enum packet_type type;
+	
+	char *data;
 };
 
-typedef int (*packet_handler_cb) (const struct player * player,
-				  const struct packet_buffer * buf);
+typedef int (*packet_handler_cb)(const struct player *player, const struct packet_buffer *buf);
 
 struct packet_handler {
-    uint8_t type;
-    packet_handler_cb handler;
+	uint8_t type;
+	packet_handler_cb handler;
 };
 
-int packet_read_header(const uv_buf_t * buf, uint8_t * out_type,
-		       uint16_t * out_len);
+int packet_read_header(const uv_buf_t *buf, uint8_t *out_type, uint16_t *out_len);
 
-#endif				/* _HAVE_PACKET_H */
+#endif /* _HAVE_PACKET_H */

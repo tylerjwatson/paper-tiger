@@ -24,42 +24,40 @@
 
 static void __player_destructor(struct player *player)
 {
-    uv_close((uv_handle_t *) & player->handle, NULL);
-    bitmap_clear(player->game->player_slots, player->id);
+	uv_close((uv_handle_t *)&player->handle, NULL);
+	bitmap_clear(player->game->player_slots, player->id);
 }
 
-int player_new(TALLOC_CTX * context, const struct game_context *game,
-	       int id, struct player **out_player)
+int player_new(TALLOC_CTX *context, const struct game_context *game, int id, struct player **out_player)
 {
     int ret = -1;
     TALLOC_CTX *temp_context;
     struct player *player;
-
+    
     if ((temp_context = talloc_new(NULL)) == NULL) {
-	_ERROR("%s: allocating temporary talloc context failed.\n",
-	       __FUNCTION__);
-	return -1;
+        _ERROR("%s: allocating temporary talloc context failed.\n", __FUNCTION__);
+        return -1;
     }
-
+    
     if ((player = talloc_zero(temp_context, struct player)) == NULL) {
-	_ERROR("%s: allocating player object failed.\n", __FUNCTION__);
-	ret = -1;
-	goto out;
+        _ERROR("%s: allocating player object failed.\n", __FUNCTION__);
+        ret = -1;
+        goto out;
     }
-
+    
     player->id = id;
-    player->game = (struct game_context *) game;
-    talloc_set_destructor(player, __player_destructor);
-
+	player->game = (struct game_context *)game;
+	talloc_set_destructor(player, __player_destructor);
+    
     *out_player = talloc_steal(context, player);
     ret = 0;
-
-  out:
+	
+out:
     talloc_free(temp_context);
     return ret;
 }
 
 void player_close(struct player *player)
 {
-    talloc_free(player);
+	talloc_free(player);
 }

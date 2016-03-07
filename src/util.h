@@ -22,4 +22,4 @@
 
 #define _ERROR(x,...) fprintf(stderr, x,##__VA_ARGS__)
 
-#endif				//UPGRADED_GUACAMOLE_UTIL_H
+#endif //UPGRADED_GUACAMOLE_UTIL_H

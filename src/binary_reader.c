@@ -25,321 +25,306 @@
 #include "binary_reader.h"
 #include "util.h"
 
-static uint16_t le16_to_cpu(const uint8_t * buf)
+static uint16_t le16_to_cpu(const uint8_t *buf)
 {
-    return ((uint16_t) buf[0]) | (((uint16_t) buf[1]) << 8);
+	return ((uint16_t)buf[0]) | (((uint16_t)buf[1]) << 8);
 }
 
-static uint16_t be16_to_cpu(const uint8_t * buf)
+static uint16_t be16_to_cpu(const uint8_t *buf)
 {
-    return ((uint16_t) buf[1]) | (((uint16_t) buf[0]) << 8);
+	return ((uint16_t)buf[1]) | (((uint16_t)buf[0]) << 8);
 }
 
-static int __read_7_bit_int(struct binary_reader_context *context,
-			    int32_t * out_value)
-{
-    int count = 0, shift = 0;
-    uint8_t byte;
+static int __read_7_bit_int(struct binary_reader_context *context, int32_t *out_value) {
+	int count = 0, shift = 0;
+	uint8_t byte;
 
-    do {
-	if (shift == 5 * 7) {
-	    return -1;
+	do {
+		if (shift == 5 * 7) {
+			return -1;
+		}
+
+		if (binary_reader_read_byte(context, &byte) < 0) {
+			return -1;
+		}
+
+		count |= (byte & 0x7F) << shift;
+		shift += 7;
+	} while ((byte & 0x80) != 0);
+
+	*out_value = count;
+
+	return 0;
+}
+
+static int __binary_reader_destructor(struct binary_reader_context *talloc_context)
+{
+	//struct binary_reader_context *context = talloc_get_type_abort(talloc_context, struct binary_reader_context);
+	binary_reader_close(talloc_context);
+	return 0;
+}
+
+int binary_reader_new(TALLOC_CTX *parent_context, const char *file_path,
+						struct binary_reader_context **out_context)
+{
+	int ret = 0;
+	TALLOC_CTX *tempContext;
+	struct binary_reader_context *newContext;
+
+	if ((tempContext = talloc_new(NULL)) == NULL) {
+		ret = -ENOMEM;
+		goto failed;
 	}
 
-	if (binary_reader_read_byte(context, &byte) < 0) {
-	    return -1;
+	newContext = talloc_zero(tempContext, struct binary_reader_context);
+
+	if ((newContext->file_path = talloc_strdup(newContext, file_path)) == NULL) {
+		ret = -ENOMEM;
+		goto failed;
 	}
 
-	count |= (byte & 0x7F) << shift;
-	shift += 7;
-    } while ((byte & 0x80) != 0);
+	/*
+	 * Destructor callback makes sure the file pointer is closed
+	 * before the structure is deallocated with talloc_free.
+	 */
+	talloc_set_destructor(newContext, __binary_reader_destructor);
 
-    *out_value = count;
+	if (out_context != NULL) {
+		*out_context = talloc_steal(parent_context, newContext);
+	}
 
-    return 0;
+failed:
+	talloc_free(tempContext);
+	return ret;
 }
 
-static int __binary_reader_destructor(struct binary_reader_context
-				      *talloc_context)
+size_t binary_reader_pos(struct binary_reader_context *context)
 {
-    //struct binary_reader_context *context = talloc_get_type_abort(talloc_context, struct binary_reader_context);
-    binary_reader_close(talloc_context);
-    return 0;
-}
-
-int binary_reader_new(TALLOC_CTX * parent_context, const char *file_path,
-		      struct binary_reader_context **out_context)
-{
-    int ret = 0;
-    TALLOC_CTX *tempContext;
-    struct binary_reader_context *newContext;
-
-    if ((tempContext = talloc_new(NULL)) == NULL) {
-	ret = -ENOMEM;
-	goto failed;
-    }
-
-    newContext = talloc_zero(tempContext, struct binary_reader_context);
-
-    if ((newContext->file_path =
-	 talloc_strdup(newContext, file_path)) == NULL) {
-	ret = -ENOMEM;
-	goto failed;
-    }
-
-    /*
-     * Destructor callback makes sure the file pointer is closed
-     * before the structure is deallocated with talloc_free.
-     */
-    talloc_set_destructor(newContext, __binary_reader_destructor);
-
-    if (out_context != NULL) {
-	*out_context = talloc_steal(parent_context, newContext);
-    }
-
-  failed:
-    talloc_free(tempContext);
-    return ret;
-}
-
-size_t binary_reader_pos(struct binary_reader_context * context)
-{
-    return ftell(context->fp);
+	return ftell(context->fp);
 }
 
 int binary_reader_open(struct binary_reader_context *context)
 {
-    if (context->fp != NULL) {
-	return -1;
-    }
-
-    if ((context->fp = fopen(context->file_path, "r+b")) == NULL) {
-	printf("Error opening file %s: %s\n", context->file_path,
-	       strerror(errno));
-	return -1;
-    }
-
-    rewind(context->fp);
-
-    return 0;
-}
-
-int binary_reader_read_boolean(struct binary_reader_context *context,
-			       bool * out_value)
-{
-    return binary_reader_read_byte(context, (uint8_t *) out_value);
-}
-
-int binary_reader_read_byte(struct binary_reader_context *context,
-			    uint8_t * out_value)
-{
-    uint8_t val;
-
-    if (fread(&val, 1, 1, context->fp) != 1) {
-	if (feof(context->fp)) {
-	    _ERROR("%s: EOF reading file %s at position %ld\n",
-		   __FUNCTION__, context->file_path, ftell(context->fp));
-	} else if (ferror(context->fp)) {
-	    _ERROR("%s: IO error reading file %s at position %ld\n",
-		   __FUNCTION__, context->file_path, ftell(context->fp));
+	if (context->fp != NULL) {
+		return -1;
 	}
-	return -1;
-    }
 
-    if (out_value != NULL) {
-	*out_value = val;
-    }
+	if ((context->fp = fopen(context->file_path, "r+b")) == NULL) {
+		printf("Error opening file %s: %s\n", context->file_path, strerror(errno));
+		return -1;
+	}
 
-    return 0;
+	rewind(context->fp);
+
+	return 0;
 }
 
-int binary_reader_read_decimal(struct binary_reader_context *context,
-			       long double *out_value);
-
-int binary_reader_read_double(struct binary_reader_context *context,
-			      double *out_value)
+int binary_reader_read_boolean(struct binary_reader_context *context, bool *out_value)
 {
-    double val;
-
-    if (fread(&val, sizeof(double), 1, context->fp) != 1) {
-	return -1;
-    }
-
-    if (out_value != NULL) {
-	*out_value = val;
-    }
-
-    return 0;
+	return binary_reader_read_byte(context, (uint8_t *)out_value);
 }
 
-int binary_reader_read_int16(struct binary_reader_context *context,
-			     int16_t * out_value)
+int binary_reader_read_byte(struct binary_reader_context *context, uint8_t *out_value)
 {
-    uint8_t buffer[2];
+	uint8_t val;
 
-    if (fread(buffer, sizeof(int16_t), 1, context->fp) != 1) {
-	return -1;
-    }
+	if (fread(&val, 1, 1, context->fp) != 1) {
+		if (feof(context->fp)) {
+			_ERROR("%s: EOF reading file %s at position %ld\n", __FUNCTION__,
+				context->file_path, ftell(context->fp));
+		}
+		else if (ferror(context->fp)) {
+			_ERROR("%s: IO error reading file %s at position %ld\n", __FUNCTION__,
+				context->file_path, ftell(context->fp));
+		}
+		return -1;
+	}
 
-    *out_value = le16_to_cpu(buffer);
+	if (out_value != NULL) {
+		*out_value = val;
+	}
 
-    return 0;
+	return 0;
 }
 
-int binary_reader_read_int32(struct binary_reader_context *context,
-			     int32_t * out_value)
+int binary_reader_read_decimal(struct binary_reader_context *context, long double *out_value);
+
+int binary_reader_read_double(struct binary_reader_context *context, double *out_value)
 {
-    int32_t val;
-    size_t items;
+	double val;
 
-    if ((items = fread(&val, sizeof(int32_t), 1, context->fp)) != 1) {
-	if (feof(context->fp)) {
-	    _ERROR("%s: EOF reading file %s at position %ld\n",
-		   __FUNCTION__, context->file_path, ftell(context->fp));
-	} else if (ferror(context->fp)) {
-	    _ERROR("%s: IO error reading file %s at position %ld\n",
-		   __FUNCTION__, context->file_path, ftell(context->fp));
-	};
+	if (fread(&val, sizeof(double), 1, context->fp) != 1) {
+		return -1;
+	}
 
-	return -1;
-    }
+	if (out_value != NULL) {
+		*out_value = val;
+	}
 
-    if (out_value != NULL) {
-	*out_value = val;
-    }
-
-    return 0;
+	return 0;
 }
 
-int binary_reader_read_int64(struct binary_reader_context *context,
-			     int64_t * out_value)
+int binary_reader_read_int16(struct binary_reader_context *context, int16_t *out_value)
 {
-    int64_t val;
+	uint8_t buffer[2];
 
-    if (fread(&val, sizeof(int64_t), 1, context->fp) != 1) {
-	return -1;
-    }
+	if (fread(buffer, sizeof(int16_t), 1, context->fp) != 1) {
+		return -1;
+	}
 
-    if (out_value != NULL) {
-	*out_value = val;
-    }
+	*out_value = le16_to_cpu(buffer);
 
-    return 0;
+	return 0;
 }
 
-int binary_reader_read_single(struct binary_reader_context *context,
-			      float *out_value)
+int binary_reader_read_int32(struct binary_reader_context *context, int32_t *out_value)
 {
-    float val;
+	int32_t val;
+	size_t items;
 
-    if (fread(&val, sizeof(float), 1, context->fp) != 1) {
-	return -1;
-    }
+	if ((items = fread(&val, sizeof(int32_t), 1, context->fp)) != 1) {
+		if (feof(context->fp)) {
+			_ERROR("%s: EOF reading file %s at position %ld\n", __FUNCTION__,
+				context->file_path, ftell(context->fp));
+		}
+		else if (ferror(context->fp)) {
+			_ERROR("%s: IO error reading file %s at position %ld\n", __FUNCTION__,
+				context->file_path, ftell(context->fp));
+		};
 
-    if (out_value != NULL) {
-	*out_value = val;
-    }
+		return -1;
+	}
 
-    return 0;
+	if (out_value != NULL) {
+		*out_value = val;
+	}
+
+	return 0;
 }
 
-int binary_reader_read_string(struct binary_reader_context *context,
-			      char **out_value)
+int binary_reader_read_int64(struct binary_reader_context *context, int64_t *out_value)
 {
-    char *val;
-    size_t string_length = 0;
-    int ret;
+	int64_t val;
 
-    if (__read_7_bit_int(context, (int32_t *) & string_length) < 0) {
-	return -1;
-    }
+	if (fread(&val, sizeof(int64_t), 1, context->fp) != 1) {
+		return -1;
+	}
 
-    /*
-     * Note:
-     *
-     * .NET strings have a 7-bit encoded length at the start
-     * and no null terminator.  Must allocate enough room for
-     * the null terminator at the end of the c string.
-     */
-    if ((val = (char *) malloc(string_length + 1)) == NULL) {
-	ret = -ENOMEM;
+	if (out_value != NULL) {
+		*out_value = val;
+	}
+
+	return 0;
+}
+
+int binary_reader_read_single(struct binary_reader_context *context, float *out_value)
+{
+	float val;
+
+	if (fread(&val, sizeof(float), 1, context->fp) != 1) {
+		return -1;
+	}
+
+	if (out_value != NULL) {
+		*out_value = val;
+	}
+
+	return 0;
+}
+
+int binary_reader_read_string(struct binary_reader_context *context, char **out_value)
+{
+	char *val;
+	size_t string_length = 0;
+	int ret;
+
+	if (__read_7_bit_int(context, (int32_t *)&string_length) < 0) {
+		return -1;
+	}
+
+	/*
+	 * Note:
+	 *
+	 * .NET strings have a 7-bit encoded length at the start
+	 * and no null terminator.  Must allocate enough room for
+	 * the null terminator at the end of the c string.
+	 */
+	if ((val = (char *)malloc(string_length + 1)) == NULL) {
+		ret = -ENOMEM;
+		goto out;
+	}
+
+	if (fread(val, string_length, 1, context->fp) != 1) {
+		ret = -1;
+		goto failed;
+	}
+
+	val[string_length] = '\0';
+
+	if (out_value != NULL) {
+		*out_value = val;
+	}
+
+	ret = 0;
 	goto out;
-    }
 
-    if (fread(val, string_length, 1, context->fp) != 1) {
-	ret = -1;
-	goto failed;
-    }
-
-    val[string_length] = '\0';
-
-    if (out_value != NULL) {
-	*out_value = val;
-    }
-
-    ret = 0;
-    goto out;
-
-  failed:
-    free(val);
-  out:
-    return ret;
+failed:
+	free(val);
+out:
+	return ret;
 }
 
-int binary_reader_read_uint16(struct binary_reader_context *context,
-			      uint16_t * out_value)
+int binary_reader_read_uint16(struct binary_reader_context *context, uint16_t *out_value)
 {
-    uint16_t val;
+	uint16_t val;
 
-    if (fread(&val, sizeof(uint16_t), 1, context->fp) != 1) {
-	return -1;
-    }
+	if (fread(&val, sizeof(uint16_t), 1, context->fp) != 1) {
+		return -1;
+	}
 
-    if (out_value != NULL) {
-	*out_value = val;
-    }
+	if (out_value != NULL) {
+		*out_value = val;
+	}
 
-    return 0;
+	return 0;
 }
 
-int binary_reader_read_uint32(struct binary_reader_context *context,
-			      uint32_t * out_value)
+int binary_reader_read_uint32(struct binary_reader_context *context, uint32_t *out_value)
 {
-    uint32_t val;
+	uint32_t val;
 
-    if (fread(&val, sizeof(uint32_t), 1, context->fp) != 1) {
-	return -1;
-    }
+	if (fread(&val, sizeof(uint32_t), 1, context->fp) != 1) {
+		return -1;
+	}
 
-    if (out_value != NULL) {
-	*out_value = val;
-    }
+	if (out_value != NULL) {
+		*out_value = val;
+	}
 
-    return 0;
+	return 0;
 }
 
-int binary_reader_read_uint64(struct binary_reader_context *context,
-			      uint64_t * out_value)
+int binary_reader_read_uint64(struct binary_reader_context *context, uint64_t *out_value)
 {
-    uint64_t val;
+	uint64_t val;
 
-    if (fread(&val, sizeof(uint64_t), 1, context->fp) != 1) {
-	return -1;
-    }
+	if (fread(&val, sizeof(uint64_t), 1, context->fp) != 1) {
+		return -1;
+	}
 
-    if (out_value != NULL) {
-	*out_value = val;
-    }
+	if (out_value != NULL) {
+		*out_value = val;
+	}
 
-    return 0;
+	return 0;
 }
 
 int binary_reader_close(struct binary_reader_context *context)
 {
-    if (context->fp == NULL) {
-	return -1;
-    }
+	if (context->fp == NULL) {
+		return -1;
+	}
 
-    fclose(context->fp);
-    return 0;
+	fclose(context->fp);
+	return 0;
 }

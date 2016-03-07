@@ -28,15 +28,14 @@
 
 struct server {
     char *listen_address;
-    uint32_t port;
-    struct game_context *game;	/* Backpointer to the game who owns it */
-
+    uint32_t port;		
+    struct game_context *game;                      /* Backpointer to the game who owns it */
+    
     uv_tcp_t tcp;
 };
 
-int server_new(TALLOC_CTX * context, const char *listen_address,
-	       const uint16_t port, struct game_context *game,
-	       struct server **out_server);
+int server_new(TALLOC_CTX *context, const char *listen_address, const uint16_t port,
+               struct game_context *game, struct server **out_server);
 
 int server_start(struct server *server);
 
