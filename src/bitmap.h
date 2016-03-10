@@ -24,7 +24,8 @@
 #include <limits.h>    /* for CHAR_BIT */
 #include <stdint.h>   /* for uint32_t */
 #include <stdbool.h>
-typedef uint64_t word_t;
+
+typedef uint32_t word_t;
 
 enum {
     BITS_PER_WORD = sizeof(word_t) * CHAR_BIT

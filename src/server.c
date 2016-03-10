@@ -54,7 +54,7 @@ static void __alloc_buffer(uv_handle_t *handle, size_t size, uv_buf_t *out_buf)
 	struct player *player = (struct player *)handle->data;
 	
 	if (player->state == PLAYER_SOCKET_STATE_HEADER) {
-		size = 2;
+		size = 3;
 	}
 	
 	*out_buf = uv_buf_init(talloc_size(player, size), size);

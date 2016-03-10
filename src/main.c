@@ -27,6 +27,7 @@
 #endif
 
 #include "talloc/talloc.h"
+#include "console.h"
 #include "util.h"
 #include "getopt.h"
 #include "game.h"
@@ -98,6 +99,8 @@ int main(int argc, char **argv)
     
     server_start(game->server);
 	
+	console_init(game);
+
 	printf("server started.\n");
 	
     game_start_event_loop(game);

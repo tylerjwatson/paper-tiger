@@ -44,6 +44,7 @@ struct game_context {
 	word_t *player_slots;
 	
     uv_loop_t *event_loop;
+	uv_tty_t *console_handle;
 	/*pthread_t game_thread;
 	pthread_mutex_t game_mutex;*/
 };
