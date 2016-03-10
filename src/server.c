@@ -67,7 +67,7 @@ void __on_connection(uv_stream_t *handle, int status)
 	struct player *player;
     int name_len = sizeof(peer);
 	int player_id;
-    char remote_addr[16] = {};
+    char remote_addr[16];
     
 	uv_tcp_t *client_handle;
 		
@@ -75,11 +75,6 @@ void __on_connection(uv_stream_t *handle, int status)
         return;
     }
     
-    /*
-     * Re-listen for more clients
-     */
-	
-	
 	if ((player_id = game_find_next_slot(server->game)) < 0) {
 		return;
 	}

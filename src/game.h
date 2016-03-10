@@ -23,7 +23,7 @@
 
 #include <errno.h>
 #include <stdbool.h>
-#include <pthread.h>
+//#include <pthread.h>
 #include <uv.h>
 
 #include "talloc/talloc.h"
@@ -44,8 +44,8 @@ struct game_context {
 	word_t *player_slots;
 	
     uv_loop_t *event_loop;
-	pthread_t game_thread;
-	pthread_mutex_t game_mutex;
+	/*pthread_t game_thread;
+	pthread_mutex_t game_mutex;*/
 };
 
 int game_find_next_slot(struct game_context *context);

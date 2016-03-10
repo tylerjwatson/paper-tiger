@@ -12,7 +12,7 @@ if(WIN32)
 	set(CMAKE_PREFIX_PATH "${PROJECT_SOURCE_DIR}/win32")
 	
 	include(FindLibUV-Win32)
-	include(FindPThread-Win32)
+	# include(FindPThread-Win32)
 else()
 	include(FindLibUV)
 endif()
@@ -22,9 +22,9 @@ if(NOT LIBUV_FOUND)
 	message(FATAL_ERROR "LibUV not found and is required.")
 endif()
 
-if (WIN32 AND NOT PTHREAD_FOUND)
-	message(FATAL_ERROR "pthread not found and is required.")
-endif()
+#if (WIN32 AND NOT PTHREAD_FOUND)
+#	message(FATAL_ERROR "pthread not found and is required.")
+#endif()
 
 add_library(talloc STATIC src/talloc/talloc.c)
 
@@ -57,7 +57,8 @@ set_property(TARGET upgraded-guacamole PROPERTY C_STANDARD 11)
 
 
 if(WIN32)
-	target_link_libraries(upgraded-guacamole talloc "${LIBUV_LIBRARIES}" "${PTHREAD_LIBRARY}")
+	target_link_libraries(upgraded-guacamole talloc "${LIBUV_LIBRARIES}")
+	# target_link_libraries(upgraded-guacamole talloc "${LIBUV_LIBRARIES}" "${PTHREAD_LIBRARY}")
 else()
 	target_link_libraries(upgraded-guacamole talloc "${LIBUV_LIBRARIES}")
 endif()

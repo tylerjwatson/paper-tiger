@@ -64,8 +64,8 @@ static void *__game_thread(void *data)
 static void __game_destructor(struct game_context *context)
 {
 	context->is_exited = true;
-	pthread_join(context->game_thread, NULL);
-    pthread_mutex_destroy(&context->game_mutex);
+	//pthread_join(context->game_thread, NULL);
+ //   pthread_mutex_destroy(&context->game_mutex);
     
     uv_loop_close(context->event_loop);
 }
@@ -89,10 +89,10 @@ int game_start_event_loop(struct game_context *context)
 
 int game_start_thread(struct game_context *context)
 {
-	if (pthread_create(&context->game_thread, NULL, __game_thread, (void *)context) < 0) {
-		_ERROR("%s: Could not create game thread.\n", __FUNCTION__);
-		return -1;
-	}
+	//if (pthread_create(&context->game_thread, NULL, __game_thread, (void *)context) < 0) {
+	//	_ERROR("%s: Could not create game thread.\n", __FUNCTION__);
+	//	return -1;
+	//}
     
     return 0;
 }
@@ -148,11 +148,11 @@ int game_new(TALLOC_CTX *context, struct game_context **out_context)
     }
     
 
-	if (pthread_mutex_init(&gameContext->game_mutex, NULL) < 0) {
-		_ERROR("%s: Could not initialize game thread mutex\n", __FUNCTION__);
-		ret = -1;
-		goto out;
-	}
+	//if (pthread_mutex_init(&gameContext->game_mutex, NULL) < 0) {
+	//	_ERROR("%s: Could not initialize game thread mutex\n", __FUNCTION__);
+	//	ret = -1;
+	//	goto out;
+	//}
     
     uv_loop_init(gameContext->event_loop);
 	
