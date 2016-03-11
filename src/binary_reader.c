@@ -128,21 +128,23 @@ int binary_reader_read_byte(struct binary_reader_context *context, uint8_t *out_
 {
 	uint8_t val;
 
-	if (fread(&val, 1, 1, context->fp) != 1) {
-		if (feof(context->fp)) {
-			_ERROR("%s: EOF reading file %s at position %ld\n", __FUNCTION__,
-				context->file_path, ftell(context->fp));
-		}
-		else if (ferror(context->fp)) {
-			_ERROR("%s: IO error reading file %s at position %ld\n", __FUNCTION__,
-				context->file_path, ftell(context->fp));
-		}
-		return -1;
-	}
+	fread(out_value, 1, 1, context->fp);
 
-	if (out_value != NULL) {
-		*out_value = val;
-	}
+	//if (fread(out_value, 1, 1, context->fp) != 1) {
+	//	if (feof(context->fp)) {
+	//		_ERROR("%s: EOF reading file %s at position %ld\n", __FUNCTION__,
+	//			context->file_path, ftell(context->fp));
+	//	}
+	//	else if (ferror(context->fp)) {
+	//		_ERROR("%s: IO error reading file %s at position %ld\n", __FUNCTION__,
+	//			context->file_path, ftell(context->fp));
+	//	}
+	//	return -1;
+	//}
+
+	//if (out_value != NULL) {
+	//	*out_value = val;
+	//}
 
 	return 0;
 }

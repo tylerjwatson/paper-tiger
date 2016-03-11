@@ -88,21 +88,25 @@ int main(int argc, char **argv)
 	printf("done (%dms).\n", (int)(diff * 1000 / CLOCKS_PER_SEC));
 
 	if (server_new(game, "0.0.0.0", 7777, game, &game->server) < 0) {
-		_ERROR("Initializing TCP server for game context failed.");
+		_ERROR("Initializing TCP server for game context failed.\n");
 		ret = -1;
 		goto out;
 	}
 
 	if (console_new(game, game, &game->console) < 0) {
-		_ERROR("Initializing console failed.");
+		_ERROR("Initializing console failed.\n");
 		ret = -1;
 		goto out;
 	}
 	
-	server_start(game->server);
+	if (server_start(game->server) < 0) {
+		_ERROR("Starting server for game context failed.\n");
+		ret = -1;
+		goto out;
+	}
+
 	game_update_loop_init(game);
 	
-
 	printf("\nStarted successfully on %s:%d\n", 
 		game->server->listen_address,
 		game->server->port);
@@ -121,6 +125,7 @@ int main(int argc, char **argv)
 	console_init(game->console);
 	game_start_event_loop(game);
 
+	uv_timer_stop(game->update_handle);
 	uv_read_stop((uv_stream_t *)game->console->console_handle);
 	uv_read_stop((uv_stream_t *)game->server->tcp_handle);
 
