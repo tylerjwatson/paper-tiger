@@ -62,19 +62,19 @@ static void __alloc_buffer(uv_handle_t *handle, size_t size, uv_buf_t *out_buf)
 
 void __on_connection(uv_stream_t *handle, int status)
 {
-    struct sockaddr_in peer;
-    struct server *server = (struct server *)handle->data;
+	struct sockaddr_in peer;
+	struct server *server = (struct server *)handle->data;
 	struct player *player;
-    int name_len = sizeof(peer);
+	int name_len = sizeof(peer);
 	int player_id;
-    char remote_addr[16];
-    
+	char remote_addr[16];
+	
 	uv_tcp_t *client_handle;
 		
-    if (status < 0) {
-        return;
-    }
-    
+	if (status < 0) {
+		return;
+	}
+	
 	if ((player_id = game_find_next_slot(server->game)) < 0) {
 		return;
 	}
@@ -90,21 +90,21 @@ void __on_connection(uv_stream_t *handle, int status)
 	uv_tcp_init(server->game->event_loop, client_handle);
 	uv_tcp_nodelay(client_handle, true);
 	
-    if (uv_accept(handle, (uv_stream_t *)client_handle) < 0) {
-        _ERROR("%s: Could not accept socket.", __FUNCTION__);
-        return;
+	if (uv_accept(handle, (uv_stream_t *)client_handle) < 0) {
+		_ERROR("%s: Could not accept socket.", __FUNCTION__);
+		return;
 	}
 	
 	player->handle = client_handle;
 	player->handle->data = player;
 	
-    uv_tcp_getpeername((uv_tcp_t *)&client_handle, (struct sockaddr *)&peer, &name_len);
-    uv_inet_ntop(AF_INET, &peer.sin_addr, remote_addr, sizeof(remote_addr));
+	uv_tcp_getpeername((uv_tcp_t *)&client_handle, (struct sockaddr *)&peer, &name_len);
+	uv_inet_ntop(AF_INET, &peer.sin_addr, remote_addr, sizeof(remote_addr));
 	
 	player->remote_addr = talloc_strdup(player, remote_addr);
 	player->remote_port = peer.sin_port;
 	
-    _ERROR("%s: %s has connected to slot %d\n", __FUNCTION__, remote_addr, player_id);
+	_ERROR("%s: %s has connected to slot %d\n", __FUNCTION__, remote_addr, player_id);
 	
 	// start read
 	server->game->players[player_id] = player;
@@ -112,19 +112,19 @@ void __on_connection(uv_stream_t *handle, int status)
 }
 
 int server_new(TALLOC_CTX *context, const char *listen_address, const uint16_t port,
-               struct game *game, struct server **out_server)
+			   struct game *game, struct server **out_server)
 {
-    int ret = -1;
-    TALLOC_CTX *temp_context;
-    struct server *server;
+	int ret = -1;
+	TALLOC_CTX *temp_context;
+	struct server *server;
 	uv_tcp_t *tcp_handle;
-    
-    if ((temp_context = talloc_new(NULL)) == NULL
-        || (server = talloc_zero(temp_context, struct server)) == NULL) {
-        _ERROR("%s: Cannot allocate a server object.\n", __FUNCTION__);
-        ret = -ENOMEM;
-        goto out;
-    }
+	
+	if ((temp_context = talloc_new(NULL)) == NULL
+		|| (server = talloc_zero(temp_context, struct server)) == NULL) {
+		_ERROR("%s: Cannot allocate a server object.\n", __FUNCTION__);
+		ret = -ENOMEM;
+		goto out;
+	}
 
 	tcp_handle = talloc(temp_context, uv_tcp_t);
 	if (tcp_handle == NULL) {
@@ -132,35 +132,35 @@ int server_new(TALLOC_CTX *context, const char *listen_address, const uint16_t p
 		ret = -ENOMEM;
 		goto out;
 	}
-    
-    server->listen_address = talloc_strdup(server, listen_address);
-    server->port = port;
-    server->game = game;
+	
+	server->listen_address = talloc_strdup(server, listen_address);
+	server->port = port;
+	server->game = game;
 	server->tcp_handle = talloc_steal(context, tcp_handle);
 
-    *out_server = talloc_steal(context, server);
-    
-    ret = 0;
+	*out_server = talloc_steal(context, server);
+	
+	ret = 0;
 out:
-    talloc_free(temp_context);
-    
-    return ret;
+	talloc_free(temp_context);
+	
+	return ret;
 }
 
 int server_start(struct server *server)
 {
-    struct sockaddr_in server_addr;
+	struct sockaddr_in server_addr;
 	
-    uv_tcp_init(server->game->event_loop, server->tcp_handle);
-    uv_ip4_addr(server->listen_address, server->port, &server_addr);
-    uv_tcp_bind(server->tcp_handle, (const struct sockaddr *)&server_addr, 0);
-    
-    server->tcp_handle->data = server;
-    
-    if (uv_listen((uv_stream_t *)server->tcp_handle, 128, __on_connection) != 0) {
-        _ERROR("%s: listen failure.\n", __FUNCTION__);
-        return -1;
-    }
+	uv_tcp_init(server->game->event_loop, server->tcp_handle);
+	uv_ip4_addr(server->listen_address, server->port, &server_addr);
+	uv_tcp_bind(server->tcp_handle, (const struct sockaddr *)&server_addr, 0);
 	
-    return 0;
+	server->tcp_handle->data = server;
+	
+	if (uv_listen((uv_stream_t *)server->tcp_handle, 128, __on_connection) != 0) {
+		_ERROR("%s: listen failure.\n", __FUNCTION__);
+		return -1;
+	}
+	
+	return 0;
 }

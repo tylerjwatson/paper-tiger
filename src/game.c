@@ -74,7 +74,7 @@ int game_find_next_slot(struct game *context)
 
 int game_start_event_loop(struct game *context)
 {
-    return uv_run(context->event_loop, UV_RUN_DEFAULT);
+	return uv_run(context->event_loop, UV_RUN_DEFAULT);
 }
 
 int game_new(TALLOC_CTX *context, struct game **out_context)
@@ -88,20 +88,19 @@ int game_new(TALLOC_CTX *context, struct game **out_context)
 	}
 
 	gameContext = talloc_zero(tempContext, struct game);
-    
+	
 	/*
 	 * Init game stuff here
 	 */
-
 	gameContext->ms_per_frame = 1000. / FRAMES_PER_SEC;
 
-    if ((gameContext->event_loop = talloc_zero(gameContext, uv_loop_t)) == NULL) {
-        _ERROR("%s: Could not allocate a game event loop.\n", __FUNCTION__);
-        ret = -1;
-        goto out;
-    }
-    
-    uv_loop_init(gameContext->event_loop);
+	if ((gameContext->event_loop = talloc_zero(gameContext, uv_loop_t)) == NULL) {
+		_ERROR("%s: Could not allocate a game event loop.\n", __FUNCTION__);
+		ret = -1;
+		goto out;
+	}
+	
+	uv_loop_init(gameContext->event_loop);
 	
 	gameContext->player_slots = talloc_array(gameContext, word_t, GAME_MAX_PLAYERS / sizeof(word_t));
 	

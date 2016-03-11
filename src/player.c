@@ -30,31 +30,31 @@ static void __player_destructor(struct player *player)
 
 int player_new(TALLOC_CTX *context, const struct game *game, int id, struct player **out_player)
 {
-    int ret = -1;
-    TALLOC_CTX *temp_context;
-    struct player *player;
-    
-    if ((temp_context = talloc_new(NULL)) == NULL) {
-        _ERROR("%s: allocating temporary talloc context failed.\n", __FUNCTION__);
-        return -1;
-    }
-    
-    if ((player = talloc_zero(temp_context, struct player)) == NULL) {
-        _ERROR("%s: allocating player object failed.\n", __FUNCTION__);
-        ret = -1;
-        goto out;
-    }
-    
-    player->id = id;
+	int ret = -1;
+	TALLOC_CTX *temp_context;
+	struct player *player;
+	
+	if ((temp_context = talloc_new(NULL)) == NULL) {
+		_ERROR("%s: allocating temporary talloc context failed.\n", __FUNCTION__);
+		return -1;
+	}
+	
+	if ((player = talloc_zero(temp_context, struct player)) == NULL) {
+		_ERROR("%s: allocating player object failed.\n", __FUNCTION__);
+		ret = -1;
+		goto out;
+	}
+	
+	player->id = id;
 	player->game = (struct game *)game;
 	talloc_set_destructor(player, __player_destructor);
-    
-    *out_player = talloc_steal(context, player);
-    ret = 0;
+	
+	*out_player = talloc_steal(context, player);
+	ret = 0;
 	
 out:
-    talloc_free(temp_context);
-    return ret;
+	talloc_free(temp_context);
+	return ret;
 }
 
 void player_close(struct player *player)
