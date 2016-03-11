@@ -63,7 +63,8 @@ int main(int argc, char **argv)
 	clock_t start;
 	clock_t diff;
 
-	printf("Upgraded Guacamole\n");
+	printf("Upgraded Guacamole Terraria Server\n");
+	printf(" by Tyler W. <tyler@tw.id.au>\n\n");
 
 	parse_command_line(argc, argv);
 	talloc_enable_leak_report_full();
@@ -91,18 +92,40 @@ int main(int argc, char **argv)
         ret = -1;
         goto out;
     }
+
+	if (console_new(game, game, &game->console) < 0) {
+		_ERROR("Initializing console failed.");
+		ret = -1;
+		goto out;
+	}
     
     server_start(game->server);
-	console_init(game);
-
 	game_update_loop_init(game);
+	
+
+	printf("\nStarted successfully on %s:%d\n", 
+		game->server->listen_address,
+		game->server->port);
+
+	printf(" * %s (%dx%d)\n", game->world->world_name, 
+		game->world->max_tiles_x, 
+		game->world->max_tiles_y);
+
+	printf(" * Expert: %s, Crimson: %s\n",
+		game->world->expert_mode ? "Yes" : "No",
+		game->world->flags.crimson ? "Yes" : "No"
+	);
+
+	printf("\n");
+
+	console_init(game->console);
     game_start_event_loop(game);
 
-	uv_read_stop((uv_stream_t *)game->console_handle);
+	uv_read_stop((uv_stream_t *)game->console->console_handle);
 	uv_read_stop((uv_stream_t *)game->server->tcp_handle);
 
 	uv_close((uv_handle_t *)game->update_handle, NULL);
-	uv_close((uv_handle_t *)game->console_handle, NULL);
+	uv_close((uv_handle_t *)game->console->console_handle, NULL);
 	uv_close((uv_handle_t *)game->server->tcp_handle, NULL);
 
 	uv_loop_close(game->event_loop);

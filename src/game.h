@@ -30,6 +30,7 @@
 #include "bitmap.h"
 #include "server.h"
 #include "player.h"
+#include "console.h"
 
 #define GAME_MAX_PLAYERS 255
 
@@ -39,11 +40,11 @@ struct game_context {
 	struct world *world;
     struct server *server;
     struct player *players[256];
+	struct console *console;
 	
 	word_t *player_slots;
 	
     uv_loop_t *event_loop;
-	uv_tty_t *console_handle;
 	uv_timer_t *update_handle;
 };
 

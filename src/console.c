@@ -122,10 +122,11 @@ static void __console_destructor(uv_tty_t *handle)
 {
 }
 
-int console_new(TALLOC_CTX *context, uv_tty_t **out_tty_handle)
+int console_new(TALLOC_CTX *context, struct game_context *game, struct console **out_console)
 {
 	int ret = -1;
 	TALLOC_CTX *temp_context;
+	struct console *console;
 	uv_tty_t *tty_handle;
 
 	if ((temp_context = talloc_new(NULL)) == NULL) {
@@ -134,42 +135,41 @@ int console_new(TALLOC_CTX *context, uv_tty_t **out_tty_handle)
 		goto out;
 	}
 
+	if ((console = talloc_zero(temp_context, struct console)) == NULL) {
+		_ERROR("%s: cannot allocate console context.\n", __FUNCTION__);
+		ret = -ENOMEM;
+		goto out;
+	}
+
 	if ((tty_handle = talloc_zero(temp_context, uv_tty_t)) == NULL) {
 		_ERROR("%s: Cannot allocate console handle.\n", __FUNCTION__);
 		ret = -ENOMEM;
+		goto out;
 	}
 
 	talloc_set_destructor(tty_handle, __console_destructor);
 
+	console->console_handle = talloc_steal(console, tty_handle);
+	console->game = game;
+
 	ret = 0;
-	*out_tty_handle = talloc_steal(context, tty_handle);
+	*out_console = talloc_steal(context, console);
 out:
 	talloc_free(temp_context);
 
 	return ret;
 }
 
-int console_init(struct game_context *context)
+int console_init(struct console *console)
 {
-	uv_tty_t *tty_handle;
+	uv_tty_init(console->game->event_loop, console->console_handle, 0, true);
+	uv_tty_set_mode(console->console_handle, UV_TTY_MODE_NORMAL);
 
-	if (console_new(context, &tty_handle) < 0) {
-		_ERROR("%s: Console initialization failed.\n", __FUNCTION__);
-		return -1;
-	}
+	console->console_handle->data = console->game;
 
-	uv_tty_init(context->event_loop, tty_handle, 0, true);
-	uv_tty_set_mode(tty_handle, UV_TTY_MODE_NORMAL);
+	uv_read_start((uv_stream_t *)console->console_handle, __alloc_buffer, __on_read);
 
-	tty_handle->data = context;
-	context->console_handle = tty_handle;
-
-	uv_read_start((uv_stream_t *)tty_handle, __alloc_buffer, __on_read);
-
-	__print_prompt((uv_stream_t *)tty_handle);
+	__print_prompt((uv_stream_t *)console->console_handle);
 
 	return 0;
-error:
-	talloc_free(tty_handle);
-	return -1;
 }

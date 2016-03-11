@@ -44,6 +44,8 @@ struct console_command_handler {
 	console_command_cb handler;
 };
 
-int console_init(struct game_context *context);
+int console_new(TALLOC_CTX *context, struct game_context *game, struct console **out_console);
+
+int console_init(struct console *console);
 
 #endif
