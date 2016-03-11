@@ -33,6 +33,11 @@ static struct console_command_handler __command_handlers[] = {
 	{ .command_name = "quit", .handler = __handle_quit }
 };
 
+static void __print_prompt(uv_stream_t *stream)
+{
+	printf("%s> ", "guac");
+}
+
 static void __on_read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 {
 	char *command_copy;
@@ -65,6 +70,10 @@ static void __on_read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 	command_copy[strcspn(command_copy, "\r\n")] = '\0';
 	parameters = buf->base + strcspn(buf->base, " ");
 	
+	if (strlen(command_copy) == 0) {
+		goto out;
+	}
+
 	for (int i = 0; i < __num_handlers; i++) {
 		handler = &__command_handlers[i];
 
@@ -89,6 +98,8 @@ command_copy_free:
 	free(command_copy);
 out:
 	talloc_free(buf->base);
+
+	__print_prompt(stream);
 }
 
 static void __alloc_buffer(uv_handle_t *handle, size_t suggested_size, uv_buf_t *buf)
@@ -154,6 +165,8 @@ int console_init(struct game_context *context)
 	context->console_handle = tty_handle;
 
 	uv_read_start((uv_stream_t *)tty_handle, __alloc_buffer, __on_read);
+
+	__print_prompt((uv_stream_t *)tty_handle);
 
 	return 0;
 error:

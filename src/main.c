@@ -56,11 +56,6 @@ static int parse_command_line(int argc, char **argv)
 	return 0;
 }
 
-static int __run_loop_init()
-{
-    return 0;
-}
-
 int main(int argc, char **argv)
 {
 	int ret = 0;
@@ -99,19 +94,16 @@ int main(int argc, char **argv)
     
     server_start(game->server);
 	console_init(game);
-	game_update_loop_init(game);
 
-	printf("server started.\n");
-	
+	game_update_loop_init(game);
     game_start_event_loop(game);
 
 	uv_read_stop((uv_stream_t *)game->console_handle);
-	uv_read_stop((uv_stream_t *)&game->server->tcp);
+	uv_read_stop((uv_stream_t *)game->server->tcp_handle);
 
 	uv_close((uv_handle_t *)game->update_handle, NULL);
 	uv_close((uv_handle_t *)game->console_handle, NULL);
-	uv_close((uv_handle_t *)&game->server->tcp, NULL);
-
+	uv_close((uv_handle_t *)game->server->tcp_handle, NULL);
 
 	uv_loop_close(game->event_loop);
 out:
