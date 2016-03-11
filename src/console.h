@@ -21,9 +21,28 @@
 #ifndef _HAVE_CONSOLE_H
 #define _HAVE_CONSOLE_H
 
+#include <uv.h>
+
 #include "game.h"
 
-typedef void(*console_read_cb)(struct game_context *context, const char *command);
+typedef int(*console_command_cb)(struct game_context *game, struct console_command *command);
+
+struct console {
+	uv_tty_t *console_handle;
+	struct game_context *game;
+};
+
+struct console_command {
+	char *command_name;
+	char *getopt_options;
+	char *parameters;
+};
+
+struct console_command_handler {
+	char *command_name;
+	char *help_text;
+	console_command_cb handler;
+};
 
 int console_init(struct game_context *context);
 

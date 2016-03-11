@@ -104,9 +104,12 @@ int main(int argc, char **argv)
 	printf("server started.\n");
 	
     game_start_event_loop(game);
-    
+    	
 out:
     talloc_free(game);
+
+	talloc_report_full(NULL, stdout);
+
 	return ret;
 }
 

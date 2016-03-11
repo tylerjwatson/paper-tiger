@@ -22,9 +22,73 @@
 #include "game.h"
 #include "util.h"
 
+static int __handle_quit(struct game_context *game, struct console_command *command)
+{
+	uv_stop(game->event_loop);
+	return 0;
+}
+
+static int __num_handlers = 1;
+static struct console_command_handler __command_handlers[] = {
+	{ .command_name = "quit", .handler = __handle_quit }
+};
+
 static void __on_read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 {
+	char *command_copy;
+	char *parameters;
+	struct game_context *game = (struct game_context *)stream->data;
+	struct console_command_handler *handler;
+	struct console_command command;
 
+	if (nread <= 0) {
+		goto out;
+	}
+
+	command_copy = strdup(buf->base);
+	if (command_copy == NULL) {
+		goto out;
+	}
+
+	/*
+	 * We are not interested in the preceding slash, skip the pointer
+	 * by one to tar over the fact that it even exists.
+	 */
+	if (command_copy[0] == '/') {
+		command_copy++;
+	}
+
+	/*
+	 * Linefeed characters must be terminated from the input.
+	 */
+	command_copy = strtok(command_copy, " ");
+	command_copy[strcspn(command_copy, "\r\n")] = '\0';
+	parameters = buf->base + strcspn(buf->base, " ");
+	
+	for (int i = 0; i < __num_handlers; i++) {
+		handler = &__command_handlers[i];
+
+		if (strcmp(handler->command_name, command_copy) != 0) {
+			continue;
+		}
+
+		command.command_name = command_copy;
+		command.parameters = parameters;
+
+		if (handler->handler(game, &command) != 0) {
+			_ERROR("%s: Error executing handler for %s command.\n", __FUNCTION__, command_copy);
+			goto command_copy_free;
+		}
+
+		goto command_copy_free;
+	}
+
+	_ERROR("console: error: %s: unknown command.\n", command_copy);
+
+command_copy_free:
+	free(command_copy);
+out:
+	talloc_free(buf->base);
 }
 
 static void __alloc_buffer(uv_handle_t *handle, size_t suggested_size, uv_buf_t *buf)
@@ -38,7 +102,7 @@ static void __alloc_buffer(uv_handle_t *handle, size_t suggested_size, uv_buf_t 
 		goto out;
 	}
 
-	*buf = uv_buf_init(talloc_steal(handle, buffer), suggested_size);
+	*buf = uv_buf_init(talloc_steal(context, buffer), suggested_size);
 out:
 	talloc_free(temp_context);
 }
@@ -46,7 +110,7 @@ out:
 int console_new(TALLOC_CTX *context, uv_tty_t **out_tty_handle)
 {
 	int ret = -1;
-	TALLOC_CTX *temp_context = talloc_new(NULL);
+	TALLOC_CTX *temp_context;
 	uv_tty_t *tty_handle;
 
 	if ((temp_context = talloc_new(NULL)) == NULL) {
