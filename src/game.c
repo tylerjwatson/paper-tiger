@@ -49,18 +49,18 @@ static inline void __sleep(double msec)
 
 static int __game_update(uv_timer_t *timer)
 {
-	struct game_context *game = (struct game_context *)timer->data;
+	struct game *game = (struct game *)timer->data;
 
 	//TODO: Update the game shit.
 
 	return 0;
 }
 
-static void __game_destructor(struct game_context *context)
+static void __game_destructor(struct game *context)
 {   
 }
 
-int game_find_next_slot(struct game_context *context)
+int game_find_next_slot(struct game *context)
 {
 	for (unsigned i = 0; i < GAME_MAX_PLAYERS; i++) {
 		if (bitmap_get(context->player_slots, i) == false) {
@@ -72,22 +72,22 @@ int game_find_next_slot(struct game_context *context)
 	return -1;
 }
 
-int game_start_event_loop(struct game_context *context)
+int game_start_event_loop(struct game *context)
 {
     return uv_run(context->event_loop, UV_RUN_DEFAULT);
 }
 
-int game_new(TALLOC_CTX *context, struct game_context **out_context)
+int game_new(TALLOC_CTX *context, struct game **out_context)
 {
 	int ret = -1;
-	struct game_context *gameContext = NULL;
+	struct game *gameContext = NULL;
 	TALLOC_CTX *tempContext;
 
 	if ((tempContext = talloc_new(NULL)) == NULL) {
 		return -ENOMEM;
 	}
 
-	gameContext = talloc_zero(tempContext, struct game_context);
+	gameContext = talloc_zero(tempContext, struct game);
     
 	/*
 	 * Init game stuff here
@@ -115,7 +115,7 @@ out:
 	return ret;
 }
 
-int game_update_loop_init(struct game_context *game)
+int game_update_loop_init(struct game *game)
 {
 	int ret = -1;
 	TALLOC_CTX *temp_context;

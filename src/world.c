@@ -85,7 +85,6 @@ static int __world_read_file_header(struct world *world)
 		if (binary_reader_read_int32(world->reader, &world->positions[i]) < 0) {
 			goto error;
 		}
-		//_ERROR("%s: world->positions[%d] = %d\n", __FUNCTION__, i, world->positions[i]);
 	}
 
 	if (binary_reader_read_uint16(world->reader, &world->num_important) < 0) {

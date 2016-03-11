@@ -22,7 +22,7 @@
 #include "game.h"
 #include "util.h"
 
-static int __handle_quit(struct game_context *game, struct console_command *command)
+static int __handle_quit(struct game *game, struct console_command *command)
 {
 	uv_stop(game->event_loop);
 	return 0;
@@ -42,7 +42,7 @@ static void __on_read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 {
 	char *command_copy;
 	char *parameters;
-	struct game_context *game = (struct game_context *)stream->data;
+	struct game *game = (struct game *)stream->data;
 	struct console_command_handler *handler;
 	struct console_command command;
 
@@ -105,7 +105,7 @@ out:
 static void __alloc_buffer(uv_handle_t *handle, size_t suggested_size, uv_buf_t *buf)
 {
 	TALLOC_CTX *temp_context = talloc_new(NULL);
-	struct game_context *context = (struct game_context *)handle->data;
+	struct game *context = (struct game *)handle->data;
 	char *buffer;
 
 	if ((buffer = talloc_size(temp_context, suggested_size)) == NULL) {
@@ -122,7 +122,7 @@ static void __console_destructor(uv_tty_t *handle)
 {
 }
 
-int console_new(TALLOC_CTX *context, struct game_context *game, struct console **out_console)
+int console_new(TALLOC_CTX *context, struct game *game, struct console **out_console)
 {
 	int ret = -1;
 	TALLOC_CTX *temp_context;

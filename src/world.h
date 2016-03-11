@@ -104,8 +104,8 @@ struct world {
 	float top_world;
 	float bottom_world;
 
-	int32_t max_tiles_x;
-	int32_t max_tiles_y;
+	uint32_t max_tiles_x;
+	uint32_t max_tiles_y;
 
 	int64_t creation_time;
 

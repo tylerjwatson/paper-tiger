@@ -38,13 +38,13 @@ struct player {
 	char *name;
 	char *remote_addr;
 	uint16_t remote_port;
-	struct game_context *game;
+	struct game *game;
     uv_tcp_t *handle;
 	
 	int state;
 };
 
-int player_new(TALLOC_CTX *context, const struct game_context *game, int id, struct player **out_player);
+int player_new(TALLOC_CTX *context, const struct game *game, int id, struct player **out_player);
 
 void player_close(struct player *player);
 

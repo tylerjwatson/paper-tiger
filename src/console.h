@@ -25,11 +25,11 @@
 
 #include "game.h"
 
-typedef int(*console_command_cb)(struct game_context *game, struct console_command *command);
+typedef int(*console_command_cb)(struct game *game, struct console_command *command);
 
 struct console {
 	uv_tty_t *console_handle;
-	struct game_context *game;
+	struct game *game;
 };
 
 struct console_command {
@@ -44,7 +44,7 @@ struct console_command_handler {
 	console_command_cb handler;
 };
 
-int console_new(TALLOC_CTX *context, struct game_context *game, struct console **out_console);
+int console_new(TALLOC_CTX *context, struct game *game, struct console **out_console);
 
 int console_init(struct console *console);
 

@@ -112,7 +112,7 @@ void __on_connection(uv_stream_t *handle, int status)
 }
 
 int server_new(TALLOC_CTX *context, const char *listen_address, const uint16_t port,
-               struct game_context *game, struct server **out_server)
+               struct game *game, struct server **out_server)
 {
     int ret = -1;
     TALLOC_CTX *temp_context;
@@ -153,7 +153,7 @@ int server_start(struct server *server)
 	
     uv_tcp_init(server->game->event_loop, server->tcp_handle);
     uv_ip4_addr(server->listen_address, server->port, &server_addr);
-    uv_tcp_bind(&server->tcp_handle, (const struct sockaddr *)&server_addr, 0);
+    uv_tcp_bind(server->tcp_handle, (const struct sockaddr *)&server_addr, 0);
     
     server->tcp_handle->data = server;
     

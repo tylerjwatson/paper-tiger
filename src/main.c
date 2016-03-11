@@ -59,7 +59,7 @@ static int parse_command_line(int argc, char **argv)
 int main(int argc, char **argv)
 {
 	int ret = 0;
-	struct game_context *game;
+	struct game *game;
 	clock_t start;
 	clock_t diff;
 

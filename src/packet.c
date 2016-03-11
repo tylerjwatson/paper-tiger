@@ -34,5 +34,7 @@ int packet_read_header(const uv_buf_t *buf, uint8_t *out_type, uint16_t *out_len
 	if (buf->len <= 3) {
 		return -1;
 	}
+
+	return 0;
 }
 
