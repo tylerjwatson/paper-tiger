@@ -47,27 +47,17 @@ static inline void __sleep(double msec)
 	
 }
 
-static int __game_update(struct game_context *context)
+static int __game_update(uv_timer_t *timer)
 {
+	struct game_context *game = (struct game_context *)timer->data;
+
+	//TODO: Update the game shit.
+
 	return 0;
 }
 
-static void *__game_thread(void *data)
-{
-	struct game_context *context = (struct game_context *)data;
-
-	game_run(context);
-    
-    return NULL;
-}
-
 static void __game_destructor(struct game_context *context)
-{
-	context->is_exited = true;
-	//pthread_join(context->game_thread, NULL);
- //   pthread_mutex_destroy(&context->game_mutex);
-    
-    uv_loop_close(context->event_loop);
+{   
 }
 
 int game_find_next_slot(struct game_context *context)
@@ -85,42 +75,6 @@ int game_find_next_slot(struct game_context *context)
 int game_start_event_loop(struct game_context *context)
 {
     return uv_run(context->event_loop, UV_RUN_DEFAULT);
-}
-
-int game_start_thread(struct game_context *context)
-{
-	//if (pthread_create(&context->game_thread, NULL, __game_thread, (void *)context) < 0) {
-	//	_ERROR("%s: Could not create game thread.\n", __FUNCTION__);
-	//	return -1;
-	//}
-    
-    return 0;
-}
-
-int game_run(struct game_context *context)
-{
-	double msec;
-	int ret;
-	clock_t start, diff;
-
-	do {
-		start = clock();
-
-		if ((ret = __game_update(context)) < 0) {
-			_ERROR("%s: game has existed with code %d", __FUNCTION__, ret);
-			return ret;
-		}
-
-		diff = clock() - start;
-		msec = diff * 1000. / CLOCKS_PER_SEC;
-
-		printf("%s: frame took %f ms\n", __FUNCTION__, msec);
-		if (context->ms_per_frame - msec > 0) {
-			__sleep(context->ms_per_frame - msec);
-		}
-	} while (context->is_exited == false);
-
-	return 0;
 }
 
 int game_new(TALLOC_CTX *context, struct game_context **out_context)
@@ -147,13 +101,6 @@ int game_new(TALLOC_CTX *context, struct game_context **out_context)
         goto out;
     }
     
-
-	//if (pthread_mutex_init(&gameContext->game_mutex, NULL) < 0) {
-	//	_ERROR("%s: Could not initialize game thread mutex\n", __FUNCTION__);
-	//	ret = -1;
-	//	goto out;
-	//}
-    
     uv_loop_init(gameContext->event_loop);
 	
 	gameContext->player_slots = talloc_array(gameContext, word_t, GAME_MAX_PLAYERS / sizeof(word_t));
@@ -165,5 +112,37 @@ int game_new(TALLOC_CTX *context, struct game_context **out_context)
 	ret = 0;
 out:
 	talloc_free(tempContext);
+	return ret;
+}
+
+int game_update_loop_init(struct game_context *game)
+{
+	int ret = -1;
+	TALLOC_CTX *temp_context;
+	uv_timer_t *update_timer;
+
+	temp_context = talloc_new(NULL);
+	if (temp_context == NULL) {
+		_ERROR("%s: Allocating a temp context for game update timer failed.\n", __FUNCTION__);
+		ret = -ENOMEM;
+		goto out;
+	}
+
+	update_timer = talloc(temp_context, uv_timer_t);
+	if (update_timer == NULL) {
+		_ERROR("%s: Allocating an update timer failed.\n", __FUNCTION__);
+		goto out;
+	}
+	
+	uv_timer_init(game->event_loop, update_timer);
+	update_timer->data = game;
+	uv_timer_start(update_timer, __game_update, (uint64_t)game->ms_per_frame, (uint64_t)game->ms_per_frame);
+
+	game->update_handle = talloc_steal(game, update_timer);
+
+	ret = 0;
+out:
+	talloc_free(temp_context);
+
 	return ret;
 }

@@ -107,6 +107,10 @@ out:
 	talloc_free(temp_context);
 }
 
+static void __console_destructor(uv_tty_t *handle)
+{
+}
+
 int console_new(TALLOC_CTX *context, uv_tty_t **out_tty_handle)
 {
 	int ret = -1;
@@ -123,6 +127,8 @@ int console_new(TALLOC_CTX *context, uv_tty_t **out_tty_handle)
 		_ERROR("%s: Cannot allocate console handle.\n", __FUNCTION__);
 		ret = -ENOMEM;
 	}
+
+	talloc_set_destructor(tty_handle, __console_destructor);
 
 	ret = 0;
 	*out_tty_handle = talloc_steal(context, tty_handle);

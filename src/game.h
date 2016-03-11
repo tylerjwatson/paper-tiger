@@ -34,7 +34,6 @@
 #define GAME_MAX_PLAYERS 255
 
 struct game_context {
-	bool is_exited;
 	double ms_per_frame;
 
 	struct world *world;
@@ -45,18 +44,16 @@ struct game_context {
 	
     uv_loop_t *event_loop;
 	uv_tty_t *console_handle;
-	/*pthread_t game_thread;
-	pthread_mutex_t game_mutex;*/
+	uv_timer_t *update_handle;
 };
 
 int game_find_next_slot(struct game_context *context);
 
 int game_start_event_loop(struct game_context *context);
 
-int game_start_thread(struct game_context *context);
-
-int game_run(struct game_context *context);
-
 int game_new(TALLOC_CTX *context, struct game_context **out_context);
+
+int game_update_loop_init(struct game_context *game);
+
 
 #endif /* _HAVE_GAME_H */

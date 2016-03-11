@@ -98,13 +98,22 @@ int main(int argc, char **argv)
     }
     
     server_start(game->server);
-	
 	console_init(game);
+	game_update_loop_init(game);
 
 	printf("server started.\n");
 	
     game_start_event_loop(game);
-    	
+
+	uv_read_stop((uv_stream_t *)game->console_handle);
+	uv_read_stop((uv_stream_t *)&game->server->tcp);
+
+	uv_close((uv_handle_t *)game->update_handle, NULL);
+	uv_close((uv_handle_t *)game->console_handle, NULL);
+	uv_close((uv_handle_t *)&game->server->tcp, NULL);
+
+
+	uv_loop_close(game->event_loop);
 out:
     talloc_free(game);
 
