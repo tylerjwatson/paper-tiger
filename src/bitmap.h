@@ -21,9 +21,14 @@
 #ifndef _HAVE_BITMAP_H
 #define _HAVE_BITMAP_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <limits.h>    /* for CHAR_BIT */
 #include <stdint.h>   /* for uint32_t */
 #include <stdbool.h>
+
 
 typedef uint32_t word_t;
 
@@ -49,5 +54,9 @@ static inline bool bitmap_get(word_t *words, int n)
     word_t bit = words[WORD_OFFSET(n)] & (1 << BIT_OFFSET(n));
     return bit != 0;
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _HAVE_BITMAP_H */

@@ -21,6 +21,9 @@
 #ifndef _HAVE_PLAYER_H
 #define _HAVE_PLAYER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <stdint.h>
 #include <uv.h>
@@ -47,5 +50,9 @@ struct player {
 int player_new(TALLOC_CTX *context, const struct game *game, int id, struct player **out_player);
 
 void player_close(struct player *player);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _HAVE_PLAYER_H */

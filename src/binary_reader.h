@@ -25,6 +25,10 @@
 #include "talloc/talloc.h"
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct binary_reader_context {
 	char *file_path;
 	FILE *fp;
@@ -61,5 +65,9 @@ int binary_reader_read_uint32(struct binary_reader_context *context, uint32_t *o
 int binary_reader_read_uint64(struct binary_reader_context *context, uint64_t *out_value);
 
 int binary_reader_close(struct binary_reader_context *context);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* HAVE_BINARY_READER_H */

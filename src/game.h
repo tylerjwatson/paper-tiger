@@ -21,9 +21,12 @@
 #ifndef _HAVE_GAME_H
 #define _HAVE_GAME_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <errno.h>
 #include <stdbool.h>
-//#include <pthread.h>
 #include <uv.h>
 
 #include "talloc/talloc.h"
@@ -56,5 +59,8 @@ int game_new(TALLOC_CTX *context, struct game **out_context);
 
 int game_update_loop_init(struct game *game);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _HAVE_GAME_H */

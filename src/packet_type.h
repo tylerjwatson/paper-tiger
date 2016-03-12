@@ -21,8 +21,16 @@
 #ifndef _PACKET_TYPE_H
 #define _PACKET_TYPE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 enum packet_type {
 	PACKET_TYPE_CONNECT_REQUEST = 0x01
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _PACKET_TYPE_H */

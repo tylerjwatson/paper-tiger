@@ -21,6 +21,10 @@
 #ifndef _HAVE_WORLD_H
 #define _HAVE_WORLD_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "talloc/talloc.h"
 #include <stdbool.h>
 #include <errno.h>
@@ -174,5 +178,9 @@ struct world {
 int world_new(TALLOC_CTX *parent, const char *world_path, struct world **out_world);
 int world_init(struct world *world);
 struct tile *world_tile_at(struct world *world, const uint32_t x, const uint32_t y);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _HAVE_WORLD_H */

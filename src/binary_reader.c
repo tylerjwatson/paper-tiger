@@ -126,8 +126,6 @@ int binary_reader_read_boolean(struct binary_reader_context *context, bool *out_
 
 int binary_reader_read_byte(struct binary_reader_context *context, uint8_t *out_value)
 {
-	uint8_t val;
-
 	fread(out_value, 1, 1, context->fp);
 
 	//if (fread(out_value, 1, 1, context->fp) != 1) {

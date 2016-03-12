@@ -22,6 +22,10 @@
 #ifndef _HAVE_TILE_H
 #define _HAVE_TILE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "talloc/talloc.h"
 #include <stdint.h>
 #include "binary_reader.h"
@@ -104,5 +108,9 @@ void tile_set_inactive(struct tile *tile, bool val);
 void tile_set_actuator(struct tile *tile, bool val);
 
 void tile_copy(const struct tile *src, struct tile *dest);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

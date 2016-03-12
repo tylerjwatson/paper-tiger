@@ -21,9 +21,15 @@
 #ifndef _HAVE_CONSOLE_H
 #define _HAVE_CONSOLE_H
 
+
+
 #include <uv.h>
 
 #include "game.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef int(*console_command_cb)(struct game *game, struct console_command *command);
 
@@ -47,5 +53,9 @@ struct console_command_handler {
 int console_new(TALLOC_CTX *context, struct game *game, struct console **out_console);
 
 int console_init(struct console *console);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

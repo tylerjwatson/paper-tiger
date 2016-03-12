@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.6)
-project(upgraded-guacamole C)
+project(upgraded-guacamole)
 
 # set(CMAKE_SOURCE_DIR "${PROJECT_SOURCE_DIR}/src")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/CMakeModules")
@@ -35,6 +35,8 @@ add_executable(upgraded-guacamole
 	src/binary_reader.h
 	src/packet_type.h
 	src/bitmap.h
+	src/console.c
+	src/console.h
 	src/game.c
 	src/game.h
 	src/getopt.c
@@ -52,6 +54,8 @@ add_executable(upgraded-guacamole
 	src/world.c
 	src/world.h)
 
+SET_TARGET_PROPERTIES(talloc PROPERTIES LINKER_LANGUAGE C)
+#SET_TARGET_PROPERTIES(upgraded-guacamole PROPERTIES LINKER_LANGUAGE CXX)
 
 set_property(TARGET upgraded-guacamole PROPERTY C_STANDARD 11)
 

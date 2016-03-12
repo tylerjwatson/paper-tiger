@@ -21,6 +21,10 @@
 #ifndef _HAVE_PACKET_H
 #define _HAVE_PACKET_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <uv.h>
 #include <stdint.h>
 
@@ -42,5 +46,9 @@ struct packet_handler {
 };
 
 int packet_read_header(const uv_buf_t *buf, uint8_t *out_type, uint16_t *out_len);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _HAVE_PACKET_H */

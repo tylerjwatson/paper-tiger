@@ -21,6 +21,10 @@
 #ifndef _HAVE_SERVER_H
 #define _HAVE_SERVER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <uv.h>
 
 #include "talloc/talloc.h"
@@ -38,5 +42,9 @@ int server_new(TALLOC_CTX *context, const char *listen_address, const uint16_t p
                struct game *game, struct server **out_server);
 
 int server_start(struct server *server);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
