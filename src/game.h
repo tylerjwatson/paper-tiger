@@ -21,9 +21,6 @@
 #ifndef _HAVE_GAME_H
 #define _HAVE_GAME_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include <errno.h>
 #include <stdbool.h>
@@ -36,6 +33,10 @@ extern "C" {
 #include "console.h"
 
 #define GAME_MAX_PLAYERS 255
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct game {
 	double ms_per_frame;

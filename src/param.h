@@ -21,10 +21,21 @@
 #ifndef HAVE_PARAM_H
 #define HAVE_PARAM_H
 
+#include "talloc/talloc.h"
+#include <errno.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+extern const char *REGEX_PARAM;
+
+struct param_context {
+	char *input_string;
+	char **parameters;
+};
+
+int param_context_new(void *context, const char *input_string, struct param_context **out_context);
 
 
 #ifdef __cplusplus

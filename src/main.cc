@@ -35,6 +35,11 @@
 
 #define GUAC_OPTIONS "w:"
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 static const char *options_worldPath = NULL;
 
 static int parse_command_line(int argc, char **argv)
@@ -142,3 +147,7 @@ out:
 	return ret;
 }
 
+
+#ifdef __cplusplus
+}
+#endif
