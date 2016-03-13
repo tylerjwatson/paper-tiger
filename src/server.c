@@ -26,15 +26,13 @@
 #include "player.h"
 #include "packet.h"
 
-static void __process_header(const uv_buf_t *buf)
-{
-	
-}
+#include "packets/connect_request.h"
 
 static void __on_read(uv_stream_t *stream, ssize_t len, const uv_buf_t *buf)
 {
 	struct player *player = (struct player *)stream->data;
-	
+	struct packet_handler *packet_handler;
+
 	if (len < 0) {
 		if (len == UV_EOF) {
 			_ERROR("%s: EOF while reading from slot %d\n", __FUNCTION__, player->id);
@@ -42,9 +40,49 @@ static void __on_read(uv_stream_t *stream, ssize_t len, const uv_buf_t *buf)
 		
 		goto player_out;
 	}
-	
-	
-	
+
+	if (len == 0) {
+		goto out;
+	}
+
+	if (player->incoming_packet == NULL && len == PACKET_HEADER_SIZE) {
+		if (packet_new(player, player, buf, &player->incoming_packet) < 0) {
+			_ERROR("%s: error parsing packet header for slot %d\n", __FUNCTION__, player->id);
+			goto player_out;
+		}
+
+		printf("%s: slot %d packet: header=%d, len=%d\n", __FUNCTION__, player->id, player->incoming_packet->type, player->incoming_packet->len);
+	}
+	else {
+		packet_handler = packet_handler_for_type(player->incoming_packet->type);
+		if (packet_handler == NULL) {
+			_ERROR("%s: unknown packet type %d from slot %d.\n", __FUNCTION__,
+				player->incoming_packet->type,
+				player->id);
+
+			goto player_out;
+		}
+
+		if (packet_handler->new_func(player->incoming_packet, buf) < 0) {
+			_ERROR("%s: packet parsing failed for slot %d.\n", __FUNCTION__, player->id);
+			goto player_out;
+		}
+
+		/*
+		 * After the body of the packet has been parsed and the read handler called,
+		 * player->incoming_packet gets released and exchanged to NULL and the read 
+		 * process begins once again.
+		 */
+
+		if (packet_handler->read_func != NULL && packet_handler->read_func(player, player->incoming_packet) < 0) {
+			_ERROR("%s: read handler for packet failed for slot %d.\n", __FUNCTION__, player->id);
+			goto player_out;
+		}
+
+		talloc_free(player->incoming_packet);
+		player->incoming_packet = NULL;
+	}
+
 	goto out;
 	
 player_out:
@@ -58,9 +96,12 @@ out:
 static void __alloc_buffer(uv_handle_t *handle, size_t size, uv_buf_t *out_buf)
 {
 	struct player *player = (struct player *)handle->data;
-	
-	if (player->state == PLAYER_SOCKET_STATE_HEADER) {
+
+	if (player->incoming_packet == NULL) {
 		size = PACKET_HEADER_SIZE;
+	}
+	else {
+		size = player->incoming_packet->len - PACKET_HEADER_SIZE;
 	}
 	
 	*out_buf = uv_buf_init(talloc_size(player, size), size);

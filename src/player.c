@@ -24,7 +24,7 @@
 
 static void __player_destructor(struct player *player)
 {
-	uv_close((uv_handle_t *)&player->handle, NULL);
+	uv_close((uv_handle_t *)player->handle, NULL);
 	bitmap_clear(player->game->player_slots, player->id);
 }
 

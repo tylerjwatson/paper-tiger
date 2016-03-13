@@ -66,6 +66,8 @@ int binary_reader_read_uint64(struct binary_reader_context *context, uint64_t *o
 
 int binary_reader_close(struct binary_reader_context *context);
 
+int binary_reader_read_7bit_int(const char *buf, int *pos, int *out_value);
+
 #ifdef __cplusplus
 }
 #endif

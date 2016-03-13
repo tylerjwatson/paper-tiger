@@ -21,20 +21,16 @@
 #ifndef _HAVE_PLAYER_H
 #define _HAVE_PLAYER_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stdint.h>
 #include <uv.h>
 
 #include "talloc/talloc.h"
+#include "packet.h"
 #include "game.h"
 
-enum {
-	PLAYER_SOCKET_STATE_HEADER,
-	PLAYER_SOCKET_STATE_PAYLOAD
-} PLAYER_SOCKET_STATE;
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct player {
     uint32_t id;
@@ -44,7 +40,7 @@ struct player {
 	struct game *game;
     uv_tcp_t *handle;
 	
-	int state;
+	struct packet *incoming_packet;
 };
 
 int player_new(TALLOC_CTX *context, const struct game *game, int id, struct player **out_player);

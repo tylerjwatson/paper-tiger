@@ -21,38 +21,42 @@
 #ifndef _HAVE_PACKET_H
 #define _HAVE_PACKET_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <uv.h>
 #include <stdint.h>
 
 #include "player.h"
 #include "packet_type.h"
 
+
 #define PACKET_HEADER_SIZE 3
 
-struct packet_header {
-	uint16_t len;
-	uint8_t type;
-};
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct packet {
-	struct packet_header header;
+	uint16_t len;
+	uint8_t type;
+
+	struct player *player;
+
 	void *data;
 };
 
-typedef int (*packet_read_cb)(struct packet *packet, uv_buf_t *buffer);
-typedef int (*packet_handler_cb)(const struct player *player, struct packet *packet);
+typedef int (*packet_new_cb)(struct packet *packet, uv_buf_t *buffer);
+typedef int (*packet_read_cb)(const struct player *player, struct packet *packet);
 
 struct packet_handler {
 	uint8_t type;
-	packet_read_cb read_handler;
-	packet_handler_cb handler;
+	packet_new_cb new_func;
+	packet_read_cb read_func;
 };
 
+struct packet_handler *packet_handler_for_type(uint8_t type);
+
 int packet_read_header(const uv_buf_t *buf, uint8_t *out_type, uint16_t *out_len);
+
+int packet_new(TALLOC_CTX *ctx, struct player *player, const uv_buf_t *buf, struct packet **out_packet);
 
 #ifdef __cplusplus
 }

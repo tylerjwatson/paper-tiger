@@ -21,19 +21,78 @@
 #include <stdint.h>
 
 #include "packet.h"
-#include "packets/packets.h"
-
+#include "util.h"
+#include "packets/connect_request.h"
 
 static struct packet_handler packet_handlers[] = {
-	{ .type = PACKET_TYPE_CONNECT_REQUEST, .read_handler = read_connect_request, .handler = NULL }
+	{ .type = PACKET_TYPE_CONNECT_REQUEST, .new_func = connect_request_new, .read_func = NULL },
+	{ NULL, NULL, NULL }
 };
+
+struct packet_handler *packet_handler_for_type(uint8_t type)
+{
+	struct packet_handler *handler;
+
+	for (handler = packet_handlers; handler->new_func != NULL; handler++) {
+		if (handler->type == type) {
+			return handler;
+		}
+	}
+
+	return NULL;
+}
 
 int packet_read_header(const uv_buf_t *buf, uint8_t *out_type, uint16_t *out_len)
 {
-	if (buf->len <= 3) {
+	if (buf->len < 3) {
 		return -1;
 	}
+
+	*out_len = *(uint16_t *)buf->base;
+	*out_type = buf->base[2];
 
 	return 0;
 }
 
+int packet_new(TALLOC_CTX *context, struct player *player, const uv_buf_t *buf, struct packet **out_packet)
+{
+	int ret = -1;
+	TALLOC_CTX *temp_context;
+	struct packet *packet;
+
+	uint8_t type;
+	uint16_t len;
+
+	temp_context = talloc_new(NULL);
+	if (temp_context == NULL) {
+		_ERROR("%s: out of memory allocating temp context for packet.\n", __FUNCTION__);
+		ret = -1;
+		goto out;
+	}
+
+	packet = talloc_zero(temp_context, struct packet);
+	if (packet == NULL) {
+		_ERROR("%s: out of memory allocating temp context for packet.\n", __FUNCTION__);
+		ret = -1;
+		goto out;
+	}
+
+	if (packet_read_header(buf, &type, &len) < 0) {
+		_ERROR("%s: failed to read header from socket.\n", __FUNCTION__);
+		ret = -1;
+		goto out;
+	}
+
+	packet->type = type;
+	packet->len = len;
+
+	//TODO: Packet sanity checks.
+
+	*out_packet = talloc_steal(context, packet);
+	ret = 0;
+
+out:
+	talloc_free(temp_context);
+
+	return ret;
+}

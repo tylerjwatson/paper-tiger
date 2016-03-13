@@ -92,7 +92,7 @@ int binary_reader_new(TALLOC_CTX *parent_context, const char *file_path,
 	if (out_context != NULL) {
 		*out_context = talloc_steal(parent_context, newContext);
 	}
-
+	
 failed:
 	talloc_free(tempContext);
 	return ret;
@@ -326,5 +326,29 @@ int binary_reader_close(struct binary_reader_context *context)
 	}
 
 	fclose(context->fp);
+	return 0;
+}
+
+int binary_reader_read_7bit_int(const char *buffer, int *pos, int32_t *out_value)
+{
+	int count = 0, shift = 0;
+	uint8_t byte;
+
+	do {
+		if (shift == 5 * 7) {
+			return -1;
+		}
+
+		if ((byte = buffer[*pos]) < 0) {
+			return -1;
+		}
+
+		count |= (byte & 0x7F) << shift;
+		shift += 7;
+		(*pos)++;
+	} while ((byte & 0x80) != 0);
+
+	*out_value = count;
+
 	return 0;
 }
