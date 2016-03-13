@@ -21,6 +21,24 @@
 #include "console.h"
 #include "game.h"
 #include "util.h"
+#include "param.h"
+
+static int __handle_test(struct game *game, struct console_command *command)
+{
+	struct param *params;
+
+	param_new(game, command->parameters, &params);
+
+	printf("%s: %d params\n", command->command_name, params->num_parameters);
+
+	for (int i = 0; i < params->num_parameters; i++) {
+		printf("%s: match %d: %s\n", __FUNCTION__, i, params->parameters[i]);
+	}
+
+	param_free(params);
+	
+	return 0;
+}
 
 static int __handle_quit(struct game *game, struct console_command *command)
 {
@@ -28,9 +46,11 @@ static int __handle_quit(struct game *game, struct console_command *command)
 	return 0;
 }
 
-static int __num_handlers = 1;
+static int __num_handlers = 2;
 static struct console_command_handler __command_handlers[] = {
-	{ .command_name = "quit", .handler = __handle_quit }
+	{ .command_name = "test", .handler = __handle_test },
+	{ .command_name = "quit", .handler = __handle_quit },
+	{ 0, 0 }
 };
 
 static void __print_prompt(uv_stream_t *stream)

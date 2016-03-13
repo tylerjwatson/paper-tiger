@@ -26,17 +26,17 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif	
 
-extern const char *REGEX_PARAM;
-
-struct param_context {
+struct param {
 	char *input_string;
 	char **parameters;
+	int num_parameters;
 };
 
-int param_context_new(void *context, const char *input_string, struct param_context **out_context);
+int param_new(TALLOC_CTX *context, const char *input_string, struct param **out_context);
 
+void param_free(struct param *param);
 
 #ifdef __cplusplus
 }
