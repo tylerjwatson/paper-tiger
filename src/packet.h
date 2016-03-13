@@ -31,17 +31,24 @@ extern "C" {
 #include "player.h"
 #include "packet_type.h"
 
-struct packet_buffer {
+#define PACKET_HEADER_SIZE 3
+
+struct packet_header {
 	uint16_t len;
-	enum packet_type type;
-	
-	char *data;
+	uint8_t type;
 };
 
-typedef int (*packet_handler_cb)(const struct player *player, const struct packet_buffer *buf);
+struct packet {
+	struct packet_header header;
+	void *data;
+};
+
+typedef int (*packet_read_cb)(struct packet *packet, uv_buf_t *buffer);
+typedef int (*packet_handler_cb)(const struct player *player, struct packet *packet);
 
 struct packet_handler {
 	uint8_t type;
+	packet_read_cb read_handler;
 	packet_handler_cb handler;
 };
 

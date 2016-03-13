@@ -18,15 +18,14 @@
  * along with upgraded-guacamole.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "packet.h"
+#include <stdint.h>
 
-static int handle_connect_request(const struct player *player, const struct packet_buffer *buf)
-{
-	return 0;
-}
+#include "packet.h"
+#include "packets/packets.h"
+
 
 static struct packet_handler packet_handlers[] = {
-	{ .type = PACKET_TYPE_CONNECT_REQUEST, .handler = handle_connect_request }
+	{ .type = PACKET_TYPE_CONNECT_REQUEST, .read_handler = read_connect_request, .handler = NULL }
 };
 
 int packet_read_header(const uv_buf_t *buf, uint8_t *out_type, uint16_t *out_len)

@@ -31,6 +31,9 @@ add_library(talloc STATIC src/talloc/talloc.c)
 include_directories("/usr/local/include" "${PROJECT_SOURCE_DIR}" "${LIBUV_INCLUDE_DIRS}") 
 
 add_executable(upgraded-guacamole
+	src/packets/connect_request.h
+	src/packets/connect_request.c
+
 	src/binary_reader.c
 	src/binary_reader.h
 	src/packet_type.h

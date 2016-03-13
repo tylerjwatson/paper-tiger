@@ -24,6 +24,12 @@
 #include "util.h"
 #include "server.h"
 #include "player.h"
+#include "packet.h"
+
+static void __process_header(const uv_buf_t *buf)
+{
+	
+}
 
 static void __on_read(uv_stream_t *stream, ssize_t len, const uv_buf_t *buf)
 {
@@ -36,8 +42,8 @@ static void __on_read(uv_stream_t *stream, ssize_t len, const uv_buf_t *buf)
 		
 		goto player_out;
 	}
-
-	_ERROR("%s: Read %ld bytes from client at slot %d\n", __FUNCTION__, len, player->id);
+	
+	
 	
 	goto out;
 	
@@ -54,7 +60,7 @@ static void __alloc_buffer(uv_handle_t *handle, size_t size, uv_buf_t *out_buf)
 	struct player *player = (struct player *)handle->data;
 	
 	if (player->state == PLAYER_SOCKET_STATE_HEADER) {
-		size = 3;
+		size = PACKET_HEADER_SIZE;
 	}
 	
 	*out_buf = uv_buf_init(talloc_size(player, size), size);
