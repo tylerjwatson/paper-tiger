@@ -10,6 +10,8 @@ static const std::regex __param_regex(REGEX_PARAM);
 
 static int __param_init(struct param *param)
 {
+	param->input_string[strcspn(param->input_string, "\r\n")] = '\0';
+
 	std::string input_string = param->input_string;
 	std::sregex_iterator params_begin(input_string.begin(), input_string.end(), __param_regex);
 	std::sregex_iterator params_end = std::sregex_iterator();
@@ -17,14 +19,14 @@ static int __param_init(struct param *param)
 
 	param->num_parameters = std::distance(params_begin, params_end);
 
-	if (param->num_parameters > 1) {
-		/*
-		 * Discard the end-most match as it seems to be rubbish.
-		 *
-		 * TODO: Find out why this is
-		 */
-		param->num_parameters--;
-	}
+	//if (param->num_parameters > 1) {
+	//	/*
+	//	 * Discard the end-most match as it seems to be rubbish.
+	//	 *
+	//	 * TODO: Find out why this is
+	//	 */
+	//	param->num_parameters--;
+	//}
 
 	param->parameters = talloc_array(param, char *, param->num_parameters);
 	if (param->parameters == NULL) {
