@@ -44,9 +44,12 @@ int connect_request_new(struct packet *packet, const uv_buf_t *buf)
 
 	binary_reader_read_7bit_int(buf->base, &pos, &str_len);
 
-	(buf->base + pos)[str_len] = '\0';
+	connect_request->protocol_version = talloc_size(connect_request, str_len + 1);
+	//TODO: check alloc
 
-	connect_request->protocol_version = talloc_strdup(connect_request, buf->base + pos);
+	memcpy(connect_request->protocol_version, buf->base + pos, str_len);
+
+	connect_request->protocol_version[str_len] = '\0';
 	connect_request->packet = packet;
 
 	packet->data = (void *)talloc_steal(packet, connect_request);
