@@ -18,10 +18,10 @@
 * along with upgraded-guacamole.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _HAVE_CONNECT_REQUEST_H
-#define _HAVE_CONNECT_REQUEST_H
+#ifndef _HAVE_CONTINUE_CONNECTING_H
+#define _HAVE_CONTINUE_CONNECTING_H
 
-#define PACKET_TYPE_CONNECT_REQUEST 0x01
+#define PACKET_TYPE_CONTINUE_CONNECTING 0x02
 
 #include <uv.h>
 #include "../packet.h"
@@ -30,17 +30,12 @@
 extern "C" {
 #endif
 
-struct connect_request {
-	struct packet *packet;
-	char *protocol_version;
-};
+int continue_connecting_new(TALLOC_CTX *ctx, struct packet **out_packet);
 
-int connect_request_read(struct packet *packet, const uv_buf_t *buf);
 
-int connect_request_handle(const struct player *player, struct packet *packet);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif //_HAVE_CONNECT_REQUEST_H
+#endif //_HAVE_CONTINUE_CONNECTING_H

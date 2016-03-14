@@ -25,8 +25,6 @@
 #include <stdint.h>
 
 #include "player.h"
-#include "packet_type.h"
-
 
 #define PACKET_HEADER_SIZE 3
 
@@ -43,13 +41,15 @@ struct packet {
 	void *data;
 };
 
-typedef int (*packet_new_cb)(struct packet *packet, uv_buf_t *buffer);
-typedef int (*packet_read_cb)(const struct player *player, struct packet *packet);
+typedef int (*packet_write_cb)(const struct packet *packet, const uv_buf_t *buffer);
+typedef int (*packet_read_cb)(struct packet *packet, const uv_buf_t *buffer);
+typedef int (*packet_handle_cb)(const struct player *player, struct packet *packet);
 
 struct packet_handler {
 	uint8_t type;
-	packet_new_cb new_func;
 	packet_read_cb read_func;
+	packet_handle_cb handle_func;
+	packet_write_cb write_func;
 };
 
 struct packet_handler *packet_handler_for_type(uint8_t type);
@@ -57,6 +57,8 @@ struct packet_handler *packet_handler_for_type(uint8_t type);
 int packet_read_header(const uv_buf_t *buf, uint8_t *out_type, uint16_t *out_len);
 
 int packet_new(TALLOC_CTX *ctx, struct player *player, const uv_buf_t *buf, struct packet **out_packet);
+
+int packet_send(uint8_t packet_type);
 
 #ifdef __cplusplus
 }

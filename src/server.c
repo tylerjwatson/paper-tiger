@@ -63,7 +63,7 @@ static void __on_read(uv_stream_t *stream, ssize_t len, const uv_buf_t *buf)
 			goto player_out;
 		}
 
-		if (packet_handler->new_func(player->incoming_packet, buf) < 0) {
+		if (packet_handler->read_func(player->incoming_packet, buf) < 0) {
 			_ERROR("%s: packet parsing failed for slot %d.\n", __FUNCTION__, player->id);
 			goto player_out;
 		}
@@ -74,7 +74,7 @@ static void __on_read(uv_stream_t *stream, ssize_t len, const uv_buf_t *buf)
 		 * process begins once again.
 		 */
 
-		if (packet_handler->read_func != NULL && packet_handler->read_func(player, player->incoming_packet) < 0) {
+		if (packet_handler->handle_func != NULL && packet_handler->handle_func(player, player->incoming_packet) < 0) {
 			_ERROR("%s: read handler for packet failed for slot %d.\n", __FUNCTION__, player->id);
 			goto player_out;
 		}

@@ -25,7 +25,7 @@
 #include "packets/connect_request.h"
 
 static struct packet_handler packet_handlers[] = {
-	{ .type = PACKET_TYPE_CONNECT_REQUEST, .new_func = connect_request_new, .read_func = NULL },
+	{ .type = PACKET_TYPE_CONNECT_REQUEST, .read_func = connect_request_read, .handle_func = connect_request_handle },
 	{ NULL, NULL, NULL }
 };
 
@@ -33,7 +33,7 @@ struct packet_handler *packet_handler_for_type(uint8_t type)
 {
 	struct packet_handler *handler;
 
-	for (handler = packet_handlers; handler->new_func != NULL; handler++) {
+	for (handler = packet_handlers; handler->read_func != NULL; handler++) {
 		if (handler->type == type) {
 			return handler;
 		}
@@ -95,4 +95,18 @@ out:
 	talloc_free(temp_context);
 
 	return ret;
+}
+
+int packet_send(uint8_t type)
+{
+	const struct packet_handler *handler;
+	uv_buf_t buf = { .base = NULL, .len = 0 };
+
+	handler = packet_handler_for_type(type);
+	if (handler == NULL || handler->write_func == NULL) {
+		_ERROR("%s: cannot find write handler for packet type %d\n", __FUNCTION__, type);
+		return -1;
+	}
+
+	
 }

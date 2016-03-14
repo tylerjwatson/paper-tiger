@@ -19,22 +19,23 @@
 */
 
 #include "connect_request.h"
+#include "../game.h"
 #include "../binary_reader.h"
 #include "../util.h"
 
-int connect_request_new(struct packet *packet, const uv_buf_t *buf)
+int connect_request_read(struct packet *packet, const uv_buf_t *buf)
 {
 	TALLOC_CTX *temp_context;
 	int ret = -1, pos = 0, str_len;
 	struct connect_request *connect_request;
-	
+
 	temp_context = talloc_new(NULL);
 	if (temp_context = NULL) {
 		_ERROR("%s: out of memory allocating temp context for connect request.\n", __FUNCTION__);
 		ret = -ENOMEM;
 		goto out;
 	}
-	
+
 	connect_request = talloc_zero(temp_context, struct connect_request);
 	if (connect_request == NULL) {
 		_ERROR("%s: out of memory allocating connect request.\n", __FUNCTION__);
@@ -45,13 +46,16 @@ int connect_request_new(struct packet *packet, const uv_buf_t *buf)
 	binary_reader_read_7bit_int(buf->base, &pos, &str_len);
 
 	connect_request->protocol_version = talloc_size(connect_request, str_len + 1);
-	//TODO: check alloc
+	if (connect_request->protocol_version == NULL) {
+		_ERROR("%s: out of memory copying protocol version to packet.\n", __FUNCTION__);
+		ret = -ENOMEM;
+		goto out;
+	}
 
 	memcpy(connect_request->protocol_version, buf->base + pos, str_len);
 
 	connect_request->protocol_version[str_len] = '\0';
 	connect_request->packet = packet;
-
 	packet->data = (void *)talloc_steal(packet, connect_request);
 	
 	ret = 0;
@@ -59,4 +63,22 @@ out:
 	talloc_free(temp_context);
 
 	return ret;
+}
+
+int connect_request_handle(const struct player *player, struct packet *packet)
+{
+	struct connect_request *req = (struct connect_request *)packet->data;
+	char target_version[12];
+
+	sprintf(target_version, "Terraria%d", GAME_PROTOCOL_VERSION);
+
+	if (strcmp(req->protocol_version, target_version) == 0) {
+
+	}
+	else {
+		_ERROR("%s: disconnected slot 0 for incompatible version.\n", __FUNCTION__);
+		player_close(player);
+	}
+
+	return 0;
 }

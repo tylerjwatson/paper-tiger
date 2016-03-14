@@ -33,6 +33,7 @@
 #include "console.h"
 
 #define GAME_MAX_PLAYERS 255
+#define GAME_PROTOCOL_VERSION 156
 
 #ifdef __cplusplus
 extern "C" {
