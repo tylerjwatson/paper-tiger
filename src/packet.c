@@ -97,6 +97,14 @@ out:
 	return ret;
 }
 
+void packet_write_header(uint8_t type, uint16_t len, uv_buf_t *buf, int *pos)
+{
+	*(uint16_t *)buf->base = len;
+	*pos += sizeof(uint16_t);
+	buf->base[*pos] = type;
+}
+
+
 int packet_send(uint8_t type)
 {
 	const struct packet_handler *handler;

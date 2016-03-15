@@ -23,4 +23,44 @@
 #include "../binary_reader.h"
 #include "../util.h"
 
-int continue_connecting_new(TALLOC_CTX *ctx);
+int continue_connecting_new(TALLOC_CTX *ctx, const struct player *player, struct packet **out_packet)
+{
+	int ret = -1;
+	TALLOC_CTX *temp_context;
+	struct packet *packet;
+
+	temp_context = talloc_new(NULL);
+	if (temp_context == NULL) {
+		_ERROR("%s: out of memory allocating temp context for packet %d\n", __FUNCTION__, PACKET_TYPE_CONTINUE_CONNECTING);
+		return -ENOMEM;
+	}
+
+	packet = talloc(temp_context, struct packet);
+	if (packet == NULL) {
+		_ERROR("%s: out of memory allocating packet %d\n", __FUNCTION__, PACKET_TYPE_CONTINUE_CONNECTING);
+		goto out;
+	}
+
+	/*
+	 * Packet has no payload.
+	 */
+
+	packet->type = PACKET_TYPE_CONTINUE_CONNECTING;
+	packet->len = PACKET_HEADER_SIZE;
+	packet->data = NULL;
+	packet->player = (struct player *)player;
+
+out:
+	talloc_free(temp_context);
+
+	return ret;
+}
+
+int continue_connecting_write(struct packet *packet, uv_buf_t *buf)
+{
+	int pos = 0;
+
+	packet_write_header(packet->type, packet->len, buf, &pos);
+
+	return 0;
+}

@@ -107,6 +107,8 @@ static void __alloc_buffer(uv_handle_t *handle, size_t size, uv_buf_t *out_buf)
 	*out_buf = uv_buf_init(talloc_size(player, size), size);
 }
 
+
+
 void __on_connection(uv_stream_t *handle, int status)
 {
 	struct sockaddr_in peer;
@@ -157,6 +159,35 @@ void __on_connection(uv_stream_t *handle, int status)
 	server->game->players[player_id] = player;
 	uv_read_start((uv_stream_t *)player->handle, __alloc_buffer, __on_read);
 }
+
+static void __on_write(uv_write_t* req, int status)
+{
+
+}
+
+int server_packet_write(const struct player *player, const uv_buf_t *buf)
+{
+	uv_write_t *write_request;
+
+	write_request = talloc(player, uv_write_t);
+	if (write_request == NULL) {
+		_ERROR("%s: out of memory writing packet to slot %d\n", __FUNCTION__, player->id);
+		return -ENOMEM;
+	}
+
+	write_request->data = player;
+
+	if (uv_write(write_request, player->handle, buf, 1, __on_write) < 0) {
+		_ERROR("%s: write failed to slot %d.\n", __FUNCTION__);
+		goto error;
+	}
+
+	return 0;
+error:
+	talloc_free(write_request);
+	return -1;
+}
+
 
 int server_new(TALLOC_CTX *context, const char *listen_address, const uint16_t port,
 			   struct game *game, struct server **out_server)

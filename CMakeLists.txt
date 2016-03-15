@@ -38,7 +38,6 @@ add_executable(upgraded-guacamole
 
 	src/binary_reader.c
 	src/binary_reader.h
-	src/packet_type.h
 	src/bitmap.h
 	src/param.cc
 	src/param.h

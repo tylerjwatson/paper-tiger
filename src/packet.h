@@ -54,6 +54,8 @@ struct packet_handler {
 
 struct packet_handler *packet_handler_for_type(uint8_t type);
 
+void packet_write_header(uint8_t type, uint16_t len, uv_buf_t *buf, int *pos);
+
 int packet_read_header(const uv_buf_t *buf, uint8_t *out_type, uint16_t *out_len);
 
 int packet_new(TALLOC_CTX *ctx, struct player *player, const uv_buf_t *buf, struct packet **out_packet);
