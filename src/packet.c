@@ -22,18 +22,21 @@
 
 #include "packet.h"
 #include "util.h"
+
 #include "packets/connect_request.h"
+#include "packets/continue_connecting.h"
 
 static struct packet_handler packet_handlers[] = {
 	{ .type = PACKET_TYPE_CONNECT_REQUEST, .read_func = connect_request_read, .handle_func = connect_request_handle },
-	{ NULL, NULL, NULL }
+	{ .type = PACKET_TYPE_CONTINUE_CONNECTING, .read_func = NULL, .handle_func = NULL, .write_func = continue_connecting_write },
+	{ 0x00, NULL, NULL }
 };
 
 struct packet_handler *packet_handler_for_type(uint8_t type)
 {
 	struct packet_handler *handler;
 
-	for (handler = packet_handlers; handler->read_func != NULL; handler++) {
+	for (handler = packet_handlers; handler->type != 0x00; handler++) {
 		if (handler->type == type) {
 			return handler;
 		}
@@ -102,19 +105,4 @@ void packet_write_header(uint8_t type, uint16_t len, uv_buf_t *buf, int *pos)
 	*(uint16_t *)buf->base = len;
 	*pos += sizeof(uint16_t);
 	buf->base[*pos] = type;
-}
-
-
-int packet_send(uint8_t type)
-{
-	const struct packet_handler *handler;
-	uv_buf_t buf = { .base = NULL, .len = 0 };
-
-	handler = packet_handler_for_type(type);
-	if (handler == NULL || handler->write_func == NULL) {
-		_ERROR("%s: cannot find write handler for packet type %d\n", __FUNCTION__, type);
-		return -1;
-	}
-
-	
 }

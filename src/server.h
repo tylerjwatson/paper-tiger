@@ -43,7 +43,7 @@ int server_new(TALLOC_CTX *context, const char *listen_address, const uint16_t p
 
 int server_start(struct server *server);
 
-int server_packet_write(const struct player *player, const uv_buf_t *buf);
+int server_send_packet(const struct player *player, const struct packet *packet);
 
 #ifdef __cplusplus
 }

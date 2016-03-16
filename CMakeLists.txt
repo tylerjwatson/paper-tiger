@@ -65,6 +65,10 @@ set_property(TARGET upgraded-guacamole PROPERTY C_STANDARD 11)
 
 
 if(WIN32)
+	set_property(TARGET upgraded-guacamole PROPERTY COMPILE_DEFINITIONS_DEBUG _CRT_SECURE_NO_WARNINGS)
+	set_property(TARGET upgraded-guacamole PROPERTY COMPILE_DEFINITIONS_RELEASE _CRT_SECURE_NO_WARNINGS)
+
+
 	target_link_libraries(upgraded-guacamole talloc "${LIBUV_LIBRARIES}")
 	# target_link_libraries(upgraded-guacamole talloc "${LIBUV_LIBRARIES}" "${PTHREAD_LIBRARY}")
 else()

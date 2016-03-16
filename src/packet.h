@@ -41,7 +41,7 @@ struct packet {
 	void *data;
 };
 
-typedef int (*packet_write_cb)(const struct packet *packet, const uv_buf_t *buffer);
+typedef int (*packet_write_cb)(TALLOC_CTX *context, const struct packet *packet, const uv_buf_t *buffer);
 typedef int (*packet_read_cb)(struct packet *packet, const uv_buf_t *buffer);
 typedef int (*packet_handle_cb)(const struct player *player, struct packet *packet);
 
@@ -59,8 +59,6 @@ void packet_write_header(uint8_t type, uint16_t len, uv_buf_t *buf, int *pos);
 int packet_read_header(const uv_buf_t *buf, uint8_t *out_type, uint16_t *out_len);
 
 int packet_new(TALLOC_CTX *ctx, struct player *player, const uv_buf_t *buf, struct packet **out_packet);
-
-int packet_send(uint8_t packet_type);
 
 #ifdef __cplusplus
 }

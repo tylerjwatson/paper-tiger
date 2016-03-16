@@ -50,16 +50,20 @@ int continue_connecting_new(TALLOC_CTX *ctx, const struct player *player, struct
 	packet->data = NULL;
 	packet->player = (struct player *)player;
 
+	*out_packet = talloc_steal(ctx, packet);
+
+	ret = 0;
 out:
 	talloc_free(temp_context);
 
 	return ret;
 }
 
-int continue_connecting_write(struct packet *packet, uv_buf_t *buf)
+int continue_connecting_write(TALLOC_CTX *context, struct packet *packet, uv_buf_t *buf)
 {
-	int pos = 0;
+	*buf = uv_buf_init(talloc_size(context, PACKET_LEN_CONTINUE_CONNECTING), PACKET_LEN_CONTINUE_CONNECTING);
 
+	buf->base[0] = packet->player->id;
 
 	return 0;
 }

@@ -19,9 +19,12 @@
 */
 
 #include "connect_request.h"
+#include "../server.h"
 #include "../game.h"
 #include "../binary_reader.h"
 #include "../util.h"
+
+#include "continue_connecting.h"
 
 int connect_request_read(struct packet *packet, const uv_buf_t *buf)
 {
@@ -68,17 +71,27 @@ out:
 int connect_request_handle(const struct player *player, struct packet *packet)
 {
 	struct connect_request *req = (struct connect_request *)packet->data;
+	struct packet *continue_connecting;
+
 	char target_version[12];
 
 	sprintf(target_version, "Terraria%d", GAME_PROTOCOL_VERSION);
 
 	if (strcmp(req->protocol_version, target_version) == 0) {
+		
+		if (continue_connecting_new(player, player, &continue_connecting) < 0) {
+			_ERROR("%s: out of memory sending packet.\n", __FUNCTION__);
+			goto error;
+		}
 
+		server_send_packet(player, continue_connecting);
+		talloc_free(continue_connecting);
 	}
 	else {
 		_ERROR("%s: disconnected slot 0 for incompatible version.\n", __FUNCTION__);
-		player_close(player);
 	}
 
 	return 0;
+error:
+	return -1;
 }

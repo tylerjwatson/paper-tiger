@@ -21,7 +21,9 @@
 #ifndef _HAVE_CONTINUE_CONNECTING_H
 #define _HAVE_CONTINUE_CONNECTING_H
 
-#define PACKET_TYPE_CONTINUE_CONNECTING 0x02
+#define PACKET_TYPE_CONTINUE_CONNECTING 0x03
+
+#define PACKET_LEN_CONTINUE_CONNECTING 1
 
 #include <uv.h>
 #include "../packet.h"
@@ -30,9 +32,9 @@
 extern "C" {
 #endif
 
-int continue_connecting_new(TALLOC_CTX *ctx, struct packet **out_packet);
+int continue_connecting_new(TALLOC_CTX *ctx, const struct player *player, struct packet **out_packet);
 
-
+int continue_connecting_write(TALLOC_CTX *context, struct packet *packet, uv_buf_t *buf);
 
 #ifdef __cplusplus
 }
