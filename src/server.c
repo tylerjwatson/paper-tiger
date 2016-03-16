@@ -165,7 +165,15 @@ static void __on_write(uv_write_t* req, int status)
 
 }
 
-int server_packet_write(const struct player *player, const uv_buf_t *buf)
+static int __packet_to_buffer(const struct packet *packet, int *num_buffers, uv_buf_t **out_buffers)
+{
+	uv_buf_t *header_buf, *payload_buf;
+
+	header_buf = talloc(packet, uv_buf_t);
+
+}
+
+int server_send_packet(const struct player *player, const struct packet *packet)
 {
 	uv_write_t *write_request;
 

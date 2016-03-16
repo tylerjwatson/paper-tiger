@@ -60,7 +60,6 @@ int continue_connecting_write(struct packet *packet, uv_buf_t *buf)
 {
 	int pos = 0;
 
-	packet_write_header(packet->type, packet->len, buf, &pos);
 
 	return 0;
 }
