@@ -102,7 +102,7 @@ int game_new(TALLOC_CTX *context, struct game **out_context)
 	
 	uv_loop_init(gameContext->event_loop);
 	
-	gameContext->player_slots = talloc_array(gameContext, word_t, GAME_MAX_PLAYERS / sizeof(word_t));
+	gameContext->player_slots = talloc_zero_array(gameContext, word_t, GAME_MAX_PLAYERS / sizeof(word_t));
 	
 	talloc_set_destructor(gameContext, __game_destructor);
 

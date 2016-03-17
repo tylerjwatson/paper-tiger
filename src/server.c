@@ -35,9 +35,9 @@ static int __handle_packet(struct packet *packet, const uv_buf_t *buf)
 
 	packet_handler = packet_handler_for_type(packet->type);
 	if (packet_handler == NULL) {
-		_ERROR("%s: unknown packet type %d from slot %d.\n", __FUNCTION__,
+	/*	_ERROR("%s: unknown packet type %d from slot %d.\n", __FUNCTION__,
 			packet->type,
-			packet->player->id);
+			packet->player->id);*/
 		return -1;
 	}
 
@@ -75,9 +75,9 @@ static void __on_read(uv_stream_t *stream, ssize_t len, const uv_buf_t *buf)
 			goto player_out;
 		}
 
-		printf("%s: slot %d packet: header=%d, len=%d\n", __FUNCTION__, player->id, 
+		/*printf("%s: slot %d packet: header=%d, len=%d\n", __FUNCTION__, player->id, 
 			player->incoming_packet->type, player->incoming_packet->len);
-
+*/
 		if (player->incoming_packet->len == PACKET_HEADER_SIZE) {
 			goto handle_packet;
 		} 
