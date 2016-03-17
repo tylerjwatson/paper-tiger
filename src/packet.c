@@ -88,6 +88,7 @@ int packet_new(TALLOC_CTX *context, struct player *player, const uv_buf_t *buf, 
 
 	packet->type = type;
 	packet->len = len;
+	packet->player = player;
 
 	//TODO: Packet sanity checks.
 

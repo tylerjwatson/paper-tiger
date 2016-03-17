@@ -28,17 +28,41 @@
 
 #include "packets/connect_request.h"
 
+static int __handle_packet(struct packet *packet, const uv_buf_t *buf)
+{
+	struct packet_handler *packet_handler;
+	int ret = -1;
+
+	packet_handler = packet_handler_for_type(packet->type);
+	if (packet_handler == NULL) {
+		_ERROR("%s: unknown packet type %d from slot %d.\n", __FUNCTION__,
+			packet->type,
+			packet->player->id);
+		return -1;
+	}
+
+	if ((ret = packet_handler->read_func(packet, buf)) < 0) {
+		_ERROR("%s: packet parsing failed for slot %d.\n", __FUNCTION__, 
+			packet->player->id);
+		return ret;
+	}
+
+	if (packet_handler->handle_func != NULL && (ret = packet_handler->handle_func(packet->player, packet)) < 0) {
+		_ERROR("%s: read handler for packet failed for slot %d.\n", __FUNCTION__, packet->player->id);
+		return ret;
+	}
+
+	return 0;
+}
+
 static void __on_read(uv_stream_t *stream, ssize_t len, const uv_buf_t *buf)
 {
 	struct player *player = (struct player *)stream->data;
-	struct packet_handler *packet_handler;
 
 	if (len < 0) {
-		if (len == UV_EOF) {
-			_ERROR("%s: EOF while reading from slot %d\n", __FUNCTION__, player->id);
-		}
-		
-		goto player_out;
+		_ERROR("%s: %s while reading from slot %d\n", __FUNCTION__, uv_err_name(len), player->id);
+		player_close(player);
+		return;
 	}
 
 	if (len == 0) {
@@ -51,40 +75,24 @@ static void __on_read(uv_stream_t *stream, ssize_t len, const uv_buf_t *buf)
 			goto player_out;
 		}
 
-		printf("%s: slot %d packet: header=%d, len=%d\n", __FUNCTION__, player->id, player->incoming_packet->type, player->incoming_packet->len);
+		printf("%s: slot %d packet: header=%d, len=%d\n", __FUNCTION__, player->id, 
+			player->incoming_packet->type, player->incoming_packet->len);
+
+		if (player->incoming_packet->len == PACKET_HEADER_SIZE) {
+			goto handle_packet;
+		} 
+
+		goto out;
 	}
-	else {
-		packet_handler = packet_handler_for_type(player->incoming_packet->type);
-		if (packet_handler == NULL) {
-			_ERROR("%s: unknown packet type %d from slot %d.\n", __FUNCTION__,
-				player->incoming_packet->type,
-				player->id);
 
-			goto out;
-		}
+handle_packet:
+	__handle_packet(player->incoming_packet, buf);
 
-		if (packet_handler->read_func(player->incoming_packet, buf) < 0) {
-			_ERROR("%s: packet parsing failed for slot %d.\n", __FUNCTION__, player->id);
-			goto player_out;
-		}
-
-		/*
-		 * After the body of the packet has been parsed and the read handler called,
-		 * player->incoming_packet gets released and exchanged to NULL and the read 
-		 * process begins once again.
-		 */
-
-		if (packet_handler->handle_func != NULL && packet_handler->handle_func(player, player->incoming_packet) < 0) {
-			_ERROR("%s: read handler for packet failed for slot %d.\n", __FUNCTION__, player->id);
-			goto player_out;
-		}
-
-		talloc_free(player->incoming_packet);
-		player->incoming_packet = NULL;
-	}
+	talloc_free(player->incoming_packet);
+	player->incoming_packet = NULL;
 
 	goto out;
-	
+
 player_out:
 	_ERROR("%s: read error from slot %d", __FUNCTION__, player->id);
 	player_close(player);
