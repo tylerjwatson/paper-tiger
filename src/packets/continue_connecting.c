@@ -32,12 +32,14 @@ int continue_connecting_new(TALLOC_CTX *ctx, const struct player *player, struct
 	temp_context = talloc_new(NULL);
 	if (temp_context == NULL) {
 		_ERROR("%s: out of memory allocating temp context for packet %d\n", __FUNCTION__, PACKET_TYPE_CONTINUE_CONNECTING);
-		return -ENOMEM;
+		ret = -ENOMEM;
+		goto out;
 	}
 
 	packet = talloc(temp_context, struct packet);
 	if (packet == NULL) {
 		_ERROR("%s: out of memory allocating packet %d\n", __FUNCTION__, PACKET_TYPE_CONTINUE_CONNECTING);
+		ret = -ENOMEM;
 		goto out;
 	}
 

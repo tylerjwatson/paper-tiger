@@ -31,9 +31,10 @@ int connect_request_read(struct packet *packet, const uv_buf_t *buf)
 	TALLOC_CTX *temp_context;
 	int ret = -1, pos = 0, str_len;
 	struct connect_request *connect_request;
+	char *protocol_version;
 
 	temp_context = talloc_new(NULL);
-	if (temp_context = NULL) {
+	if (temp_context == NULL) {
 		_ERROR("%s: out of memory allocating temp context for connect request.\n", __FUNCTION__);
 		ret = -ENOMEM;
 		goto out;
@@ -48,16 +49,19 @@ int connect_request_read(struct packet *packet, const uv_buf_t *buf)
 
 	binary_reader_read_7bit_int(buf->base, &pos, &str_len);
 
-	connect_request->protocol_version = talloc_size(connect_request, str_len + 1);
-	if (connect_request->protocol_version == NULL) {
+	protocol_version = talloc_size(temp_context, str_len + 1);
+	if (protocol_version == NULL) {
 		_ERROR("%s: out of memory copying protocol version to packet.\n", __FUNCTION__);
 		ret = -ENOMEM;
 		goto out;
 	}
 
-	memcpy(connect_request->protocol_version, buf->base + pos, str_len);
+	memcpy(protocol_version, buf->base + pos, str_len);
 
-	connect_request->protocol_version[str_len] = '\0';
+	protocol_version[str_len] = '\0';
+
+	connect_request->protocol_version = talloc_steal(connect_request, protocol_version);
+
 	connect_request->packet = packet;
 	packet->data = (void *)talloc_steal(packet, connect_request);
 	
@@ -79,7 +83,7 @@ int connect_request_handle(const struct player *player, struct packet *packet)
 
 	if (strcmp(req->protocol_version, target_version) == 0) {
 		
-		if (continue_connecting_new(player, player, &continue_connecting) < 0) {
+		if (continue_connecting_new((struct player *)player, player, &continue_connecting) < 0) {
 			_ERROR("%s: out of memory sending packet.\n", __FUNCTION__);
 			goto error;
 		}
