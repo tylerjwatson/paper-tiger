@@ -18,12 +18,12 @@
 * along with upgraded-guacamole.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "continue_connecting.h"
+#include "player_info.h"
 #include "../game.h"
 #include "../binary_reader.h"
 #include "../util.h"
 
-int continue_connecting_new(TALLOC_CTX *ctx, const struct player *player, struct packet **out_packet)
+int player_info_new(TALLOC_CTX *ctx, const struct player *player, struct packet **out_packet)
 {
 	int ret = -1;
 	TALLOC_CTX *temp_context;
@@ -31,14 +31,14 @@ int continue_connecting_new(TALLOC_CTX *ctx, const struct player *player, struct
 
 	temp_context = talloc_new(NULL);
 	if (temp_context == NULL) {
-		_ERROR("%s: out of memory allocating temp context for packet %d\n", __FUNCTION__, PACKET_TYPE_CONTINUE_CONNECTING);
+		_ERROR("%s: out of memory allocating temp context for packet %d\n", __FUNCTION__, PACKET_TYPE_PLAYER_INFO);
 		ret = -ENOMEM;
 		goto out;
 	}
 
 	packet = talloc(temp_context, struct packet);
 	if (packet == NULL) {
-		_ERROR("%s: out of memory allocating packet %d\n", __FUNCTION__, PACKET_TYPE_CONTINUE_CONNECTING);
+		_ERROR("%s: out of memory allocating packet %d\n", __FUNCTION__, PACKET_TYPE_PLAYER_INFO);
 		ret = -ENOMEM;
 		goto out;
 	}
@@ -47,12 +47,12 @@ int continue_connecting_new(TALLOC_CTX *ctx, const struct player *player, struct
 	 * Packet has no payload.
 	 */
 
-	packet->type = PACKET_TYPE_CONTINUE_CONNECTING;
+	packet->type = PACKET_TYPE_PLAYER_INFO;
 	packet->len = PACKET_HEADER_SIZE;
 	packet->data = NULL;
 	packet->player = (struct player *)player;
 
-	*out_packet = talloc_steal(ctx, packet);
+	*out_packet = (struct packet *)talloc_steal(ctx, packet);
 
 	ret = 0;
 out:
@@ -61,11 +61,7 @@ out:
 	return ret;
 }
 
-int continue_connecting_write(TALLOC_CTX *context, struct packet *packet, uv_buf_t *buf)
+int player_info_read(struct packet *packet, const uv_buf_t *buf)
 {
-	*buf = uv_buf_init(talloc_size(context, PACKET_LEN_CONTINUE_CONNECTING), PACKET_LEN_CONTINUE_CONNECTING);
-
-	buf->base[0] = packet->player->id;
-
 	return 0;
 }
