@@ -53,9 +53,27 @@ static struct console_command_handler __command_handlers[] = {
 	{ 0, 0 }
 };
 
+static void __on_write(uv_write_t *req, int status)
+{
+	// stub
+}
+
 static void __print_prompt(uv_stream_t *stream)
 {
-	printf("%s> ", "guac");
+	uv_write_t *req = talloc(stream->data, uv_write_t);
+	uv_buf_t buf = {
+		.base = "guac > ",
+		.len = 7
+	};
+	
+	if (req == NULL) {
+		_ERROR("%s: write request for console handle failed.\n", __FUNCTION__);
+		return;
+	}
+	
+	uv_write(req, stream, &buf, 1, __on_write);
+	
+	//printf("%s> ", "guac");
 }
 
 static void __on_read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)

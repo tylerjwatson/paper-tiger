@@ -33,6 +33,8 @@ include_directories("/usr/local/include" "${PROJECT_SOURCE_DIR}" "${LIBUV_INCLUD
 add_executable(upgraded-guacamole
 	src/packets/continue_connecting.h
 	src/packets/continue_connecting.c
+	src/packets/player_info.h
+	src/packets/player_info.c
 	src/packets/connect_request.h
 	src/packets/connect_request.c
 

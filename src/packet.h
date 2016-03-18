@@ -41,7 +41,7 @@ struct packet {
 	void *data;
 };
 
-typedef int (*packet_write_cb)(TALLOC_CTX *context, const struct packet *packet, const uv_buf_t *buffer);
+typedef int (*packet_write_cb)(TALLOC_CTX *context, const struct packet *packet, uv_buf_t *buffer);
 typedef int (*packet_read_cb)(struct packet *packet, const uv_buf_t *buffer);
 typedef int (*packet_handle_cb)(const struct player *player, struct packet *packet);
 

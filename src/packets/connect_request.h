@@ -25,6 +25,7 @@
 
 #include <uv.h>
 #include "../packet.h"
+#include "../player.h"
 
 #ifdef __cplusplus
 extern "C" {

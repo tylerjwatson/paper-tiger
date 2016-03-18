@@ -88,7 +88,7 @@ int connect_request_handle(const struct player *player, struct packet *packet)
 			goto error;
 		}
 
-		server_send_packet(player, continue_connecting);
+		server_send_packet(player, (const struct packet *)continue_connecting);
 		talloc_free(continue_connecting);
 	}
 	else {

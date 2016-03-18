@@ -21,7 +21,7 @@
 #ifndef _HAVE_PLAYER_INFO_H
 #define _HAVE_PLAYER_INFO_H
 
-#define PACKET_TYPE_PLAYER_INFO 0x03
+#define PACKET_TYPE_PLAYER_INFO 0x04
 
 /*
  * Base length + name length + 1
@@ -63,6 +63,8 @@ int player_info_write(TALLOC_CTX *context, struct packet *packet, uv_buf_t *buf)
 
 int player_info_read(struct packet *packet, const uv_buf_t *buf);
 
+int player_info_handle(struct player *player, struct packet *packet);
+	
 
 #ifdef __cplusplus
 }

@@ -23,6 +23,17 @@
 #include "../binary_reader.h"
 #include "../util.h"
 
+int player_info_handle(struct player *player, struct packet *packet)
+{
+	struct player_info *player_info = (struct player_info *)packet->data;
+	
+	player->name = talloc_strdup(player, player_info->name);
+	
+	printf("%s (%s) has joined to slot %d.\n", player->name, player->remote_addr, player->id);
+	
+	return 0;
+}
+
 int player_info_new(TALLOC_CTX *ctx, const struct player *player, struct packet **out_packet)
 {
 	int ret = -1;
@@ -92,21 +103,26 @@ int player_info_read(struct packet *packet, const uv_buf_t *buf)
 	player_info->name = talloc_size(player_info, name_len + 1);
 	memcpy(player_info->name, name, name_len);
 
-	pos += name_len;
+	pos += name_len + 1;
+	
+	player_info->hair_dye = buf->base[pos++];
+	player_info->hide_visuals = buf->base[pos++];
+	player_info->hide_visuals2 = buf->base[pos++];
+	player_info->hide_misc = buf->base[pos++];
 
-	player_info->hair_colour = *(struct colour *)buf->base[pos];
+	player_info->hair_colour = *(struct colour *)(buf->base + pos);
 	pos += sizeof(struct colour);
-	player_info->skin_colour = *(struct colour *)buf->base[pos];
+	player_info->skin_colour = *(struct colour *)(buf->base + pos);
 	pos += sizeof(struct colour);
-	player_info->eye_colour = *(struct colour *)buf->base[pos];
+	player_info->eye_colour = *(struct colour *)(buf->base + pos);
 	pos += sizeof(struct colour);
-	player_info->shirt_colour = *(struct colour *)buf->base[pos];
+	player_info->shirt_colour = *(struct colour *)(buf->base + pos);
 	pos += sizeof(struct colour);
-	player_info->under_shirt_colour = *(struct colour *)buf->base[pos];
+	player_info->under_shirt_colour = *(struct colour *)(buf->base + pos);
 	pos += sizeof(struct colour);
-	player_info->pants_colour = *(struct colour *)buf->base[pos];
+	player_info->pants_colour = *(struct colour *)(buf->base + pos);
 	pos += sizeof(struct colour);
-	player_info->shoe_colour = *(struct colour *)buf->base[pos];
+	player_info->shoe_colour = *(struct colour *)(buf->base + pos);
 	pos += sizeof(struct colour);
 
 	player_info->difficulty = buf->base[pos];

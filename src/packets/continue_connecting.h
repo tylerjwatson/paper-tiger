@@ -34,7 +34,7 @@ extern "C" {
 
 int continue_connecting_new(TALLOC_CTX *ctx, const struct player *player, struct packet **out_packet);
 
-int continue_connecting_write(TALLOC_CTX *context, struct packet *packet, uv_buf_t *buf);
+int continue_connecting_write(TALLOC_CTX *context, const struct packet *packet, uv_buf_t *buf);
 
 #ifdef __cplusplus
 }

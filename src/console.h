@@ -31,8 +31,6 @@
 extern "C" {
 #endif
 
-typedef int(*console_command_cb)(struct game *game, struct console_command *command);
-
 struct console {
 	uv_tty_t *console_handle;
 	struct game *game;
@@ -44,6 +42,8 @@ struct console_command {
 	char *parameters;
 };
 
+typedef int(*console_command_cb)(struct game *game, struct console_command *command);
+	
 struct console_command_handler {
 	char *command_name;
 	char *help_text;

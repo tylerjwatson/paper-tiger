@@ -438,13 +438,13 @@ static int __world_read_header(struct world *world)
 		goto out;
 	}
 
-	if (binary_reader_read_int32(world->reader, &world->max_tiles_y) < 0) {
+	if (binary_reader_read_uint32(world->reader, &world->max_tiles_y) < 0) {
 		_ERROR("%s: binary reader error reading world->max_tiles_y\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 
-	if (binary_reader_read_int32(world->reader, &world->max_tiles_x) < 0) {
+	if (binary_reader_read_uint32(world->reader, &world->max_tiles_x) < 0) {
 		_ERROR("%s: binary reader error reading world->max_tiles_x\n", __FUNCTION__);
 
 		ret = -1;
