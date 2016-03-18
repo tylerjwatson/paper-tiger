@@ -232,6 +232,15 @@ int binary_reader_read_single(struct binary_reader_context *context, float *out_
 	return 0;
 }
 
+int binary_reader_read_string_buffer(char *buf, int pos, int *out_len, char **out_value)
+{
+	if (binary_reader_read_7bit_int(buf, &pos, &out_len) < 0) {
+		return -1;
+	}
+
+	*out_value = (char *)(buf + pos);
+}
+
 int binary_reader_read_string(struct binary_reader_context *context, char **out_value)
 {
 	char *val;

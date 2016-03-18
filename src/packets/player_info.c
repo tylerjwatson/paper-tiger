@@ -63,5 +63,59 @@ out:
 
 int player_info_read(struct packet *packet, const uv_buf_t *buf)
 {
-	return 0;
+	int ret = -1, pos = 0, name_len = 0;
+	TALLOC_CTX *temp_context;
+	struct player_info *player_info;
+
+	char *name;
+
+	temp_context = talloc_new(NULL);
+	if (temp_context == NULL) {
+		_ERROR("%s: out of memory allocating temp context for player info.\n", __FUNCTION__);
+		ret = -ENOMEM;
+		goto out;
+	}
+
+	player_info = talloc_zero(temp_context, struct player_info);
+	if (player_info == NULL) {
+		_ERROR("%s: out of memory allocating player info.\n", __FUNCTION__);
+		ret = -ENOMEM;
+		goto out;
+	}
+
+	player_info->id = buf->base[pos++];
+	player_info->skin_variant = buf->base[pos++];
+	player_info->hair = buf->base[pos++];
+
+	binary_reader_read_string_buffer(buf->base, pos, &name_len, &name);
+
+	player_info->name = talloc_size(player_info, name_len + 1);
+	memcpy(player_info->name, name, name_len);
+
+	pos += name_len;
+
+	player_info->hair_colour = *(struct colour *)buf->base[pos];
+	pos += sizeof(struct colour);
+	player_info->skin_colour = *(struct colour *)buf->base[pos];
+	pos += sizeof(struct colour);
+	player_info->eye_colour = *(struct colour *)buf->base[pos];
+	pos += sizeof(struct colour);
+	player_info->shirt_colour = *(struct colour *)buf->base[pos];
+	pos += sizeof(struct colour);
+	player_info->under_shirt_colour = *(struct colour *)buf->base[pos];
+	pos += sizeof(struct colour);
+	player_info->pants_colour = *(struct colour *)buf->base[pos];
+	pos += sizeof(struct colour);
+	player_info->shoe_colour = *(struct colour *)buf->base[pos];
+	pos += sizeof(struct colour);
+
+	player_info->difficulty = buf->base[pos];
+
+	packet->data = (void *)talloc_steal(packet, player_info);
+
+	ret = 0;
+out:
+	talloc_free(temp_context);
+
+	return ret;
 }

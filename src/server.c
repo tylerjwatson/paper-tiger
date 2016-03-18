@@ -77,7 +77,7 @@ static void __on_read(uv_stream_t *stream, ssize_t len, const uv_buf_t *buf)
 
 		/*printf("%s: slot %d packet: header=%d, len=%d\n", __FUNCTION__, player->id, 
 			player->incoming_packet->type, player->incoming_packet->len);
-*/
+			*/
 		if (player->incoming_packet->len == PACKET_HEADER_SIZE) {
 			goto handle_packet;
 		} 
