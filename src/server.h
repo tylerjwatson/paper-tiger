@@ -23,10 +23,8 @@
 
 #include <uv.h>
 
-#include "packet.h"
-#include "player.h"
 #include "talloc/talloc.h"
-#include "game.h"
+#include "packet.h"
 
 #ifdef __cplusplus
 extern "C" {

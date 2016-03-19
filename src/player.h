@@ -25,13 +25,14 @@
 #include <uv.h>
 
 #include "talloc/talloc.h"
-#include "packet.h"
-#include "game.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+struct packet;
+struct game;
+	
 struct player {
     uint32_t id;
 	char *name;

@@ -18,6 +18,8 @@
 * along with upgraded-guacamole.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
+
 #include "player_info.h"
 #include "../game.h"
 #include "../binary_reader.h"

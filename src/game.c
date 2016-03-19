@@ -47,16 +47,14 @@ static inline void __sleep(double msec)
 	
 }
 
-static int __game_update(uv_timer_t *timer)
+static void __game_update(uv_timer_t *timer)
 {
 	struct game *game = (struct game *)timer->data;
 
 	//TODO: Update the game shit.
-
-	return 0;
 }
 
-static void __game_destructor(struct game *context)
+static void __game_destructor(TALLOC_CTX *context)
 {   
 }
 

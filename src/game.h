@@ -27,10 +27,10 @@
 #include <uv.h>
 
 #include "talloc/talloc.h"
+//#include "server.h"
 #include "bitmap.h"
-#include "server.h"
-#include "player.h"
-#include "console.h"
+//#include "player.h"
+//#include "console.h"
 
 #define GAME_MAX_PLAYERS 255
 #define GAME_PROTOCOL_VERSION 156
@@ -38,6 +38,11 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+	
+struct player;
+struct server;
+struct game;
+struct console;
 
 struct game {
 	double ms_per_frame;

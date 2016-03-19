@@ -17,6 +17,7 @@
 * You should have received a copy of the GNU General Public License
 * along with upgraded-guacamole.  If not, see <http://www.gnu.org/licenses/>.
 */
+#include <string.h>
 
 #include "console.h"
 #include "game.h"
@@ -156,7 +157,7 @@ out:
 	talloc_free(temp_context);
 }
 
-static void __console_destructor(uv_tty_t *handle)
+static void __console_destructor(TALLOC_CTX *handle)
 {
 }
 

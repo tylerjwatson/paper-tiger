@@ -18,6 +18,8 @@
 * along with upgraded-guacamole.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
+
 #include "connect_request.h"
 #include "../server.h"
 #include "../game.h"

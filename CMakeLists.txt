@@ -1,5 +1,7 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.1)
 project(upgraded-guacamole)
+
+set(CMAKE_CXX_STANDARD 11)
 
 # set(CMAKE_SOURCE_DIR "${PROJECT_SOURCE_DIR}/src")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/CMakeModules")
@@ -31,6 +33,9 @@ add_library(talloc STATIC src/talloc/talloc.c)
 include_directories("/usr/local/include" "${PROJECT_SOURCE_DIR}" "${LIBUV_INCLUDE_DIRS}") 
 
 add_executable(upgraded-guacamole
+	src/packet.c
+	src/packet.h
+
 	src/packets/continue_connecting.h
 	src/packets/continue_connecting.c
 	src/packets/player_info.h
@@ -50,8 +55,6 @@ add_executable(upgraded-guacamole
 	src/getopt.c
 	src/getopt.h
 	src/main.cc
-	src/packet.c
-	src/packet.h
 	src/player.c
 	src/player.h
 	src/server.c
@@ -61,7 +64,6 @@ add_executable(upgraded-guacamole
 	src/util.h
 	src/world.c
 	src/world.h)
-
 
 set_property(TARGET upgraded-guacamole PROPERTY C_STANDARD 11)
 

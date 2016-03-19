@@ -20,9 +20,10 @@
 
 
 #include "player.h"
+#include "game.h"
 #include "util.h"
 
-static void __player_destructor(struct player *player)
+static int __player_destructor(struct player *player)
 {
 	uv_close((uv_handle_t *)player->handle, NULL);
 	bitmap_clear(player->game->player_slots, player->id);

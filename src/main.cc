@@ -18,6 +18,7 @@
  * along with upgraded-guacamole.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <string.h>
 #include <time.h>
 #include <errno.h>
 #include <uv.h>
@@ -30,6 +31,7 @@
 #include "console.h"
 #include "util.h"
 #include "getopt.h"
+#include "server.h"
 #include "game.h"
 #include "world.h"
 
