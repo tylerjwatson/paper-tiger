@@ -157,8 +157,9 @@ out:
 	talloc_free(temp_context);
 }
 
-static void __console_destructor(TALLOC_CTX *handle)
+static int __console_destructor(struct console *handle)
 {
+	return 0;
 }
 
 int console_new(TALLOC_CTX *context, struct game *game, struct console **out_console)
@@ -186,7 +187,7 @@ int console_new(TALLOC_CTX *context, struct game *game, struct console **out_con
 		goto out;
 	}
 
-	talloc_set_destructor(tty_handle, __console_destructor);
+	talloc_set_destructor(console, __console_destructor);
 
 	console->console_handle = talloc_steal(console, tty_handle);
 	console->game = game;

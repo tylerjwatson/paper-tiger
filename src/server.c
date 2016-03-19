@@ -26,9 +26,7 @@
 #include "player.h"
 #include "packet.h"
 
-#include "packets/connect_request.h"
-
-static int __handle_packet(struct packet *packet, const uv_buf_t *buf)
+static int __handle_packet(struct player *player, struct packet *packet, const uv_buf_t *buf)
 {
 	struct packet_handler *packet_handler;
 	int ret = -1;
@@ -43,12 +41,12 @@ static int __handle_packet(struct packet *packet, const uv_buf_t *buf)
 
 	if ((ret = packet_handler->read_func(packet, buf)) < 0) {
 		_ERROR("%s: packet parsing failed for slot %d.\n", __FUNCTION__, 
-			packet->player->id);
+			player->id);
 		return ret;
 	}
 
-	if (packet_handler->handle_func != NULL && (ret = packet_handler->handle_func(packet->player, packet)) < 0) {
-		_ERROR("%s: read handler for packet failed for slot %d.\n", __FUNCTION__, packet->player->id);
+	if (packet_handler->handle_func != NULL && (ret = packet_handler->handle_func(player, packet)) < 0) {
+		_ERROR("%s: read handler for packet failed for slot %d.\n", __FUNCTION__, player->id);
 		return ret;
 	}
 
@@ -86,7 +84,7 @@ static void __on_read(uv_stream_t *stream, ssize_t len, const uv_buf_t *buf)
 	}
 
 handle_packet:
-	__handle_packet(player->incoming_packet, buf);
+	__handle_packet(player, player->incoming_packet, buf);
 
 	talloc_free(player->incoming_packet);
 	player->incoming_packet = NULL;
@@ -114,8 +112,6 @@ static void __alloc_buffer(uv_handle_t *handle, size_t size, uv_buf_t *out_buf)
 	
 	*out_buf = uv_buf_init(talloc_size(player, size), size);
 }
-
-
 
 void __on_connection(uv_stream_t *handle, int status)
 {
@@ -208,7 +204,7 @@ int server_send_packet(const struct player *player, const struct packet *packet)
 		goto error;
 	}
 
-	if (packet_handler->write_func != NULL && packet_handler->write_func(write_request, packet, &bufs[1]) < 0) {
+	if (packet_handler->write_func != NULL && packet_handler->write_func((struct player *)player, packet, player, &bufs[1]) < 0) {
 		_ERROR("%s: error in write handler for packet type %d slot %d.\n", __FUNCTION__, packet->type, player->id);
 		ret = -1;
 		goto error;

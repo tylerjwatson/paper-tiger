@@ -54,7 +54,7 @@ static void __game_update(uv_timer_t *timer)
 	//TODO: Update the game shit.
 }
 
-static void __game_destructor(TALLOC_CTX *context)
+static int __game_destructor(struct game *context)
 {   
 }
 
@@ -99,9 +99,7 @@ int game_new(TALLOC_CTX *context, struct game **out_context)
 	}
 	
 	uv_loop_init(gameContext->event_loop);
-	
 	gameContext->player_slots = talloc_zero_array(gameContext, word_t, GAME_MAX_PLAYERS / sizeof(word_t));
-	
 	talloc_set_destructor(gameContext, __game_destructor);
 
 	*out_context = talloc_steal(context, gameContext);

@@ -29,13 +29,17 @@
 #define PACKET_LEN_PLAYER_INFO 29
 
 #include <uv.h>
-#include "../packet.h"
+
+#include "../talloc/talloc.h"
 #include "../colour.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+struct player;
+struct packet;
+	
 struct player_info {
 	uint8_t id;
 	uint8_t skin_variant;

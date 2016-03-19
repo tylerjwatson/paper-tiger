@@ -24,7 +24,8 @@
 #include <uv.h>
 #include <stdint.h>
 
-#include "player.h"
+#include "talloc/talloc.h"
+//#include "player.h"
 
 #define PACKET_HEADER_SIZE 3
 
@@ -32,18 +33,20 @@
 extern "C" {
 #endif
 
+struct player;
+
 struct packet {
 	uint16_t len;
 	uint8_t type;
 
-	struct player *player;
+	//struct player *player;
 
 	void *data;
 };
 
-typedef int (*packet_write_cb)(TALLOC_CTX *context, const struct packet *packet, uv_buf_t *buffer);
+typedef int (*packet_write_cb)(TALLOC_CTX *context, const struct packet *packet, const struct player *player, uv_buf_t *buffer);
 typedef int (*packet_read_cb)(struct packet *packet, const uv_buf_t *buffer);
-typedef int (*packet_handle_cb)(const struct player *player, struct packet *packet);
+typedef int (*packet_handle_cb)(struct player *player, struct packet *packet);
 
 struct packet_handler {
 	uint8_t type;

@@ -38,7 +38,7 @@ struct connect_request {
 
 int connect_request_read(struct packet *packet, const uv_buf_t *buf);
 
-int connect_request_handle(const struct player *player, struct packet *packet);
+int connect_request_handle(struct player *player, struct packet *packet);
 
 #ifdef __cplusplus
 }

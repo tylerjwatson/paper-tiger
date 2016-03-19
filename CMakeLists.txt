@@ -36,6 +36,8 @@ add_executable(upgraded-guacamole
 	src/packet.c
 	src/packet.h
 
+	src/packets/client_uuid.h
+	src/packets/client_uuid.c
 	src/packets/continue_connecting.h
 	src/packets/continue_connecting.c
 	src/packets/player_info.h

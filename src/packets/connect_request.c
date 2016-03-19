@@ -74,7 +74,7 @@ out:
 	return ret;
 }
 
-int connect_request_handle(const struct player *player, struct packet *packet)
+int connect_request_handle(struct player *player, struct packet *packet)
 {
 	struct connect_request *req = (struct connect_request *)packet->data;
 	struct packet *continue_connecting;

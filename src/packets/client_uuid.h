@@ -18,29 +18,37 @@
 * along with upgraded-guacamole.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _HAVE_CONTINUE_CONNECTING_H
-#define _HAVE_CONTINUE_CONNECTING_H
+#ifndef _HAVE_CLIENT_UUID_H
+#define _HAVE_CLIENT_UUID_H
 
-#define PACKET_TYPE_CONTINUE_CONNECTING 0x03
+#define PACKET_TYPE_CLIENT_UUID 68
 
-#define PACKET_LEN_CONTINUE_CONNECTING 1
+/*
+ * UUID length + 1
+ */
+#define PACKET_LEN_CLIENT_UUID 37
 
 #include <uv.h>
-#include "../talloc/talloc.h"
+#include "../packet.h"
+#include "../colour.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-struct player;
-struct packet;
-	
-int continue_connecting_new(TALLOC_CTX *ctx, const struct player *player, struct packet **out_packet);
+struct client_uuid {
+	char *uuid;
+};
 
-int continue_connecting_write(TALLOC_CTX *context, const struct packet *packet, const struct player *player, uv_buf_t *buf);
+int client_uuid_new(TALLOC_CTX *ctx, const struct player *player, const char *uuid, struct packet **out_packet);
+
+int client_uuid_read(struct packet *packet, const uv_buf_t *buf);
+
+int client_uuid_handle(struct player *player, struct packet *packet);
+	
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif //_HAVE_CONTINUE_CONNECTING_H
+#endif //_HAVE_player_info_H

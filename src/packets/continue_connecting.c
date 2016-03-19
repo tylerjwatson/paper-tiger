@@ -17,10 +17,12 @@
 * You should have received a copy of the GNU General Public License
 * along with upgraded-guacamole.  If not, see <http://www.gnu.org/licenses/>.
 */
+
 #include <string.h>
 
 #include "continue_connecting.h"
-#include "../game.h"
+#include "../player.h"
+#include "../packet.h"
 #include "../binary_reader.h"
 #include "../util.h"
 
@@ -51,7 +53,6 @@ int continue_connecting_new(TALLOC_CTX *ctx, const struct player *player, struct
 	packet->type = PACKET_TYPE_CONTINUE_CONNECTING;
 	packet->len = PACKET_HEADER_SIZE;
 	packet->data = NULL;
-	packet->player = (struct player *)player;
 
 	*out_packet = talloc_steal(ctx, packet);
 
@@ -62,11 +63,11 @@ out:
 	return ret;
 }
 
-int continue_connecting_write(TALLOC_CTX *context, const struct packet *packet, uv_buf_t *buf)
+int continue_connecting_write(TALLOC_CTX *context, const struct packet *packet, const struct player *player, uv_buf_t *buf)
 {
 	*buf = uv_buf_init(talloc_size(context, PACKET_LEN_CONTINUE_CONNECTING), PACKET_LEN_CONTINUE_CONNECTING);
 
-	buf->base[0] = packet->player->id;
+	buf->base[0] = player->id;
 
 	return 0;
 }

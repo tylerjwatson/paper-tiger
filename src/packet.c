@@ -31,7 +31,7 @@ static struct packet_handler packet_handlers[] = {
 	{ .type = PACKET_TYPE_CONNECT_REQUEST, .read_func = connect_request_read, .handle_func = connect_request_handle },
 	{ .type = PACKET_TYPE_CONTINUE_CONNECTING, .read_func = NULL, .handle_func = NULL, .write_func = continue_connecting_write },
 	{ .type = PACKET_TYPE_PLAYER_INFO, .read_func = player_info_read, .handle_func = player_info_handle, .write_func = NULL },
-	{ 0x00, NULL, NULL }
+	{ 0x00, NULL, NULL, NULL }
 };
 
 struct packet_handler *packet_handler_for_type(uint8_t type)
@@ -90,7 +90,7 @@ int packet_new(TALLOC_CTX *context, struct player *player, const uv_buf_t *buf, 
 
 	packet->type = type;
 	packet->len = len;
-	packet->player = player;
+	//packet->player = player;
 
 	//TODO: Packet sanity checks.
 

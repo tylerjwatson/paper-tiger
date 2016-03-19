@@ -21,7 +21,11 @@
 #include <string.h>
 
 #include "player_info.h"
-#include "../game.h"
+
+#include "../packet.h"
+#include "../player.h"
+
+
 #include "../binary_reader.h"
 #include "../util.h"
 
@@ -63,7 +67,6 @@ int player_info_new(TALLOC_CTX *ctx, const struct player *player, struct packet 
 	packet->type = PACKET_TYPE_PLAYER_INFO;
 	packet->len = PACKET_HEADER_SIZE;
 	packet->data = NULL;
-	packet->player = (struct player *)player;
 
 	*out_packet = (struct packet *)talloc_steal(ctx, packet);
 
