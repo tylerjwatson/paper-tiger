@@ -1,0 +1,113 @@
+\hypertarget{group__server}{}\section{Server subsystem}
+\label{group__server}\index{Server subsystem@{Server subsystem}}
+
+
+The server subsystem lives inside the {\ttfamily game} context, and is responsible for managing and talking to connected clients via the {\itshape Terraria} protocol.  
+
+
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structserver}{server}
+\begin{DoxyCompactList}\small\item\em Describes a server context. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{group__server_gac98cdc3daa5c89785e0dae45dc8d6c56}{server\+\_\+new} (\hyperlink{group__talloc_ga8a521b1347c0e37b84eb942db8fa9beb}{T\+A\+L\+L\+O\+C\+\_\+\+C\+T\+X} $\ast$context, const char $\ast$listen\+\_\+address, const uint16\+\_\+t port, struct \hyperlink{structgame}{game} $\ast$\hyperlink{structgame}{game}, struct \hyperlink{structserver}{server} $\ast$$\ast$out\+\_\+server)
+\begin{DoxyCompactList}\small\item\em Allocates a new server context, with the specified listen address and port. \end{DoxyCompactList}\item 
+int \hyperlink{group__server_gaf6735c294993687a5e385b1e2e2f778f}{server\+\_\+start} (struct \hyperlink{structserver}{server} $\ast$\hyperlink{structserver}{server})
+\begin{DoxyCompactList}\small\item\em starts the server \end{DoxyCompactList}\item 
+int \hyperlink{group__server_ga139b4c0888c43a7e35793bcb25f3c522}{server\+\_\+send\+\_\+packet} (const struct \hyperlink{structplayer}{player} $\ast$\hyperlink{structplayer}{player}, const struct \hyperlink{structpacket}{packet} $\ast$\hyperlink{structpacket}{packet})
+\begin{DoxyCompactList}\small\item\em Sends a packet to the specified player. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+The server subsystem lives inside the {\ttfamily game} context, and is responsible for managing and talking to connected clients via the {\itshape Terraria} protocol. 
+
+The {\ttfamily server} system has routines for decoding and encoding {\itshape Terraria} messages, as well as callbacks for managing the T\+C\+P connections to all its clients. 
+
+\subsection{Function Documentation}
+\hypertarget{group__server_gac98cdc3daa5c89785e0dae45dc8d6c56}{}\index{Server subsystem@{Server subsystem}!server\+\_\+new@{server\+\_\+new}}
+\index{server\+\_\+new@{server\+\_\+new}!Server subsystem@{Server subsystem}}
+\subsubsection[{server\+\_\+new(\+T\+A\+L\+L\+O\+C\+\_\+\+C\+T\+X $\ast$context, const char $\ast$listen\+\_\+address, const uint16\+\_\+t port, struct game $\ast$game, struct server $\ast$$\ast$out\+\_\+server)}]{\setlength{\rightskip}{0pt plus 5cm}int server\+\_\+new (
+\begin{DoxyParamCaption}
+\item[{{\bf T\+A\+L\+L\+O\+C\+\_\+\+C\+T\+X} $\ast$}]{context, }
+\item[{const char $\ast$}]{listen\+\_\+address, }
+\item[{const uint16\+\_\+t}]{port, }
+\item[{struct {\bf game} $\ast$}]{game, }
+\item[{struct {\bf server} $\ast$$\ast$}]{out\+\_\+server}
+\end{DoxyParamCaption}
+)}\label{group__server_gac98cdc3daa5c89785e0dae45dc8d6c56}
+
+
+Allocates a new server context, with the specified listen address and port. 
+
+Allocates a new server object underneath the specified talloc context, with the specified {\itshape listen\+\_\+address} and {\itshape port}.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em context} & The talloc context in which to allocate memory for this server context underneath.\\
+\hline
+\mbox{\tt in}  & {\em listen\+\_\+address} & The I\+Pv4 interface listen address to listen for T\+C\+P connections on.\\
+\hline
+\mbox{\tt in}  & {\em port} & Specifies the T\+C\+P port on which to listen on\\
+\hline
+\mbox{\tt in}  & {\em game} & A pointer to the game context in which to allocate a server object under\\
+\hline
+\mbox{\tt out}  & {\em out\+\_\+server} & A pointer to the address in which the allocated server structure may be stored.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+{\ttfamily 0} if the server context was allocated successfully, {\ttfamily $<$ 0} if an error occurred. 
+\end{DoxyReturn}
+\hypertarget{group__server_ga139b4c0888c43a7e35793bcb25f3c522}{}\index{Server subsystem@{Server subsystem}!server\+\_\+send\+\_\+packet@{server\+\_\+send\+\_\+packet}}
+\index{server\+\_\+send\+\_\+packet@{server\+\_\+send\+\_\+packet}!Server subsystem@{Server subsystem}}
+\subsubsection[{server\+\_\+send\+\_\+packet(const struct player $\ast$player, const struct packet $\ast$packet)}]{\setlength{\rightskip}{0pt plus 5cm}int server\+\_\+send\+\_\+packet (
+\begin{DoxyParamCaption}
+\item[{const struct {\bf player} $\ast$}]{player, }
+\item[{const struct {\bf packet} $\ast$}]{packet}
+\end{DoxyParamCaption}
+)}\label{group__server_ga139b4c0888c43a7e35793bcb25f3c522}
+
+
+Sends a packet to the specified player. 
+
+Sends a packet pointed to by {\itshape packet}, to the client pointed to by {\itshape player}.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em player} & A pointer to an allocated and joined player object whom to send the packet\\
+\hline
+\mbox{\tt in}  & {\em packet} & A pointer to an allocated packet to send to the player.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+{\ttfamily 0} if the packet was queued for sending successfully, {\ttfamily $<$ 0} otherwise.
+\end{DoxyReturn}
+\begin{DoxyRemark}{Remarks}
+The successful return from this function does {\bfseries not} indicate that the packet was sent successfully and arrived at its destination. It merely guarantees that the packet was queued for sending to the client at the return of this function.
+\end{DoxyRemark}
+The packet buffers rely on function callbacks in the packet handler table to be able to send the data to the client. The packet\textquotesingle{}s data stream is copied from the packet into the send queue, thus the caller of this function still owns the memory pointed to by {\itshape packet} and is responsible for freeing it. \hypertarget{group__server_gaf6735c294993687a5e385b1e2e2f778f}{}\index{Server subsystem@{Server subsystem}!server\+\_\+start@{server\+\_\+start}}
+\index{server\+\_\+start@{server\+\_\+start}!Server subsystem@{Server subsystem}}
+\subsubsection[{server\+\_\+start(struct server $\ast$server)}]{\setlength{\rightskip}{0pt plus 5cm}int server\+\_\+start (
+\begin{DoxyParamCaption}
+\item[{struct {\bf server} $\ast$}]{server}
+\end{DoxyParamCaption}
+)}\label{group__server_gaf6735c294993687a5e385b1e2e2f778f}
+
+
+starts the server 
+
+Starts the server pointed to by {\itshape server}, by opening a server socket on the specified T\+C\+P address and port, and listening for clients on the game context\textquotesingle{}s event loop.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em server} & A pointer to an allocated server object in which to start listening for clients.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+{\ttfamily 0} if the server start operation was successful, {\ttfamily $<$ 0} otherwise.
+\end{DoxyReturn}
+\begin{DoxyRemark}{Remarks}
+This function will return {\ttfamily -\/1} if it cannot listen for clients, for reasons such as socket bind failures, port open failures, A\+V\+C denies, etc. 
+\end{DoxyRemark}

@@ -1,0 +1,516 @@
+\hypertarget{group__talloc__string}{}\section{The talloc string functions.}
+\label{group__talloc__string}\index{The talloc string functions.@{The talloc string functions.}}
+
+
+talloc string allocation and manipulation functions.  
+
+
+\subsection*{Modules}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{group__talloc__debug}{The talloc debugging support functions}
+\begin{DoxyCompactList}\small\item\em To aid memory debugging, talloc contains routines to inspect the currently allocated memory hierarchy. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+char $\ast$ \hyperlink{group__talloc__string_gaca866b920e3b876b00946027244cdd8f}{talloc\+\_\+strdup} (const void $\ast$t, const char $\ast$p)
+\begin{DoxyCompactList}\small\item\em Duplicate a string into a talloc chunk. \end{DoxyCompactList}\item 
+char $\ast$ \hyperlink{group__talloc__string_ga27ce7e41cadde877157b1456f629ca3d}{talloc\+\_\+strdup\+\_\+append} (char $\ast$s, const char $\ast$a)
+\begin{DoxyCompactList}\small\item\em Append a string to given string. \end{DoxyCompactList}\item 
+char $\ast$ \hyperlink{group__talloc__string_ga2b2413835aa49f303755f03fcdbf71ff}{talloc\+\_\+strdup\+\_\+append\+\_\+buffer} (char $\ast$s, const char $\ast$a)
+\begin{DoxyCompactList}\small\item\em Append a string to a given buffer. \end{DoxyCompactList}\item 
+char $\ast$ \hyperlink{group__talloc__string_gade5e000346fc18848e33a8a2dd4c38ef}{talloc\+\_\+strndup} (const void $\ast$t, const char $\ast$p, size\+\_\+t n)
+\begin{DoxyCompactList}\small\item\em Duplicate a length-\/limited string into a talloc chunk. \end{DoxyCompactList}\item 
+char $\ast$ \hyperlink{group__talloc__string_gafc991e1f5959bd60999492c9bd3bf173}{talloc\+\_\+strndup\+\_\+append} (char $\ast$s, const char $\ast$a, size\+\_\+t n)
+\begin{DoxyCompactList}\small\item\em Append at most n characters of a string to given string. \end{DoxyCompactList}\item 
+char $\ast$ \hyperlink{group__talloc__string_ga33df1e6b76551e55e57891dd76d0cca9}{talloc\+\_\+strndup\+\_\+append\+\_\+buffer} (char $\ast$s, const char $\ast$a, size\+\_\+t n)
+\begin{DoxyCompactList}\small\item\em Append at most n characters of a string to given buffer. \end{DoxyCompactList}\item 
+char $\ast$ \hyperlink{group__talloc__string_gaea795b4898d8b24424595c6ce1f05d9c}{talloc\+\_\+vasprintf} (const void $\ast$t, const char $\ast$fmt, va\+\_\+list ap) P\+R\+I\+N\+T\+F\+\_\+\+A\+T\+T\+R\+I\+B\+U\+T\+E(2
+\begin{DoxyCompactList}\small\item\em Format a string given a va\+\_\+list. \end{DoxyCompactList}\item 
+char char $\ast$ \hyperlink{group__talloc__string_gaba57dc43e539b05a7ce372e02085dc0a}{talloc\+\_\+vasprintf\+\_\+append} (char $\ast$s, const char $\ast$fmt, va\+\_\+list ap) P\+R\+I\+N\+T\+F\+\_\+\+A\+T\+T\+R\+I\+B\+U\+T\+E(2
+\begin{DoxyCompactList}\small\item\em Format a string given a va\+\_\+list and append it to the given destination string. \end{DoxyCompactList}\item 
+char char char $\ast$ \hyperlink{group__talloc__string_ga224062e19a3fbbd4d433329446d71b1c}{talloc\+\_\+vasprintf\+\_\+append\+\_\+buffer} (char $\ast$s, const char $\ast$fmt, va\+\_\+list ap) P\+R\+I\+N\+T\+F\+\_\+\+A\+T\+T\+R\+I\+B\+U\+T\+E(2
+\begin{DoxyCompactList}\small\item\em Format a string given a va\+\_\+list and append it to the given destination buffer. \end{DoxyCompactList}\item 
+char char char char $\ast$ \hyperlink{group__talloc__string_ga6e7b94bee0fea217f9622a5966425651}{talloc\+\_\+asprintf} (const void $\ast$t, const char $\ast$fmt,...) P\+R\+I\+N\+T\+F\+\_\+\+A\+T\+T\+R\+I\+B\+U\+T\+E(2
+\begin{DoxyCompactList}\small\item\em Format a string. \end{DoxyCompactList}\item 
+char char char char char $\ast$ \hyperlink{group__talloc__string_ga26111c96a2f232cc80fabdf248412a51}{talloc\+\_\+asprintf\+\_\+append} (char $\ast$s, const char $\ast$fmt,...) P\+R\+I\+N\+T\+F\+\_\+\+A\+T\+T\+R\+I\+B\+U\+T\+E(2
+\begin{DoxyCompactList}\small\item\em Append a formatted string to another string. \end{DoxyCompactList}\item 
+char char char char char char $\ast$ \hyperlink{group__talloc__string_ga32abeb90f6e1aa9f9877f31d4952f563}{talloc\+\_\+asprintf\+\_\+append\+\_\+buffer} (char $\ast$s, const char $\ast$fmt,...) P\+R\+I\+N\+T\+F\+\_\+\+A\+T\+T\+R\+I\+B\+U\+T\+E(2
+\begin{DoxyCompactList}\small\item\em Append a formatted string to another string. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+talloc string allocation and manipulation functions. 
+
+
+
+\subsection{Function Documentation}
+\hypertarget{group__talloc__string_ga6e7b94bee0fea217f9622a5966425651}{}\index{The talloc string functions.@{The talloc string functions.}!talloc\+\_\+asprintf@{talloc\+\_\+asprintf}}
+\index{talloc\+\_\+asprintf@{talloc\+\_\+asprintf}!The talloc string functions.@{The talloc string functions.}}
+\subsubsection[{talloc\+\_\+asprintf(const void $\ast$t, const char $\ast$fmt,...) P\+R\+I\+N\+T\+F\+\_\+\+A\+T\+T\+R\+I\+B\+U\+T\+E(2}]{\setlength{\rightskip}{0pt plus 5cm}char char char char$\ast$ talloc\+\_\+asprintf (
+\begin{DoxyParamCaption}
+\item[{const void $\ast$}]{t, }
+\item[{const char $\ast$}]{fmt, }
+\item[{}]{...}
+\end{DoxyParamCaption}
+)}\label{group__talloc__string_ga6e7b94bee0fea217f9622a5966425651}
+
+
+Format a string. 
+
+This function is the talloc equivalent of the C library function asprintf(3).
+
+This functions sets the name of the new pointer to the new string. This is equivalent to\+:
+
+
+\begin{DoxyCode}
+1 talloc\_set\_name\_const(ptr, ptr)
+\end{DoxyCode}
+
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em t} & The talloc context to hang the result off.\\
+\hline
+\mbox{\tt in}  & {\em fmt} & The format string.\\
+\hline
+\mbox{\tt in}  & {\em ...} & The parameters used to fill fmt.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The formatted string, N\+U\+L\+L on error. 
+\end{DoxyReturn}
+\hypertarget{group__talloc__string_ga26111c96a2f232cc80fabdf248412a51}{}\index{The talloc string functions.@{The talloc string functions.}!talloc\+\_\+asprintf\+\_\+append@{talloc\+\_\+asprintf\+\_\+append}}
+\index{talloc\+\_\+asprintf\+\_\+append@{talloc\+\_\+asprintf\+\_\+append}!The talloc string functions.@{The talloc string functions.}}
+\subsubsection[{talloc\+\_\+asprintf\+\_\+append(char $\ast$s, const char $\ast$fmt,...) P\+R\+I\+N\+T\+F\+\_\+\+A\+T\+T\+R\+I\+B\+U\+T\+E(2}]{\setlength{\rightskip}{0pt plus 5cm}char char char char char$\ast$ talloc\+\_\+asprintf\+\_\+append (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{s, }
+\item[{const char $\ast$}]{fmt, }
+\item[{}]{...}
+\end{DoxyParamCaption}
+)}\label{group__talloc__string_ga26111c96a2f232cc80fabdf248412a51}
+
+
+Append a formatted string to another string. 
+
+This function appends the given formatted string to the given string. Use this variant when the string in the current talloc buffer may have been truncated in length.
+
+This functions sets the name of the new pointer to the new string. This is equivalent to\+:
+
+
+\begin{DoxyCode}
+1 talloc\_set\_name\_const(ptr, ptr)
+\end{DoxyCode}
+
+
+If {\ttfamily s == N\+U\+L\+L} then new context is created.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em s} & The string to append to.\\
+\hline
+\mbox{\tt in}  & {\em fmt} & The format string.\\
+\hline
+\mbox{\tt in}  & {\em ...} & The parameters used to fill fmt.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The formatted string, N\+U\+L\+L on error. 
+\end{DoxyReturn}
+\hypertarget{group__talloc__string_ga32abeb90f6e1aa9f9877f31d4952f563}{}\index{The talloc string functions.@{The talloc string functions.}!talloc\+\_\+asprintf\+\_\+append\+\_\+buffer@{talloc\+\_\+asprintf\+\_\+append\+\_\+buffer}}
+\index{talloc\+\_\+asprintf\+\_\+append\+\_\+buffer@{talloc\+\_\+asprintf\+\_\+append\+\_\+buffer}!The talloc string functions.@{The talloc string functions.}}
+\subsubsection[{talloc\+\_\+asprintf\+\_\+append\+\_\+buffer(char $\ast$s, const char $\ast$fmt,...) P\+R\+I\+N\+T\+F\+\_\+\+A\+T\+T\+R\+I\+B\+U\+T\+E(2}]{\setlength{\rightskip}{0pt plus 5cm}char char char char char char$\ast$ talloc\+\_\+asprintf\+\_\+append\+\_\+buffer (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{s, }
+\item[{const char $\ast$}]{fmt, }
+\item[{}]{...}
+\end{DoxyParamCaption}
+)}\label{group__talloc__string_ga32abeb90f6e1aa9f9877f31d4952f563}
+
+
+Append a formatted string to another string. 
+
+This is a more efficient version of \hyperlink{group__talloc__string_ga26111c96a2f232cc80fabdf248412a51}{talloc\+\_\+asprintf\+\_\+append()}. It determines the length of the destination string by the size of the talloc context.
+
+Use this very carefully as it produces a different result than \hyperlink{group__talloc__string_ga26111c96a2f232cc80fabdf248412a51}{talloc\+\_\+asprintf\+\_\+append()} when a zero character is in the middle of the destination string.
+
+
+\begin{DoxyCode}
+1 char *str\_a = talloc\_strdup(NULL, "hello world");
+2 char *str\_b = talloc\_strdup(NULL, "hello world");
+3 str\_a[5] = str\_b[5] = '\(\backslash\)0'
+4 
+5 char *app = talloc\_asprintf\_append(str\_a, "%s", ", hello");
+6 char *buf = talloc\_strdup\_append\_buffer(str\_b, "%s", ", hello");
+7 
+8 printf("%s\(\backslash\)n", app); // hello, hello (app = "hello, hello")
+9 printf("%s\(\backslash\)n", buf); // hello (buf = "hello\(\backslash\)0world, hello")
+\end{DoxyCode}
+
+
+If {\ttfamily s == N\+U\+L\+L} then new context is created.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em s} & The string to append to\\
+\hline
+\mbox{\tt in}  & {\em fmt} & The format string.\\
+\hline
+\mbox{\tt in}  & {\em ...} & The parameters used to fill fmt.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The formatted string, N\+U\+L\+L on error.
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{group__talloc__string_ga6e7b94bee0fea217f9622a5966425651}{talloc\+\_\+asprintf()} 
+
+\hyperlink{group__talloc__string_ga26111c96a2f232cc80fabdf248412a51}{talloc\+\_\+asprintf\+\_\+append()} 
+\end{DoxySeeAlso}
+\hypertarget{group__talloc__string_gaca866b920e3b876b00946027244cdd8f}{}\index{The talloc string functions.@{The talloc string functions.}!talloc\+\_\+strdup@{talloc\+\_\+strdup}}
+\index{talloc\+\_\+strdup@{talloc\+\_\+strdup}!The talloc string functions.@{The talloc string functions.}}
+\subsubsection[{talloc\+\_\+strdup(const void $\ast$t, const char $\ast$p)}]{\setlength{\rightskip}{0pt plus 5cm}char$\ast$ talloc\+\_\+strdup (
+\begin{DoxyParamCaption}
+\item[{const void $\ast$}]{t, }
+\item[{const char $\ast$}]{p}
+\end{DoxyParamCaption}
+)}\label{group__talloc__string_gaca866b920e3b876b00946027244cdd8f}
+
+
+Duplicate a string into a talloc chunk. 
+
+This function is equivalent to\+:
+
+
+\begin{DoxyCode}
+1 ptr = talloc\_size(ctx, strlen(p)+1);
+2 if (ptr) memcpy(ptr, p, strlen(p)+1);
+\end{DoxyCode}
+
+
+This functions sets the name of the new pointer to the passed string. This is equivalent to\+:
+
+
+\begin{DoxyCode}
+1 talloc\_set\_name\_const(ptr, ptr)
+\end{DoxyCode}
+
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em t} & The talloc context to hang the result off.\\
+\hline
+\mbox{\tt in}  & {\em p} & The string you want to duplicate.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The duplicated string, N\+U\+L\+L on error. 
+\end{DoxyReturn}
+\hypertarget{group__talloc__string_ga27ce7e41cadde877157b1456f629ca3d}{}\index{The talloc string functions.@{The talloc string functions.}!talloc\+\_\+strdup\+\_\+append@{talloc\+\_\+strdup\+\_\+append}}
+\index{talloc\+\_\+strdup\+\_\+append@{talloc\+\_\+strdup\+\_\+append}!The talloc string functions.@{The talloc string functions.}}
+\subsubsection[{talloc\+\_\+strdup\+\_\+append(char $\ast$s, const char $\ast$a)}]{\setlength{\rightskip}{0pt plus 5cm}char$\ast$ talloc\+\_\+strdup\+\_\+append (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{s, }
+\item[{const char $\ast$}]{a}
+\end{DoxyParamCaption}
+)}\label{group__talloc__string_ga27ce7e41cadde877157b1456f629ca3d}
+
+
+Append a string to given string. 
+
+The destination string is reallocated to take {\ttfamily strlen(s) + strlen(a) + 1} characters.
+
+This functions sets the name of the new pointer to the new string. This is equivalent to\+:
+
+
+\begin{DoxyCode}
+1 talloc\_set\_name\_const(ptr, ptr)
+\end{DoxyCode}
+
+
+If {\ttfamily s == N\+U\+L\+L} then new context is created.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em s} & The destination to append to.\\
+\hline
+\mbox{\tt in}  & {\em a} & The string you want to append.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The concatenated strings, N\+U\+L\+L on error.
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{group__talloc__string_gaca866b920e3b876b00946027244cdd8f}{talloc\+\_\+strdup()} 
+
+\hyperlink{group__talloc__string_ga2b2413835aa49f303755f03fcdbf71ff}{talloc\+\_\+strdup\+\_\+append\+\_\+buffer()} 
+\end{DoxySeeAlso}
+\hypertarget{group__talloc__string_ga2b2413835aa49f303755f03fcdbf71ff}{}\index{The talloc string functions.@{The talloc string functions.}!talloc\+\_\+strdup\+\_\+append\+\_\+buffer@{talloc\+\_\+strdup\+\_\+append\+\_\+buffer}}
+\index{talloc\+\_\+strdup\+\_\+append\+\_\+buffer@{talloc\+\_\+strdup\+\_\+append\+\_\+buffer}!The talloc string functions.@{The talloc string functions.}}
+\subsubsection[{talloc\+\_\+strdup\+\_\+append\+\_\+buffer(char $\ast$s, const char $\ast$a)}]{\setlength{\rightskip}{0pt plus 5cm}char$\ast$ talloc\+\_\+strdup\+\_\+append\+\_\+buffer (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{s, }
+\item[{const char $\ast$}]{a}
+\end{DoxyParamCaption}
+)}\label{group__talloc__string_ga2b2413835aa49f303755f03fcdbf71ff}
+
+
+Append a string to a given buffer. 
+
+This is a more efficient version of \hyperlink{group__talloc__string_ga27ce7e41cadde877157b1456f629ca3d}{talloc\+\_\+strdup\+\_\+append()}. It determines the length of the destination string by the size of the talloc context.
+
+Use this very carefully as it produces a different result than \hyperlink{group__talloc__string_ga27ce7e41cadde877157b1456f629ca3d}{talloc\+\_\+strdup\+\_\+append()} when a zero character is in the middle of the destination string.
+
+
+\begin{DoxyCode}
+1 char *str\_a = talloc\_strdup(NULL, "hello world");
+2 char *str\_b = talloc\_strdup(NULL, "hello world");
+3 str\_a[5] = str\_b[5] = '\(\backslash\)0'
+4 
+5 char *app = talloc\_strdup\_append(str\_a, ", hello");
+6 char *buf = talloc\_strdup\_append\_buffer(str\_b, ", hello");
+7 
+8 printf("%s\(\backslash\)n", app); // hello, hello (app = "hello, hello")
+9 printf("%s\(\backslash\)n", buf); // hello (buf = "hello\(\backslash\)0world, hello")
+\end{DoxyCode}
+
+
+If {\ttfamily s == N\+U\+L\+L} then new context is created.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em s} & The destination buffer to append to.\\
+\hline
+\mbox{\tt in}  & {\em a} & The string you want to append.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The concatenated strings, N\+U\+L\+L on error.
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{group__talloc__string_gaca866b920e3b876b00946027244cdd8f}{talloc\+\_\+strdup()} 
+
+\hyperlink{group__talloc__string_ga27ce7e41cadde877157b1456f629ca3d}{talloc\+\_\+strdup\+\_\+append()} 
+
+talloc\+\_\+array\+\_\+length() 
+\end{DoxySeeAlso}
+\hypertarget{group__talloc__string_gade5e000346fc18848e33a8a2dd4c38ef}{}\index{The talloc string functions.@{The talloc string functions.}!talloc\+\_\+strndup@{talloc\+\_\+strndup}}
+\index{talloc\+\_\+strndup@{talloc\+\_\+strndup}!The talloc string functions.@{The talloc string functions.}}
+\subsubsection[{talloc\+\_\+strndup(const void $\ast$t, const char $\ast$p, size\+\_\+t n)}]{\setlength{\rightskip}{0pt plus 5cm}char$\ast$ talloc\+\_\+strndup (
+\begin{DoxyParamCaption}
+\item[{const void $\ast$}]{t, }
+\item[{const char $\ast$}]{p, }
+\item[{size\+\_\+t}]{n}
+\end{DoxyParamCaption}
+)}\label{group__talloc__string_gade5e000346fc18848e33a8a2dd4c38ef}
+
+
+Duplicate a length-\/limited string into a talloc chunk. 
+
+This function is the talloc equivalent of the C library function strndup(3).
+
+This functions sets the name of the new pointer to the passed string. This is equivalent to\+:
+
+
+\begin{DoxyCode}
+1 talloc\_set\_name\_const(ptr, ptr)
+\end{DoxyCode}
+
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em t} & The talloc context to hang the result off.\\
+\hline
+\mbox{\tt in}  & {\em p} & The string you want to duplicate.\\
+\hline
+\mbox{\tt in}  & {\em n} & The maximum string length to duplicate.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The duplicated string, N\+U\+L\+L on error. 
+\end{DoxyReturn}
+\hypertarget{group__talloc__string_gafc991e1f5959bd60999492c9bd3bf173}{}\index{The talloc string functions.@{The talloc string functions.}!talloc\+\_\+strndup\+\_\+append@{talloc\+\_\+strndup\+\_\+append}}
+\index{talloc\+\_\+strndup\+\_\+append@{talloc\+\_\+strndup\+\_\+append}!The talloc string functions.@{The talloc string functions.}}
+\subsubsection[{talloc\+\_\+strndup\+\_\+append(char $\ast$s, const char $\ast$a, size\+\_\+t n)}]{\setlength{\rightskip}{0pt plus 5cm}char$\ast$ talloc\+\_\+strndup\+\_\+append (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{s, }
+\item[{const char $\ast$}]{a, }
+\item[{size\+\_\+t}]{n}
+\end{DoxyParamCaption}
+)}\label{group__talloc__string_gafc991e1f5959bd60999492c9bd3bf173}
+
+
+Append at most n characters of a string to given string. 
+
+The destination string is reallocated to take {\ttfamily strlen(s) + strnlen(a, n) + 1} characters.
+
+This functions sets the name of the new pointer to the new string. This is equivalent to\+:
+
+
+\begin{DoxyCode}
+1 talloc\_set\_name\_const(ptr, ptr)
+\end{DoxyCode}
+
+
+If {\ttfamily s == N\+U\+L\+L} then new context is created.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em s} & The destination string to append to.\\
+\hline
+\mbox{\tt in}  & {\em a} & The source string you want to append.\\
+\hline
+\mbox{\tt in}  & {\em n} & The number of characters you want to append from the string.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The concatenated strings, N\+U\+L\+L on error.
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{group__talloc__string_gade5e000346fc18848e33a8a2dd4c38ef}{talloc\+\_\+strndup()} 
+
+\hyperlink{group__talloc__string_ga33df1e6b76551e55e57891dd76d0cca9}{talloc\+\_\+strndup\+\_\+append\+\_\+buffer()} 
+\end{DoxySeeAlso}
+\hypertarget{group__talloc__string_ga33df1e6b76551e55e57891dd76d0cca9}{}\index{The talloc string functions.@{The talloc string functions.}!talloc\+\_\+strndup\+\_\+append\+\_\+buffer@{talloc\+\_\+strndup\+\_\+append\+\_\+buffer}}
+\index{talloc\+\_\+strndup\+\_\+append\+\_\+buffer@{talloc\+\_\+strndup\+\_\+append\+\_\+buffer}!The talloc string functions.@{The talloc string functions.}}
+\subsubsection[{talloc\+\_\+strndup\+\_\+append\+\_\+buffer(char $\ast$s, const char $\ast$a, size\+\_\+t n)}]{\setlength{\rightskip}{0pt plus 5cm}char$\ast$ talloc\+\_\+strndup\+\_\+append\+\_\+buffer (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{s, }
+\item[{const char $\ast$}]{a, }
+\item[{size\+\_\+t}]{n}
+\end{DoxyParamCaption}
+)}\label{group__talloc__string_ga33df1e6b76551e55e57891dd76d0cca9}
+
+
+Append at most n characters of a string to given buffer. 
+
+This is a more efficient version of \hyperlink{group__talloc__string_gafc991e1f5959bd60999492c9bd3bf173}{talloc\+\_\+strndup\+\_\+append()}. It determines the length of the destination string by the size of the talloc context.
+
+Use this very carefully as it produces a different result than \hyperlink{group__talloc__string_gafc991e1f5959bd60999492c9bd3bf173}{talloc\+\_\+strndup\+\_\+append()} when a zero character is in the middle of the destination string.
+
+
+\begin{DoxyCode}
+1 char *str\_a = talloc\_strdup(NULL, "hello world");
+2 char *str\_b = talloc\_strdup(NULL, "hello world");
+3 str\_a[5] = str\_b[5] = '\(\backslash\)0'
+4 
+5 char *app = talloc\_strndup\_append(str\_a, ", hello", 7);
+6 char *buf = talloc\_strndup\_append\_buffer(str\_b, ", hello", 7);
+7 
+8 printf("%s\(\backslash\)n", app); // hello, hello (app = "hello, hello")
+9 printf("%s\(\backslash\)n", buf); // hello (buf = "hello\(\backslash\)0world, hello")
+\end{DoxyCode}
+
+
+If {\ttfamily s == N\+U\+L\+L} then new context is created.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em s} & The destination buffer to append to.\\
+\hline
+\mbox{\tt in}  & {\em a} & The source string you want to append.\\
+\hline
+\mbox{\tt in}  & {\em n} & The number of characters you want to append from the string.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The concatenated strings, N\+U\+L\+L on error.
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{group__talloc__string_gade5e000346fc18848e33a8a2dd4c38ef}{talloc\+\_\+strndup()} 
+
+\hyperlink{group__talloc__string_gafc991e1f5959bd60999492c9bd3bf173}{talloc\+\_\+strndup\+\_\+append()} 
+
+talloc\+\_\+array\+\_\+length() 
+\end{DoxySeeAlso}
+\hypertarget{group__talloc__string_gaea795b4898d8b24424595c6ce1f05d9c}{}\index{The talloc string functions.@{The talloc string functions.}!talloc\+\_\+vasprintf@{talloc\+\_\+vasprintf}}
+\index{talloc\+\_\+vasprintf@{talloc\+\_\+vasprintf}!The talloc string functions.@{The talloc string functions.}}
+\subsubsection[{talloc\+\_\+vasprintf(const void $\ast$t, const char $\ast$fmt, va\+\_\+list ap) P\+R\+I\+N\+T\+F\+\_\+\+A\+T\+T\+R\+I\+B\+U\+T\+E(2}]{\setlength{\rightskip}{0pt plus 5cm}char$\ast$ talloc\+\_\+vasprintf (
+\begin{DoxyParamCaption}
+\item[{const void $\ast$}]{t, }
+\item[{const char $\ast$}]{fmt, }
+\item[{va\+\_\+list}]{ap}
+\end{DoxyParamCaption}
+)}\label{group__talloc__string_gaea795b4898d8b24424595c6ce1f05d9c}
+
+
+Format a string given a va\+\_\+list. 
+
+This function is the talloc equivalent of the C library function vasprintf(3).
+
+This functions sets the name of the new pointer to the new string. This is equivalent to\+:
+
+
+\begin{DoxyCode}
+1 talloc\_set\_name\_const(ptr, ptr)
+\end{DoxyCode}
+
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em t} & The talloc context to hang the result off.\\
+\hline
+\mbox{\tt in}  & {\em fmt} & The format string.\\
+\hline
+\mbox{\tt in}  & {\em ap} & The parameters used to fill fmt.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The formatted string, N\+U\+L\+L on error. 
+\end{DoxyReturn}
+\hypertarget{group__talloc__string_gaba57dc43e539b05a7ce372e02085dc0a}{}\index{The talloc string functions.@{The talloc string functions.}!talloc\+\_\+vasprintf\+\_\+append@{talloc\+\_\+vasprintf\+\_\+append}}
+\index{talloc\+\_\+vasprintf\+\_\+append@{talloc\+\_\+vasprintf\+\_\+append}!The talloc string functions.@{The talloc string functions.}}
+\subsubsection[{talloc\+\_\+vasprintf\+\_\+append(char $\ast$s, const char $\ast$fmt, va\+\_\+list ap) P\+R\+I\+N\+T\+F\+\_\+\+A\+T\+T\+R\+I\+B\+U\+T\+E(2}]{\setlength{\rightskip}{0pt plus 5cm}char char$\ast$ talloc\+\_\+vasprintf\+\_\+append (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{s, }
+\item[{const char $\ast$}]{fmt, }
+\item[{va\+\_\+list}]{ap}
+\end{DoxyParamCaption}
+)}\label{group__talloc__string_gaba57dc43e539b05a7ce372e02085dc0a}
+
+
+Format a string given a va\+\_\+list and append it to the given destination string. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em s} & The destination string to append to.\\
+\hline
+\mbox{\tt in}  & {\em fmt} & The format string.\\
+\hline
+\mbox{\tt in}  & {\em ap} & The parameters used to fill fmt.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The formatted string, N\+U\+L\+L on error.
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{group__talloc__string_gaea795b4898d8b24424595c6ce1f05d9c}{talloc\+\_\+vasprintf()} 
+\end{DoxySeeAlso}
+\hypertarget{group__talloc__string_ga224062e19a3fbbd4d433329446d71b1c}{}\index{The talloc string functions.@{The talloc string functions.}!talloc\+\_\+vasprintf\+\_\+append\+\_\+buffer@{talloc\+\_\+vasprintf\+\_\+append\+\_\+buffer}}
+\index{talloc\+\_\+vasprintf\+\_\+append\+\_\+buffer@{talloc\+\_\+vasprintf\+\_\+append\+\_\+buffer}!The talloc string functions.@{The talloc string functions.}}
+\subsubsection[{talloc\+\_\+vasprintf\+\_\+append\+\_\+buffer(char $\ast$s, const char $\ast$fmt, va\+\_\+list ap) P\+R\+I\+N\+T\+F\+\_\+\+A\+T\+T\+R\+I\+B\+U\+T\+E(2}]{\setlength{\rightskip}{0pt plus 5cm}char char char$\ast$ talloc\+\_\+vasprintf\+\_\+append\+\_\+buffer (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{s, }
+\item[{const char $\ast$}]{fmt, }
+\item[{va\+\_\+list}]{ap}
+\end{DoxyParamCaption}
+)}\label{group__talloc__string_ga224062e19a3fbbd4d433329446d71b1c}
+
+
+Format a string given a va\+\_\+list and append it to the given destination buffer. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em s} & The destination buffer to append to.\\
+\hline
+\mbox{\tt in}  & {\em fmt} & The format string.\\
+\hline
+\mbox{\tt in}  & {\em ap} & The parameters used to fill fmt.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The formatted string, N\+U\+L\+L on error.
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{group__talloc__string_gaea795b4898d8b24424595c6ce1f05d9c}{talloc\+\_\+vasprintf()} 
+\end{DoxySeeAlso}

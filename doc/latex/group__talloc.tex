@@ -1,0 +1,606 @@
+\hypertarget{group__talloc}{}\section{The talloc A\+P\+I}
+\label{group__talloc}\index{The talloc A\+P\+I@{The talloc A\+P\+I}}
+
+
+talloc is a hierarchical, reference counted memory pool system with destructors.  
+
+
+\subsection*{Modules}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{group__talloc__ref}{The talloc reference function.}
+\begin{DoxyCompactList}\small\item\em This module contains the definitions around talloc references. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group__talloc_gaa1b665edcef3b29a36bdbaa5f95092be}{}\#define {\bfseries T\+A\+L\+L\+O\+C\+\_\+\+V\+E\+R\+S\+I\+O\+N\+\_\+\+M\+A\+J\+O\+R}~2\label{group__talloc_gaa1b665edcef3b29a36bdbaa5f95092be}
+
+\item 
+\hypertarget{group__talloc_ga3028a11b933199eb0b332cd176e8253f}{}\#define {\bfseries T\+A\+L\+L\+O\+C\+\_\+\+V\+E\+R\+S\+I\+O\+N\+\_\+\+M\+I\+N\+O\+R}~0\label{group__talloc_ga3028a11b933199eb0b332cd176e8253f}
+
+\item 
+\hypertarget{group__talloc_ga2aca6cf6b79367d4d8459566324ec078}{}\#define {\bfseries \+\_\+\+\_\+\+T\+A\+L\+L\+O\+C\+\_\+\+S\+T\+R\+I\+N\+G\+\_\+\+L\+I\+N\+E1\+\_\+\+\_\+}(s)    ~\#s\label{group__talloc_ga2aca6cf6b79367d4d8459566324ec078}
+
+\item 
+\hypertarget{group__talloc_gab0c050d4373e4d8b421a20230dc67095}{}\#define {\bfseries \+\_\+\+\_\+\+T\+A\+L\+L\+O\+C\+\_\+\+S\+T\+R\+I\+N\+G\+\_\+\+L\+I\+N\+E2\+\_\+\+\_\+}(s)  ~\+\_\+\+\_\+\+T\+A\+L\+L\+O\+C\+\_\+\+S\+T\+R\+I\+N\+G\+\_\+\+L\+I\+N\+E1\+\_\+\+\_\+(s)\label{group__talloc_gab0c050d4373e4d8b421a20230dc67095}
+
+\item 
+\hypertarget{group__talloc_ga089300cc411713199beb2905ac62929a}{}\#define {\bfseries \+\_\+\+\_\+\+T\+A\+L\+L\+O\+C\+\_\+\+S\+T\+R\+I\+N\+G\+\_\+\+L\+I\+N\+E3\+\_\+\+\_\+}~\+\_\+\+\_\+\+T\+A\+L\+L\+O\+C\+\_\+\+S\+T\+R\+I\+N\+G\+\_\+\+L\+I\+N\+E2\+\_\+\+\_\+(\+\_\+\+\_\+\+L\+I\+N\+E\+\_\+\+\_\+)\label{group__talloc_ga089300cc411713199beb2905ac62929a}
+
+\item 
+\hypertarget{group__talloc_ga2102830a39706812c27290bec32a9259}{}\#define {\bfseries \+\_\+\+\_\+location\+\_\+\+\_\+}~\+\_\+\+\_\+\+F\+I\+L\+E\+\_\+\+\_\+ \char`\"{}\+:\char`\"{} \+\_\+\+\_\+\+T\+A\+L\+L\+O\+C\+\_\+\+S\+T\+R\+I\+N\+G\+\_\+\+L\+I\+N\+E3\+\_\+\+\_\+\label{group__talloc_ga2102830a39706812c27290bec32a9259}
+
+\item 
+\hypertarget{group__talloc_gaec69750b797d06c6dec94862d19736e3}{}\#define {\bfseries T\+A\+L\+L\+O\+C\+\_\+\+D\+E\+P\+R\+E\+C\+A\+T\+E\+D}~0\label{group__talloc_gaec69750b797d06c6dec94862d19736e3}
+
+\item 
+\hypertarget{group__talloc_gaf41a0a9441b1da20577215063408402f}{}\#define {\bfseries P\+R\+I\+N\+T\+F\+\_\+\+A\+T\+T\+R\+I\+B\+U\+T\+E}(a1,  a2)\label{group__talloc_gaf41a0a9441b1da20577215063408402f}
+
+\item 
+\hypertarget{group__talloc_gafe346eee9b905819ea950bda14456e14}{}\#define {\bfseries talloc}(ctx,  type)~(type $\ast$)\hyperlink{group__talloc_ga72dc3f21af6c125c71221860c5d9fd36}{talloc\+\_\+named\+\_\+const}(ctx, sizeof(type), \#type)\label{group__talloc_gafe346eee9b905819ea950bda14456e14}
+
+\item 
+\hypertarget{group__talloc_gac4d90a81e4d1cde1b334007639aac861}{}\#define {\bfseries talloc\+\_\+free}(ctx)~\+\_\+talloc\+\_\+free(ctx, \+\_\+\+\_\+location\+\_\+\+\_\+)\label{group__talloc_gac4d90a81e4d1cde1b334007639aac861}
+
+\item 
+\hypertarget{group__talloc_gad3d04b1322f92d5583e72f67d864d49b}{}\#define {\bfseries talloc\+\_\+set\+\_\+destructor}(ptr,  function)~\+\_\+talloc\+\_\+set\+\_\+destructor((ptr), (int ($\ast$)(void $\ast$))(function))\label{group__talloc_gad3d04b1322f92d5583e72f67d864d49b}
+
+\item 
+\hypertarget{group__talloc_ga3f276c1615178e82165da44b3b67221b}{}\#define {\bfseries \+\_\+\+T\+A\+L\+L\+O\+C\+\_\+\+T\+Y\+P\+E\+O\+F}(ptr)~void $\ast$\label{group__talloc_ga3f276c1615178e82165da44b3b67221b}
+
+\item 
+\hypertarget{group__talloc_ga6c827f7b3f7e609e07a1eb22b78e3705}{}\#define {\bfseries talloc\+\_\+steal}(ctx,  ptr)~(\+\_\+\+T\+A\+L\+L\+O\+C\+\_\+\+T\+Y\+P\+E\+O\+F(ptr))\+\_\+talloc\+\_\+steal\+\_\+loc((ctx),(ptr), \+\_\+\+\_\+location\+\_\+\+\_\+)\label{group__talloc_ga6c827f7b3f7e609e07a1eb22b78e3705}
+
+\item 
+\hypertarget{group__talloc_gaa819720a073d6c24179d49f4db06b880}{}\#define {\bfseries talloc\+\_\+move}(ctx,  pptr)~(\+\_\+\+T\+A\+L\+L\+O\+C\+\_\+\+T\+Y\+P\+E\+O\+F($\ast$(pptr)))\+\_\+talloc\+\_\+move((ctx),(void $\ast$)(pptr))\label{group__talloc_gaa819720a073d6c24179d49f4db06b880}
+
+\item 
+\hypertarget{group__talloc_ga1e6b0d2b1ea5861ad0cdcb9ba44a27cd}{}\#define {\bfseries talloc\+\_\+size}(ctx,  size)~\hyperlink{group__talloc_ga72dc3f21af6c125c71221860c5d9fd36}{talloc\+\_\+named\+\_\+const}(ctx, size, \+\_\+\+\_\+location\+\_\+\+\_\+)\label{group__talloc_ga1e6b0d2b1ea5861ad0cdcb9ba44a27cd}
+
+\item 
+\hypertarget{group__talloc_ga701fcfe911d22322568edb930746874e}{}\#define {\bfseries talloc\+\_\+ptrtype}(ctx,  ptr)~(\+\_\+\+T\+A\+L\+L\+O\+C\+\_\+\+T\+Y\+P\+E\+O\+F(ptr))talloc\+\_\+size(ctx, sizeof($\ast$(ptr)))\label{group__talloc_ga701fcfe911d22322568edb930746874e}
+
+\item 
+\hypertarget{group__talloc_gadb84ffe9387a259e0b1cf8245747f032}{}\#define {\bfseries talloc\+\_\+new}(ctx)~\hyperlink{group__talloc_ga72dc3f21af6c125c71221860c5d9fd36}{talloc\+\_\+named\+\_\+const}(ctx, 0, \char`\"{}talloc\+\_\+new\+: \char`\"{} \+\_\+\+\_\+location\+\_\+\+\_\+)\label{group__talloc_gadb84ffe9387a259e0b1cf8245747f032}
+
+\item 
+\hypertarget{group__talloc_gadc8a378dcb3147841371c03e4dbb3cfe}{}\#define {\bfseries talloc\+\_\+zero}(ctx,  type)~(type $\ast$)\+\_\+talloc\+\_\+zero(ctx, sizeof(type), \#type)\label{group__talloc_gadc8a378dcb3147841371c03e4dbb3cfe}
+
+\item 
+\hypertarget{group__talloc_ga4463b5c9d6c20e4e9c42927aecfd3d7c}{}\#define {\bfseries talloc\+\_\+zero\+\_\+size}(ctx,  size)~\+\_\+talloc\+\_\+zero(ctx, size, \+\_\+\+\_\+location\+\_\+\+\_\+)\label{group__talloc_ga4463b5c9d6c20e4e9c42927aecfd3d7c}
+
+\item 
+\hypertarget{group__talloc_ga95ef753d2eabbd539e80ed92879ecbf4}{}\#define {\bfseries talloc\+\_\+memdup}(t,  p,  size)~\+\_\+talloc\+\_\+memdup(t, p, size, \+\_\+\+\_\+location\+\_\+\+\_\+)\label{group__talloc_ga95ef753d2eabbd539e80ed92879ecbf4}
+
+\item 
+\hypertarget{group__talloc_ga750c1ae3fea2c84670a2e4962f319b35}{}\#define {\bfseries talloc\+\_\+set\+\_\+type}(ptr,  type)~\hyperlink{group__talloc_ga204ed205d6b1524c46f12541d5eca686}{talloc\+\_\+set\+\_\+name\+\_\+const}(ptr, \#type)\label{group__talloc_ga750c1ae3fea2c84670a2e4962f319b35}
+
+\item 
+\hypertarget{group__talloc_gaf96938ad0d47dd54da843b4db8154dbc}{}\#define {\bfseries talloc\+\_\+get\+\_\+type}(ptr,  type)~(type $\ast$)\hyperlink{group__talloc_ga1f4f10b2b41c13879fd30cdb30b50862}{talloc\+\_\+check\+\_\+name}(ptr, \#type)\label{group__talloc_gaf96938ad0d47dd54da843b4db8154dbc}
+
+\item 
+\hypertarget{group__talloc_ga67d5dbe930855dad7e41b55812784892}{}\#define {\bfseries talloc\+\_\+get\+\_\+type\+\_\+abort}(ptr,  type)~(type $\ast$)\+\_\+talloc\+\_\+get\+\_\+type\+\_\+abort(ptr, \#type, \+\_\+\+\_\+location\+\_\+\+\_\+)\label{group__talloc_ga67d5dbe930855dad7e41b55812784892}
+
+\item 
+\hypertarget{group__talloc_ga8fd0116a79837a6c02069aa849572875}{}\#define {\bfseries talloc\+\_\+find\+\_\+parent\+\_\+bytype}(ptr,  type)~(type $\ast$)\hyperlink{group__talloc_gaa5dee9fd4d8d4700f14ea4dd92cd4f14}{talloc\+\_\+find\+\_\+parent\+\_\+byname}(ptr, \#type)\label{group__talloc_ga8fd0116a79837a6c02069aa849572875}
+
+\item 
+\#define {\bfseries talloc\+\_\+pooled\+\_\+object}(\+\_\+ctx,  \+\_\+type,  \+\_\+num\+\_\+subobjects,  \+\_\+total\+\_\+subobjects\+\_\+size)
+\item 
+\#define \hyperlink{group__talloc_ga2b3203a43d49423d064e1d889f6c584d}{T\+A\+L\+L\+O\+C\+\_\+\+F\+R\+E\+E}(ctx)~do \{ talloc\+\_\+free(ctx); ctx=N\+U\+L\+L; \} while(0)
+\begin{DoxyCompactList}\small\item\em Free a talloc chunk and N\+U\+L\+L out the pointer. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef void \hyperlink{group__talloc_ga8a521b1347c0e37b84eb942db8fa9beb}{T\+A\+L\+L\+O\+C\+\_\+\+C\+T\+X}
+\begin{DoxyCompactList}\small\item\em Define a talloc parent type. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group__talloc_gaec179ec7cec2f22979ed6ae8ead16ba3}{}int {\bfseries talloc\+\_\+version\+\_\+major} (void)\label{group__talloc_gaec179ec7cec2f22979ed6ae8ead16ba3}
+
+\item 
+\hypertarget{group__talloc_ga6ffad371cc3a041d8c25b1350040dab4}{}int {\bfseries talloc\+\_\+version\+\_\+minor} (void)\label{group__talloc_ga6ffad371cc3a041d8c25b1350040dab4}
+
+\item 
+\hypertarget{group__talloc_ga9166458454d5a321e9fab486b1984f31}{}void $\ast$ {\bfseries \+\_\+talloc} (const void $\ast$context, size\+\_\+t size)\label{group__talloc_ga9166458454d5a321e9fab486b1984f31}
+
+\item 
+void $\ast$ \hyperlink{group__talloc_ga4f4a621ca5763f779d011d88b869bbeb}{talloc\+\_\+init} (const char $\ast$fmt,...) P\+R\+I\+N\+T\+F\+\_\+\+A\+T\+T\+R\+I\+B\+U\+T\+E(1
+\begin{DoxyCompactList}\small\item\em Create a new top level talloc context. \end{DoxyCompactList}\item 
+\hypertarget{group__talloc_gabbd2cd2e00cf25ccfb4ed112b37128ab}{}int {\bfseries \+\_\+talloc\+\_\+free} (void $\ast$ptr, const char $\ast$location)\label{group__talloc_gabbd2cd2e00cf25ccfb4ed112b37128ab}
+
+\item 
+void \hyperlink{group__talloc_ga939926bc6d0d87e1f223a993decb70e9}{talloc\+\_\+free\+\_\+children} (void $\ast$ptr)
+\begin{DoxyCompactList}\small\item\em Free a talloc chunk\textquotesingle{}s children. \end{DoxyCompactList}\item 
+\hypertarget{group__talloc_ga1727514444a8b582af5c71a105c2c109}{}void {\bfseries \+\_\+talloc\+\_\+set\+\_\+destructor} (const void $\ast$ptr, int($\ast$\+\_\+destructor)(void $\ast$))\label{group__talloc_ga1727514444a8b582af5c71a105c2c109}
+
+\item 
+\hypertarget{group__talloc_gaa710048b3463fe968260882814428471}{}void $\ast$ {\bfseries \+\_\+talloc\+\_\+steal\+\_\+loc} (const void $\ast$new\+\_\+ctx, const void $\ast$ptr, const char $\ast$location)\label{group__talloc_gaa710048b3463fe968260882814428471}
+
+\item 
+const char $\ast$ \hyperlink{group__talloc_ga75097bd7d060a95d42f76cf41bffa207}{talloc\+\_\+set\+\_\+name} (const void $\ast$ptr, const char $\ast$fmt,...) P\+R\+I\+N\+T\+F\+\_\+\+A\+T\+T\+R\+I\+B\+U\+T\+E(2
+\begin{DoxyCompactList}\small\item\em Assign a name to a talloc chunk. \end{DoxyCompactList}\item 
+\hypertarget{group__talloc_ga5a91eb0e4c97eb636b8bbc3bcb5ec540}{}void $\ast$ {\bfseries \+\_\+talloc\+\_\+move} (const void $\ast$new\+\_\+ctx, const void $\ast$pptr)\label{group__talloc_ga5a91eb0e4c97eb636b8bbc3bcb5ec540}
+
+\item 
+void \hyperlink{group__talloc_ga204ed205d6b1524c46f12541d5eca686}{talloc\+\_\+set\+\_\+name\+\_\+const} (const void $\ast$ptr, const char $\ast$name)
+\begin{DoxyCompactList}\small\item\em Assign a name to a talloc chunk. \end{DoxyCompactList}\item 
+void $\ast$ \hyperlink{group__talloc_ga8bd5a797d207c4e04799105c065c46be}{talloc\+\_\+named} (const void $\ast$context, size\+\_\+t size, const char $\ast$fmt,...) P\+R\+I\+N\+T\+F\+\_\+\+A\+T\+T\+R\+I\+B\+U\+T\+E(3
+\begin{DoxyCompactList}\small\item\em Create a named talloc chunk. \end{DoxyCompactList}\item 
+void void $\ast$ \hyperlink{group__talloc_ga72dc3f21af6c125c71221860c5d9fd36}{talloc\+\_\+named\+\_\+const} (const void $\ast$context, size\+\_\+t size, const char $\ast$name)
+\begin{DoxyCompactList}\small\item\em Basic routine to allocate a chunk of memory. \end{DoxyCompactList}\item 
+\hypertarget{group__talloc_ga5df9c4bfbb03458a2f22b45e6a69de3a}{}void $\ast$ {\bfseries \+\_\+talloc\+\_\+zero} (const void $\ast$ctx, size\+\_\+t size, const char $\ast$name)\label{group__talloc_ga5df9c4bfbb03458a2f22b45e6a69de3a}
+
+\item 
+const char $\ast$ \hyperlink{group__talloc_ga854bc4e030677deae1c68d10bb5de31a}{talloc\+\_\+get\+\_\+name} (const void $\ast$ptr)
+\begin{DoxyCompactList}\small\item\em Return the name of a talloc chunk. \end{DoxyCompactList}\item 
+void $\ast$ \hyperlink{group__talloc_ga1f4f10b2b41c13879fd30cdb30b50862}{talloc\+\_\+check\+\_\+name} (const void $\ast$ptr, const char $\ast$name)
+\begin{DoxyCompactList}\small\item\em Verify that a talloc chunk carries a specified name. \end{DoxyCompactList}\item 
+void $\ast$ \hyperlink{group__talloc_ga75452866b0cd5c7d5a3a8e7c9dd7a6a5}{talloc\+\_\+parent} (const void $\ast$ptr)
+\begin{DoxyCompactList}\small\item\em Get the parent chunk of a pointer. \end{DoxyCompactList}\item 
+const char $\ast$ \hyperlink{group__talloc_ga45aec19f076278e5ab25c860951e6ad6}{talloc\+\_\+parent\+\_\+name} (const void $\ast$ptr)
+\begin{DoxyCompactList}\small\item\em Get a talloc chunk\textquotesingle{}s parent name. \end{DoxyCompactList}\item 
+size\+\_\+t \hyperlink{group__talloc_ga7fdaffb5e7b6ec5ee2a2d94070074338}{talloc\+\_\+total\+\_\+size} (const void $\ast$ptr)
+\begin{DoxyCompactList}\small\item\em Get the total size of a talloc chunk including its children. \end{DoxyCompactList}\item 
+size\+\_\+t \hyperlink{group__talloc_gabb6eba197e7e2cf57f7f7a5dce21b869}{talloc\+\_\+total\+\_\+blocks} (const void $\ast$ptr)
+\begin{DoxyCompactList}\small\item\em Get the number of talloc chunks hanging off a chunk. \end{DoxyCompactList}\item 
+\hypertarget{group__talloc_ga0cc5ecd3f28ea75ea67743426170f7d8}{}void $\ast$ {\bfseries \+\_\+talloc\+\_\+memdup} (const void $\ast$t, const void $\ast$p, size\+\_\+t size, const char $\ast$name)\label{group__talloc_ga0cc5ecd3f28ea75ea67743426170f7d8}
+
+\item 
+\hypertarget{group__talloc_gac4e82f4d46ccddb27bc1101e10c66b59}{}void $\ast$ {\bfseries \+\_\+talloc\+\_\+get\+\_\+type\+\_\+abort} (const void $\ast$ptr, const char $\ast$name, const char $\ast$location)\label{group__talloc_gac4e82f4d46ccddb27bc1101e10c66b59}
+
+\item 
+void $\ast$ \hyperlink{group__talloc_gaa5dee9fd4d8d4700f14ea4dd92cd4f14}{talloc\+\_\+find\+\_\+parent\+\_\+byname} (const void $\ast$ctx, const char $\ast$name)
+\begin{DoxyCompactList}\small\item\em Find a parent context by name. \end{DoxyCompactList}\item 
+void $\ast$ \hyperlink{group__talloc_ga454194769421483dbd512f26c622f713}{talloc\+\_\+pool} (const void $\ast$context, size\+\_\+t size)
+\begin{DoxyCompactList}\small\item\em Allocate a talloc pool. \end{DoxyCompactList}\item 
+\hypertarget{group__talloc_ga77a2717f102c41c6ef4bc2d656c92096}{}void $\ast$ {\bfseries \+\_\+talloc\+\_\+pooled\+\_\+object} (const void $\ast$ctx, size\+\_\+t type\+\_\+size, const char $\ast$type\+\_\+name, unsigned num\+\_\+subobjects, size\+\_\+t total\+\_\+subobjects\+\_\+size)\label{group__talloc_ga77a2717f102c41c6ef4bc2d656c92096}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+talloc is a hierarchical, reference counted memory pool system with destructors. 
+
+It is the core memory allocator used in Samba. 
+
+\subsection{Macro Definition Documentation}
+\hypertarget{group__talloc_ga2b3203a43d49423d064e1d889f6c584d}{}\index{The talloc A\+P\+I@{The talloc A\+P\+I}!T\+A\+L\+L\+O\+C\+\_\+\+F\+R\+E\+E@{T\+A\+L\+L\+O\+C\+\_\+\+F\+R\+E\+E}}
+\index{T\+A\+L\+L\+O\+C\+\_\+\+F\+R\+E\+E@{T\+A\+L\+L\+O\+C\+\_\+\+F\+R\+E\+E}!The talloc A\+P\+I@{The talloc A\+P\+I}}
+\subsubsection[{T\+A\+L\+L\+O\+C\+\_\+\+F\+R\+E\+E}]{\setlength{\rightskip}{0pt plus 5cm}\#define T\+A\+L\+L\+O\+C\+\_\+\+F\+R\+E\+E(
+\begin{DoxyParamCaption}
+\item[{}]{ctx}
+\end{DoxyParamCaption}
+)~do \{ talloc\+\_\+free(ctx); ctx=N\+U\+L\+L; \} while(0)}\label{group__talloc_ga2b3203a43d49423d064e1d889f6c584d}
+
+
+Free a talloc chunk and N\+U\+L\+L out the pointer. 
+
+\hyperlink{group__talloc_ga2b3203a43d49423d064e1d889f6c584d}{T\+A\+L\+L\+O\+C\+\_\+\+F\+R\+E\+E()} frees a pointer and sets it to N\+U\+L\+L. Use this if you want immediate feedback (i.\+e. crash) if you use a pointer after having free\textquotesingle{}ed it.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em ctx} & The chunk to be freed. \\
+\hline
+\end{DoxyParams}
+\hypertarget{group__talloc_gac7641a167abed37605421833eb5f92a9}{}\index{The talloc A\+P\+I@{The talloc A\+P\+I}!talloc\+\_\+pooled\+\_\+object@{talloc\+\_\+pooled\+\_\+object}}
+\index{talloc\+\_\+pooled\+\_\+object@{talloc\+\_\+pooled\+\_\+object}!The talloc A\+P\+I@{The talloc A\+P\+I}}
+\subsubsection[{talloc\+\_\+pooled\+\_\+object}]{\setlength{\rightskip}{0pt plus 5cm}\#define talloc\+\_\+pooled\+\_\+object(
+\begin{DoxyParamCaption}
+\item[{}]{\+\_\+ctx, }
+\item[{}]{\+\_\+type, }
+\item[{}]{\+\_\+num\+\_\+subobjects, }
+\item[{}]{\+\_\+total\+\_\+subobjects\+\_\+size}
+\end{DoxyParamCaption}
+)}\label{group__talloc_gac7641a167abed37605421833eb5f92a9}
+{\bfseries Value\+:}
+\begin{DoxyCode}
+(\_type *)\_talloc\_pooled\_object((\_ctx), \textcolor{keyword}{sizeof}(\_type), #\_type, \(\backslash\)
+                    (\_num\_subobjects), \(\backslash\)
+                    (\_total\_subobjects\_size))
+\end{DoxyCode}
+
+
+\subsection{Typedef Documentation}
+\hypertarget{group__talloc_ga8a521b1347c0e37b84eb942db8fa9beb}{}\index{The talloc A\+P\+I@{The talloc A\+P\+I}!T\+A\+L\+L\+O\+C\+\_\+\+C\+T\+X@{T\+A\+L\+L\+O\+C\+\_\+\+C\+T\+X}}
+\index{T\+A\+L\+L\+O\+C\+\_\+\+C\+T\+X@{T\+A\+L\+L\+O\+C\+\_\+\+C\+T\+X}!The talloc A\+P\+I@{The talloc A\+P\+I}}
+\subsubsection[{T\+A\+L\+L\+O\+C\+\_\+\+C\+T\+X}]{\setlength{\rightskip}{0pt plus 5cm}typedef void {\bf T\+A\+L\+L\+O\+C\+\_\+\+C\+T\+X}}\label{group__talloc_ga8a521b1347c0e37b84eb942db8fa9beb}
+
+
+Define a talloc parent type. 
+
+As talloc is a hierarchial memory allocator, every talloc chunk is a potential parent to other talloc chunks. So defining a separate type for a talloc chunk is not strictly necessary. T\+A\+L\+L\+O\+C\+\_\+\+C\+T\+X is defined nevertheless, as it provides an indicator for function arguments. You will frequently write code like
+
+
+\begin{DoxyCode}
+1 struct foo *foo\_create(TALLOC\_CTX *mem\_ctx)
+2 \{
+3         struct foo *result;
+4         result = talloc(mem\_ctx, struct foo);
+5         if (result == NULL) return NULL;
+6                 ... initialize foo ...
+7         return result;
+8 \}
+\end{DoxyCode}
+
+
+In this type of allocating functions it is handy to have a general T\+A\+L\+L\+O\+C\+\_\+\+C\+T\+X type to indicate which parent to put allocated structures on. 
+
+\subsection{Function Documentation}
+\hypertarget{group__talloc_ga1f4f10b2b41c13879fd30cdb30b50862}{}\index{The talloc A\+P\+I@{The talloc A\+P\+I}!talloc\+\_\+check\+\_\+name@{talloc\+\_\+check\+\_\+name}}
+\index{talloc\+\_\+check\+\_\+name@{talloc\+\_\+check\+\_\+name}!The talloc A\+P\+I@{The talloc A\+P\+I}}
+\subsubsection[{talloc\+\_\+check\+\_\+name(const void $\ast$ptr, const char $\ast$name)}]{\setlength{\rightskip}{0pt plus 5cm}void$\ast$ talloc\+\_\+check\+\_\+name (
+\begin{DoxyParamCaption}
+\item[{const void $\ast$}]{ptr, }
+\item[{const char $\ast$}]{name}
+\end{DoxyParamCaption}
+)}\label{group__talloc_ga1f4f10b2b41c13879fd30cdb30b50862}
+
+
+Verify that a talloc chunk carries a specified name. 
+
+This function checks if a pointer has the specified name. If it does then the pointer is returned.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em ptr} & The talloc chunk to check.\\
+\hline
+\mbox{\tt in}  & {\em name} & The name to check against.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The pointer if the name matches, N\+U\+L\+L if it doesn\textquotesingle{}t. 
+\end{DoxyReturn}
+\hypertarget{group__talloc_gaa5dee9fd4d8d4700f14ea4dd92cd4f14}{}\index{The talloc A\+P\+I@{The talloc A\+P\+I}!talloc\+\_\+find\+\_\+parent\+\_\+byname@{talloc\+\_\+find\+\_\+parent\+\_\+byname}}
+\index{talloc\+\_\+find\+\_\+parent\+\_\+byname@{talloc\+\_\+find\+\_\+parent\+\_\+byname}!The talloc A\+P\+I@{The talloc A\+P\+I}}
+\subsubsection[{talloc\+\_\+find\+\_\+parent\+\_\+byname(const void $\ast$ctx, const char $\ast$name)}]{\setlength{\rightskip}{0pt plus 5cm}void$\ast$ talloc\+\_\+find\+\_\+parent\+\_\+byname (
+\begin{DoxyParamCaption}
+\item[{const void $\ast$}]{ctx, }
+\item[{const char $\ast$}]{name}
+\end{DoxyParamCaption}
+)}\label{group__talloc_gaa5dee9fd4d8d4700f14ea4dd92cd4f14}
+
+
+Find a parent context by name. 
+
+Find a parent memory context of the current context that has the given name. This can be very useful in complex programs where it may be difficult to pass all information down to the level you need, but you know the structure you want is a parent of another context.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em ctx} & The talloc chunk to start from.\\
+\hline
+\mbox{\tt in}  & {\em name} & The name of the parent we look for.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The memory context we are looking for, N\+U\+L\+L if not found. 
+\end{DoxyReturn}
+\hypertarget{group__talloc_ga939926bc6d0d87e1f223a993decb70e9}{}\index{The talloc A\+P\+I@{The talloc A\+P\+I}!talloc\+\_\+free\+\_\+children@{talloc\+\_\+free\+\_\+children}}
+\index{talloc\+\_\+free\+\_\+children@{talloc\+\_\+free\+\_\+children}!The talloc A\+P\+I@{The talloc A\+P\+I}}
+\subsubsection[{talloc\+\_\+free\+\_\+children(void $\ast$ptr)}]{\setlength{\rightskip}{0pt plus 5cm}void talloc\+\_\+free\+\_\+children (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{ptr}
+\end{DoxyParamCaption}
+)}\label{group__talloc_ga939926bc6d0d87e1f223a993decb70e9}
+
+
+Free a talloc chunk\textquotesingle{}s children. 
+
+The function walks along the list of all children of a talloc context and talloc\+\_\+free()s only the children, not the context itself.
+
+A N\+U\+L\+L argument is handled as no-\/op.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em ptr} & The chunk that you want to free the children of (N\+U\+L\+L is allowed too) \\
+\hline
+\end{DoxyParams}
+\hypertarget{group__talloc_ga854bc4e030677deae1c68d10bb5de31a}{}\index{The talloc A\+P\+I@{The talloc A\+P\+I}!talloc\+\_\+get\+\_\+name@{talloc\+\_\+get\+\_\+name}}
+\index{talloc\+\_\+get\+\_\+name@{talloc\+\_\+get\+\_\+name}!The talloc A\+P\+I@{The talloc A\+P\+I}}
+\subsubsection[{talloc\+\_\+get\+\_\+name(const void $\ast$ptr)}]{\setlength{\rightskip}{0pt plus 5cm}const char$\ast$ talloc\+\_\+get\+\_\+name (
+\begin{DoxyParamCaption}
+\item[{const void $\ast$}]{ptr}
+\end{DoxyParamCaption}
+)}\label{group__talloc_ga854bc4e030677deae1c68d10bb5de31a}
+
+
+Return the name of a talloc chunk. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em ptr} & The talloc chunk.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The current name for the given talloc pointer.
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{group__talloc_ga75097bd7d060a95d42f76cf41bffa207}{talloc\+\_\+set\+\_\+name()} 
+\end{DoxySeeAlso}
+\hypertarget{group__talloc_ga4f4a621ca5763f779d011d88b869bbeb}{}\index{The talloc A\+P\+I@{The talloc A\+P\+I}!talloc\+\_\+init@{talloc\+\_\+init}}
+\index{talloc\+\_\+init@{talloc\+\_\+init}!The talloc A\+P\+I@{The talloc A\+P\+I}}
+\subsubsection[{talloc\+\_\+init(const char $\ast$fmt,...) P\+R\+I\+N\+T\+F\+\_\+\+A\+T\+T\+R\+I\+B\+U\+T\+E(1}]{\setlength{\rightskip}{0pt plus 5cm}void$\ast$ talloc\+\_\+init (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{fmt, }
+\item[{}]{...}
+\end{DoxyParamCaption}
+)}\label{group__talloc_ga4f4a621ca5763f779d011d88b869bbeb}
+
+
+Create a new top level talloc context. 
+
+This function creates a zero length named talloc context as a top level context. It is equivalent to\+:
+
+
+\begin{DoxyCode}
+1 talloc\_named(NULL, 0, fmt, ...);
+\end{DoxyCode}
+ 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em fmt} & Format string for the name.\\
+\hline
+\mbox{\tt in}  & {\em ...} & Additional printf-\/style arguments.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The allocated memory chunk, N\+U\+L\+L on error.
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{group__talloc_ga8bd5a797d207c4e04799105c065c46be}{talloc\+\_\+named()} 
+\end{DoxySeeAlso}
+\hypertarget{group__talloc_ga8bd5a797d207c4e04799105c065c46be}{}\index{The talloc A\+P\+I@{The talloc A\+P\+I}!talloc\+\_\+named@{talloc\+\_\+named}}
+\index{talloc\+\_\+named@{talloc\+\_\+named}!The talloc A\+P\+I@{The talloc A\+P\+I}}
+\subsubsection[{talloc\+\_\+named(const void $\ast$context, size\+\_\+t size, const char $\ast$fmt,...) P\+R\+I\+N\+T\+F\+\_\+\+A\+T\+T\+R\+I\+B\+U\+T\+E(3}]{\setlength{\rightskip}{0pt plus 5cm}void$\ast$ talloc\+\_\+named (
+\begin{DoxyParamCaption}
+\item[{const void $\ast$}]{context, }
+\item[{size\+\_\+t}]{size, }
+\item[{const char $\ast$}]{fmt, }
+\item[{}]{...}
+\end{DoxyParamCaption}
+)}\label{group__talloc_ga8bd5a797d207c4e04799105c065c46be}
+
+
+Create a named talloc chunk. 
+
+The \hyperlink{group__talloc_ga8bd5a797d207c4e04799105c065c46be}{talloc\+\_\+named()} function creates a named talloc pointer. It is equivalent to\+:
+
+
+\begin{DoxyCode}
+1 ptr = talloc\_size(context, size);
+2 talloc\_set\_name(ptr, fmt, ....);
+\end{DoxyCode}
+
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em context} & The talloc context to hang the result off.\\
+\hline
+\mbox{\tt in}  & {\em size} & Number of char\textquotesingle{}s that you want to allocate.\\
+\hline
+\mbox{\tt in}  & {\em fmt} & Format string for the name.\\
+\hline
+\mbox{\tt in}  & {\em ...} & Additional printf-\/style arguments.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The allocated memory chunk, N\+U\+L\+L on error.
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{group__talloc_ga75097bd7d060a95d42f76cf41bffa207}{talloc\+\_\+set\+\_\+name()} 
+\end{DoxySeeAlso}
+\hypertarget{group__talloc_ga72dc3f21af6c125c71221860c5d9fd36}{}\index{The talloc A\+P\+I@{The talloc A\+P\+I}!talloc\+\_\+named\+\_\+const@{talloc\+\_\+named\+\_\+const}}
+\index{talloc\+\_\+named\+\_\+const@{talloc\+\_\+named\+\_\+const}!The talloc A\+P\+I@{The talloc A\+P\+I}}
+\subsubsection[{talloc\+\_\+named\+\_\+const(const void $\ast$context, size\+\_\+t size, const char $\ast$name)}]{\setlength{\rightskip}{0pt plus 5cm}void void$\ast$ talloc\+\_\+named\+\_\+const (
+\begin{DoxyParamCaption}
+\item[{const void $\ast$}]{context, }
+\item[{size\+\_\+t}]{size, }
+\item[{const char $\ast$}]{name}
+\end{DoxyParamCaption}
+)}\label{group__talloc_ga72dc3f21af6c125c71221860c5d9fd36}
+
+
+Basic routine to allocate a chunk of memory. 
+
+This is equivalent to\+:
+
+
+\begin{DoxyCode}
+1 ptr = talloc\_size(context, size);
+2 talloc\_set\_name\_const(ptr, name);
+\end{DoxyCode}
+
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em context} & The parent context.\\
+\hline
+\mbox{\tt in}  & {\em size} & The number of char\textquotesingle{}s that we want to allocate.\\
+\hline
+\mbox{\tt in}  & {\em name} & The name the talloc block has.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The allocated memory chunk, N\+U\+L\+L on error. 
+\end{DoxyReturn}
+\hypertarget{group__talloc_ga75452866b0cd5c7d5a3a8e7c9dd7a6a5}{}\index{The talloc A\+P\+I@{The talloc A\+P\+I}!talloc\+\_\+parent@{talloc\+\_\+parent}}
+\index{talloc\+\_\+parent@{talloc\+\_\+parent}!The talloc A\+P\+I@{The talloc A\+P\+I}}
+\subsubsection[{talloc\+\_\+parent(const void $\ast$ptr)}]{\setlength{\rightskip}{0pt plus 5cm}void$\ast$ talloc\+\_\+parent (
+\begin{DoxyParamCaption}
+\item[{const void $\ast$}]{ptr}
+\end{DoxyParamCaption}
+)}\label{group__talloc_ga75452866b0cd5c7d5a3a8e7c9dd7a6a5}
+
+
+Get the parent chunk of a pointer. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em ptr} & The talloc pointer to inspect.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The talloc parent of ptr, N\+U\+L\+L on error. 
+\end{DoxyReturn}
+\hypertarget{group__talloc_ga45aec19f076278e5ab25c860951e6ad6}{}\index{The talloc A\+P\+I@{The talloc A\+P\+I}!talloc\+\_\+parent\+\_\+name@{talloc\+\_\+parent\+\_\+name}}
+\index{talloc\+\_\+parent\+\_\+name@{talloc\+\_\+parent\+\_\+name}!The talloc A\+P\+I@{The talloc A\+P\+I}}
+\subsubsection[{talloc\+\_\+parent\+\_\+name(const void $\ast$ptr)}]{\setlength{\rightskip}{0pt plus 5cm}const char$\ast$ talloc\+\_\+parent\+\_\+name (
+\begin{DoxyParamCaption}
+\item[{const void $\ast$}]{ptr}
+\end{DoxyParamCaption}
+)}\label{group__talloc_ga45aec19f076278e5ab25c860951e6ad6}
+
+
+Get a talloc chunk\textquotesingle{}s parent name. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em ptr} & The talloc pointer to inspect.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The name of ptr\textquotesingle{}s parent chunk. 
+\end{DoxyReturn}
+\hypertarget{group__talloc_ga454194769421483dbd512f26c622f713}{}\index{The talloc A\+P\+I@{The talloc A\+P\+I}!talloc\+\_\+pool@{talloc\+\_\+pool}}
+\index{talloc\+\_\+pool@{talloc\+\_\+pool}!The talloc A\+P\+I@{The talloc A\+P\+I}}
+\subsubsection[{talloc\+\_\+pool(const void $\ast$context, size\+\_\+t size)}]{\setlength{\rightskip}{0pt plus 5cm}void$\ast$ talloc\+\_\+pool (
+\begin{DoxyParamCaption}
+\item[{const void $\ast$}]{context, }
+\item[{size\+\_\+t}]{size}
+\end{DoxyParamCaption}
+)}\label{group__talloc_ga454194769421483dbd512f26c622f713}
+
+
+Allocate a talloc pool. 
+
+A talloc pool is a pure optimization for specific situations. In the release process for Samba 3.\+2 we found out that we had become considerably slower than Samba 3.\+0 was. Profiling showed that malloc(3) was a large C\+P\+U consumer in benchmarks. For Samba 3.\+2 we have internally converted many static buffers to dynamically allocated ones, so malloc(3) being beaten more was no surprise. But it made us slower.
+
+\hyperlink{group__talloc_ga454194769421483dbd512f26c622f713}{talloc\+\_\+pool()} is an optimization to call malloc(3) a lot less for the use pattern Samba has\+: The S\+M\+B protocol is mainly a request/response protocol where we have to allocate a certain amount of memory per request and free that after the S\+M\+B reply is sent to the client.
+
+\hyperlink{group__talloc_ga454194769421483dbd512f26c622f713}{talloc\+\_\+pool()} creates a talloc chunk that you can use as a talloc parent exactly as you would use any other \hyperlink{group__talloc_ga8a521b1347c0e37b84eb942db8fa9beb}{T\+A\+L\+L\+O\+C\+\_\+\+C\+T\+X}. The difference is that when you talloc a child of this pool, no malloc(3) is done. Instead, talloc just increments a pointer inside the talloc\+\_\+pool. This also works recursively. If you use the child of the talloc pool as a parent for grand-\/children, their memory is also taken from the talloc pool.
+
+If there is not enough memory in the pool to allocate the new child, it will create a new talloc chunk as if the parent was a normal talloc context.
+
+If you talloc\+\_\+free() children of a talloc pool, the memory is not given back to the system. Instead, free(3) is only called if the \hyperlink{group__talloc_ga454194769421483dbd512f26c622f713}{talloc\+\_\+pool()} itself is released with talloc\+\_\+free().
+
+The downside of a talloc pool is that if you talloc\+\_\+move() a child of a talloc pool to a talloc parent outside the pool, the whole pool memory is not free(3)\textquotesingle{}ed until that moved chunk is also talloc\+\_\+free()ed.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em context} & The talloc context to hang the result off.\\
+\hline
+\mbox{\tt in}  & {\em size} & Size of the talloc pool.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The allocated talloc pool, N\+U\+L\+L on error. 
+\end{DoxyReturn}
+\hypertarget{group__talloc_ga75097bd7d060a95d42f76cf41bffa207}{}\index{The talloc A\+P\+I@{The talloc A\+P\+I}!talloc\+\_\+set\+\_\+name@{talloc\+\_\+set\+\_\+name}}
+\index{talloc\+\_\+set\+\_\+name@{talloc\+\_\+set\+\_\+name}!The talloc A\+P\+I@{The talloc A\+P\+I}}
+\subsubsection[{talloc\+\_\+set\+\_\+name(const void $\ast$ptr, const char $\ast$fmt,...) P\+R\+I\+N\+T\+F\+\_\+\+A\+T\+T\+R\+I\+B\+U\+T\+E(2}]{\setlength{\rightskip}{0pt plus 5cm}const char$\ast$ talloc\+\_\+set\+\_\+name (
+\begin{DoxyParamCaption}
+\item[{const void $\ast$}]{ptr, }
+\item[{const char $\ast$}]{fmt, }
+\item[{}]{...}
+\end{DoxyParamCaption}
+)}\label{group__talloc_ga75097bd7d060a95d42f76cf41bffa207}
+
+
+Assign a name to a talloc chunk. 
+
+Each talloc pointer has a \char`\"{}name\char`\"{}. The name is used principally for debugging purposes, although it is also possible to set and get the name on a pointer in as a way of \char`\"{}marking\char`\"{} pointers in your code.
+
+The main use for names on pointer is for \char`\"{}talloc reports\char`\"{}. See \hyperlink{group__talloc__debug_ga4f4ff95ce5a95f61cc453fc943e3de65}{talloc\+\_\+report()} and \hyperlink{group__talloc__debug_ga66136eb6105416bfcbd390ce6a4fc89c}{talloc\+\_\+report\+\_\+full()} for details. Also see \hyperlink{group__talloc__debug_gac6f0c065b4ed391acb5c74240a8647bc}{talloc\+\_\+enable\+\_\+leak\+\_\+report()} and \hyperlink{group__talloc__debug_gab01ab00014902d25e9eaba9fd172821c}{talloc\+\_\+enable\+\_\+leak\+\_\+report\+\_\+full()}.
+
+The \hyperlink{group__talloc_ga75097bd7d060a95d42f76cf41bffa207}{talloc\+\_\+set\+\_\+name()} function allocates memory as a child of the pointer. It is logically equivalent to\+:
+
+
+\begin{DoxyCode}
+1 talloc\_set\_name\_const(ptr, talloc\_asprintf(ptr, fmt, ...));
+\end{DoxyCode}
+
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em ptr} & The talloc chunk to assign a name to.\\
+\hline
+\mbox{\tt in}  & {\em fmt} & Format string for the name.\\
+\hline
+\mbox{\tt in}  & {\em ...} & Add printf-\/style additional arguments.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The assigned name, N\+U\+L\+L on error.
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Multiple calls to \hyperlink{group__talloc_ga75097bd7d060a95d42f76cf41bffa207}{talloc\+\_\+set\+\_\+name()} will allocate more memory without releasing the name. All of the memory is released when the ptr is freed using talloc\+\_\+free(). 
+\end{DoxyNote}
+\hypertarget{group__talloc_ga204ed205d6b1524c46f12541d5eca686}{}\index{The talloc A\+P\+I@{The talloc A\+P\+I}!talloc\+\_\+set\+\_\+name\+\_\+const@{talloc\+\_\+set\+\_\+name\+\_\+const}}
+\index{talloc\+\_\+set\+\_\+name\+\_\+const@{talloc\+\_\+set\+\_\+name\+\_\+const}!The talloc A\+P\+I@{The talloc A\+P\+I}}
+\subsubsection[{talloc\+\_\+set\+\_\+name\+\_\+const(const void $\ast$ptr, const char $\ast$name)}]{\setlength{\rightskip}{0pt plus 5cm}void talloc\+\_\+set\+\_\+name\+\_\+const (
+\begin{DoxyParamCaption}
+\item[{const void $\ast$}]{ptr, }
+\item[{const char $\ast$}]{name}
+\end{DoxyParamCaption}
+)}\label{group__talloc_ga204ed205d6b1524c46f12541d5eca686}
+
+
+Assign a name to a talloc chunk. 
+
+The function is just like \hyperlink{group__talloc_ga75097bd7d060a95d42f76cf41bffa207}{talloc\+\_\+set\+\_\+name()}, but it takes a string constant, and is much faster. It is extensively used by the \char`\"{}auto naming\char`\"{} macros, such as talloc\+\_\+p().
+
+This function does not allocate any memory. It just copies the supplied pointer into the internal representation of the talloc ptr. This means you must not pass a name pointer to memory that will disappear before the ptr is freed with talloc\+\_\+free().
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em ptr} & The talloc chunk to assign a name to.\\
+\hline
+\mbox{\tt in}  & {\em name} & Format string for the name. \\
+\hline
+\end{DoxyParams}
+\hypertarget{group__talloc_gabb6eba197e7e2cf57f7f7a5dce21b869}{}\index{The talloc A\+P\+I@{The talloc A\+P\+I}!talloc\+\_\+total\+\_\+blocks@{talloc\+\_\+total\+\_\+blocks}}
+\index{talloc\+\_\+total\+\_\+blocks@{talloc\+\_\+total\+\_\+blocks}!The talloc A\+P\+I@{The talloc A\+P\+I}}
+\subsubsection[{talloc\+\_\+total\+\_\+blocks(const void $\ast$ptr)}]{\setlength{\rightskip}{0pt plus 5cm}size\+\_\+t talloc\+\_\+total\+\_\+blocks (
+\begin{DoxyParamCaption}
+\item[{const void $\ast$}]{ptr}
+\end{DoxyParamCaption}
+)}\label{group__talloc_gabb6eba197e7e2cf57f7f7a5dce21b869}
+
+
+Get the number of talloc chunks hanging off a chunk. 
+
+The \hyperlink{group__talloc_gabb6eba197e7e2cf57f7f7a5dce21b869}{talloc\+\_\+total\+\_\+blocks()} function returns the total memory block count used by this pointer and all child pointers. Mostly useful for debugging.
+
+Passing N\+U\+L\+L is allowed, but it will only give a meaningful result if \hyperlink{group__talloc__debug_gac6f0c065b4ed391acb5c74240a8647bc}{talloc\+\_\+enable\+\_\+leak\+\_\+report()} or \hyperlink{group__talloc__debug_gab01ab00014902d25e9eaba9fd172821c}{talloc\+\_\+enable\+\_\+leak\+\_\+report\+\_\+full()} has been called.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em ptr} & The talloc chunk.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The total size. 
+\end{DoxyReturn}
+\hypertarget{group__talloc_ga7fdaffb5e7b6ec5ee2a2d94070074338}{}\index{The talloc A\+P\+I@{The talloc A\+P\+I}!talloc\+\_\+total\+\_\+size@{talloc\+\_\+total\+\_\+size}}
+\index{talloc\+\_\+total\+\_\+size@{talloc\+\_\+total\+\_\+size}!The talloc A\+P\+I@{The talloc A\+P\+I}}
+\subsubsection[{talloc\+\_\+total\+\_\+size(const void $\ast$ptr)}]{\setlength{\rightskip}{0pt plus 5cm}size\+\_\+t talloc\+\_\+total\+\_\+size (
+\begin{DoxyParamCaption}
+\item[{const void $\ast$}]{ptr}
+\end{DoxyParamCaption}
+)}\label{group__talloc_ga7fdaffb5e7b6ec5ee2a2d94070074338}
+
+
+Get the total size of a talloc chunk including its children. 
+
+The function returns the total size in bytes used by this pointer and all child pointers. Mostly useful for debugging.
+
+Passing N\+U\+L\+L is allowed, but it will only give a meaningful result if \hyperlink{group__talloc__debug_gac6f0c065b4ed391acb5c74240a8647bc}{talloc\+\_\+enable\+\_\+leak\+\_\+report()} or \hyperlink{group__talloc__debug_gab01ab00014902d25e9eaba9fd172821c}{talloc\+\_\+enable\+\_\+leak\+\_\+report\+\_\+full()} has been called.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em ptr} & The talloc chunk.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The total size. 
+\end{DoxyReturn}

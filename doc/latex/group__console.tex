@@ -1,0 +1,88 @@
+\hypertarget{group__console}{}\section{Console subsystem}
+\label{group__console}\index{Console subsystem@{Console subsystem}}
+
+
+The console and command subsystem uses libuv tty handles to read input from stdin (or another source) in a cross-\/platform manner, and pass the string input to the command system once the parameters have been parsed.  
+
+
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structconsole}{console}
+\begin{DoxyCompactList}\small\item\em Describes a console context in which all memory for the console subsystem is allocated under. \end{DoxyCompactList}\item 
+struct \hyperlink{structconsole__command}{console\+\_\+command}
+\begin{DoxyCompactList}\small\item\em Describes a console command. \end{DoxyCompactList}\item 
+struct \hyperlink{structconsole__command__handler}{console\+\_\+command\+\_\+handler}
+\begin{DoxyCompactList}\small\item\em Describes a console command handler which is entered into the table of command handlers in {\itshape console.\+c}. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group__console_ga15a89293092907a5f16a723ac26c123f}{}typedef int($\ast$ \hyperlink{group__console_ga15a89293092907a5f16a723ac26c123f}{console\+\_\+command\+\_\+cb}) (struct \hyperlink{structgame}{game} $\ast$\hyperlink{structgame}{game}, struct \hyperlink{structconsole__command}{console\+\_\+command} $\ast$command)\label{group__console_ga15a89293092907a5f16a723ac26c123f}
+
+\begin{DoxyCompactList}\small\item\em Describes a function to be called when a command is entered into the console. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{group__console_ga05276c93e7e86d0058b3435d1c58afff}{console\+\_\+new} (\hyperlink{group__talloc_ga8a521b1347c0e37b84eb942db8fa9beb}{T\+A\+L\+L\+O\+C\+\_\+\+C\+T\+X} $\ast$context, struct \hyperlink{structgame}{game} $\ast$\hyperlink{structgame}{game}, struct \hyperlink{structconsole}{console} $\ast$$\ast$out\+\_\+console)
+\begin{DoxyCompactList}\small\item\em Allocate a new console context. \end{DoxyCompactList}\item 
+int \hyperlink{group__console_ga84497e6470f908c16717cc0163d90a37}{console\+\_\+init} (struct \hyperlink{structconsole}{console} $\ast$\hyperlink{structconsole}{console})
+\begin{DoxyCompactList}\small\item\em Initializes a newly-\/allocated console context. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+The console and command subsystem uses libuv tty handles to read input from stdin (or another source) in a cross-\/platform manner, and pass the string input to the command system once the parameters have been parsed. 
+
+
+
+\subsection{Function Documentation}
+\hypertarget{group__console_ga84497e6470f908c16717cc0163d90a37}{}\index{Console subsystem@{Console subsystem}!console\+\_\+init@{console\+\_\+init}}
+\index{console\+\_\+init@{console\+\_\+init}!Console subsystem@{Console subsystem}}
+\subsubsection[{console\+\_\+init(struct console $\ast$console)}]{\setlength{\rightskip}{0pt plus 5cm}int console\+\_\+init (
+\begin{DoxyParamCaption}
+\item[{struct {\bf console} $\ast$}]{console}
+\end{DoxyParamCaption}
+)}\label{group__console_ga84497e6470f908c16717cc0163d90a37}
+
+
+Initializes a newly-\/allocated console context. 
+
+Initializes the libuv tty handle contained in console-\/$>$console\+\_\+handle to accept input to and from stdin.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em console} & A pointer to the console object allocated with a call to {\itshape console\+\_\+new} \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+{\ttfamily 0} if the initialization was successful, {\ttfamily $<$ 0} otherwise. If this function cannot return successfully, paper tiger will be unable to process console input. 
+\end{DoxyReturn}
+\hypertarget{group__console_ga05276c93e7e86d0058b3435d1c58afff}{}\index{Console subsystem@{Console subsystem}!console\+\_\+new@{console\+\_\+new}}
+\index{console\+\_\+new@{console\+\_\+new}!Console subsystem@{Console subsystem}}
+\subsubsection[{console\+\_\+new(\+T\+A\+L\+L\+O\+C\+\_\+\+C\+T\+X $\ast$context, struct game $\ast$game, struct console $\ast$$\ast$out\+\_\+console)}]{\setlength{\rightskip}{0pt plus 5cm}int console\+\_\+new (
+\begin{DoxyParamCaption}
+\item[{{\bf T\+A\+L\+L\+O\+C\+\_\+\+C\+T\+X} $\ast$}]{context, }
+\item[{struct {\bf game} $\ast$}]{game, }
+\item[{struct {\bf console} $\ast$$\ast$}]{out\+\_\+console}
+\end{DoxyParamCaption}
+)}\label{group__console_ga05276c93e7e86d0058b3435d1c58afff}
+
+
+Allocate a new console context. 
+
+Allocates a new console structure underneath the talloc context pointed to by {\itshape context}.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em context} & A pointer to the talloc context in which to allocate this memory under \\
+\hline
+\mbox{\tt in}  & {\em game} & A pointer to the game context which owns this console context \\
+\hline
+\mbox{\tt out}  & {\em out\+\_\+console} & A pointer to the address where the allocated console object will be stored.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyRemark}{Remarks}
+On successful return of this function, the console handle may be initialized by calling {\itshape console\+\_\+init}.
+\end{DoxyRemark}
+\begin{DoxyReturn}{Returns}
+{\ttfamily 0} if the allocation of a new console context succeeded, or {\ttfamily $<$ 0} otherwise. 
+\end{DoxyReturn}

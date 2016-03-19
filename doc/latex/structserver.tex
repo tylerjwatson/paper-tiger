@@ -1,0 +1,34 @@
+\hypertarget{structserver}{}\section{server Struct Reference}
+\label{structserver}\index{server@{server}}
+
+
+Describes a server context.  
+
+
+
+
+{\ttfamily \#include $<$server.\+h$>$}
+
+\subsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{structserver_a1e6a3204983da9b6b8a22149a1eceb1a}{}char $\ast$ \hyperlink{structserver_a1e6a3204983da9b6b8a22149a1eceb1a}{listen\+\_\+address}\label{structserver_a1e6a3204983da9b6b8a22149a1eceb1a}
+
+\begin{DoxyCompactList}\small\item\em The interface address on which to listen on, use {\ttfamily \char`\"{}0.\+0.\+0.\+0\char`\"{}} for any, or an address to restrict listening on a specific interface. \end{DoxyCompactList}\item 
+\hypertarget{structserver_a8a4c46346a063f664085f4a89610f1ae}{}uint32\+\_\+t \hyperlink{structserver_a8a4c46346a063f664085f4a89610f1ae}{port}\label{structserver_a8a4c46346a063f664085f4a89610f1ae}
+
+\begin{DoxyCompactList}\small\item\em T\+C\+P port on which to listen on. \end{DoxyCompactList}\item 
+\hypertarget{structserver_a372bbf7bb184c187bc1800eef829cc31}{}struct \hyperlink{structgame}{game} $\ast$ \hyperlink{structserver_a372bbf7bb184c187bc1800eef829cc31}{game}\label{structserver_a372bbf7bb184c187bc1800eef829cc31}
+
+\begin{DoxyCompactList}\small\item\em Backpointer to the game context in which this server is running. \end{DoxyCompactList}\item 
+\hypertarget{structserver_a5712c1e56ae6c3838c9bfb62493dedb3}{}uv\+\_\+tcp\+\_\+t $\ast$ \hyperlink{structserver_a5712c1e56ae6c3838c9bfb62493dedb3}{tcp\+\_\+handle}\label{structserver_a5712c1e56ae6c3838c9bfb62493dedb3}
+
+\begin{DoxyCompactList}\small\item\em libuv T\+C\+P handle which is the T\+C\+P listener presenting network I/\+O on the game\textquotesingle{}s event loop. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Describes a server context. 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/server.\+h\end{DoxyCompactItemize}

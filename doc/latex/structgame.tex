@@ -1,0 +1,72 @@
+\hypertarget{structgame}{}\section{game Struct Reference}
+\label{structgame}\index{game@{game}}
+
+
+Describes a game context.  
+
+
+
+
+{\ttfamily \#include $<$game.\+h$>$}
+
+\subsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+double \hyperlink{structgame_aa9d50b55cf6dae7b73b4a451ba683f19}{ms\+\_\+per\+\_\+frame}
+\begin{DoxyCompactList}\small\item\em Time in milliseconds that an update frame may run for. \end{DoxyCompactList}\item 
+\hypertarget{structgame_a4035dec91063bfca4b7fb004e33c29ef}{}struct \hyperlink{structworld}{world} $\ast$ \hyperlink{structgame_a4035dec91063bfca4b7fb004e33c29ef}{world}\label{structgame_a4035dec91063bfca4b7fb004e33c29ef}
+
+\begin{DoxyCompactList}\small\item\em Pointer to the world running under this game context. \end{DoxyCompactList}\item 
+\hypertarget{structgame_aea9cf90d2855a6a1e88d2f87e1a753f0}{}struct \hyperlink{structserver}{server} $\ast$ \hyperlink{structgame_aea9cf90d2855a6a1e88d2f87e1a753f0}{server}\label{structgame_aea9cf90d2855a6a1e88d2f87e1a753f0}
+
+\begin{DoxyCompactList}\small\item\em Pointer to the T\+C\+P server subsystem which accepts T\+C\+P clients and deals with packet communication to and from connected clients. \end{DoxyCompactList}\item 
+struct \hyperlink{structplayer}{player} $\ast$ \hyperlink{structgame_ac35cf57540b1ffe43f32ed655711b0d0}{players} \mbox{[}256\mbox{]}
+\begin{DoxyCompactList}\small\item\em Array of players. \end{DoxyCompactList}\item 
+\hypertarget{structgame_a396c1ac8c8319a43e70d37e2a49193d1}{}struct \hyperlink{structconsole}{console} $\ast$ {\bfseries console}\label{structgame_a396c1ac8c8319a43e70d37e2a49193d1}
+
+\item 
+\hypertarget{structgame_a596626558fdf713fe288226b8d2380ec}{}word\+\_\+t $\ast$ \hyperlink{structgame_a596626558fdf713fe288226b8d2380ec}{player\+\_\+slots}\label{structgame_a596626558fdf713fe288226b8d2380ec}
+
+\begin{DoxyCompactList}\small\item\em Bitmap of connected players, decides which slot I\+D connecting clients receive. \end{DoxyCompactList}\item 
+\hypertarget{structgame_a0f5e440f0942580f2df80cfb7f0bfaff}{}uv\+\_\+loop\+\_\+t $\ast$ \hyperlink{structgame_a0f5e440f0942580f2df80cfb7f0bfaff}{event\+\_\+loop}\label{structgame_a0f5e440f0942580f2df80cfb7f0bfaff}
+
+\begin{DoxyCompactList}\small\item\em Main libuv event loop for the game. \end{DoxyCompactList}\item 
+uv\+\_\+timer\+\_\+t $\ast$ \hyperlink{structgame_ac5f68fafd929e862fab3d748973e4268}{update\+\_\+handle}
+\begin{DoxyCompactList}\small\item\em libuv timer which fires every {\itshape ms\+\_\+per\+\_\+frame} ms. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Describes a game context. 
+
+Contains all references and information that a game needs in order to run. 
+
+\subsection{Field Documentation}
+\hypertarget{structgame_aa9d50b55cf6dae7b73b4a451ba683f19}{}\index{game@{game}!ms\+\_\+per\+\_\+frame@{ms\+\_\+per\+\_\+frame}}
+\index{ms\+\_\+per\+\_\+frame@{ms\+\_\+per\+\_\+frame}!game@{game}}
+\subsubsection[{ms\+\_\+per\+\_\+frame}]{\setlength{\rightskip}{0pt plus 5cm}double game\+::ms\+\_\+per\+\_\+frame}\label{structgame_aa9d50b55cf6dae7b73b4a451ba683f19}
+
+
+Time in milliseconds that an update frame may run for. 
+
+Defaults to 60 ticks per second. \hypertarget{structgame_ac35cf57540b1ffe43f32ed655711b0d0}{}\index{game@{game}!players@{players}}
+\index{players@{players}!game@{game}}
+\subsubsection[{players}]{\setlength{\rightskip}{0pt plus 5cm}struct {\bf player}$\ast$ game\+::players\mbox{[}256\mbox{]}}\label{structgame_ac35cf57540b1ffe43f32ed655711b0d0}
+
+
+Array of players. 
+
+\begin{DoxyRemark}{Remarks}
+Due to the limitations of the official Terraria server, the maximum number of players supported is 255. 
+\end{DoxyRemark}
+\hypertarget{structgame_ac5f68fafd929e862fab3d748973e4268}{}\index{game@{game}!update\+\_\+handle@{update\+\_\+handle}}
+\index{update\+\_\+handle@{update\+\_\+handle}!game@{game}}
+\subsubsection[{update\+\_\+handle}]{\setlength{\rightskip}{0pt plus 5cm}uv\+\_\+timer\+\_\+t$\ast$ game\+::update\+\_\+handle}\label{structgame_ac5f68fafd929e862fab3d748973e4268}
+
+
+libuv timer which fires every {\itshape ms\+\_\+per\+\_\+frame} ms. 
+
+Serves as the game update loop. 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/game.\+h\end{DoxyCompactItemize}
