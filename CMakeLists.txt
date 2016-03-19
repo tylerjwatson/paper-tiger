@@ -44,6 +44,11 @@ add_executable(upgraded-guacamole
 	src/packets/player_info.c
 	src/packets/connect_request.h
 	src/packets/connect_request.c
+	
+	src/packets/player_hp.h
+	src/packets/player_hp.c
+	src/packets/player_mana.h
+	src/packets/player_mana.c
 
 	src/binary_reader.c
 	src/binary_reader.h

@@ -107,6 +107,7 @@ int player_info_read(struct packet *packet, const uv_buf_t *buf)
 
 	player_info->name = talloc_size(player_info, name_len + 1);
 	memcpy(player_info->name, name, name_len);
+	player_info->name[name_len] = '\0';
 
 	pos += name_len + 1;
 	

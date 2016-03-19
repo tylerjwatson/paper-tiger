@@ -20,61 +20,53 @@
 
 #include <string.h>
 
-#include "client_uuid.h"
-#include "../game.h"
-#include "../binary_reader.h"
-#include "../player.h"
-#include "../util.h"
+#include "player_hp.h"
+
 #include "../packet.h"
+#include "../player.h"
 
-int client_uuid_handle(struct player *player, struct packet *packet)
+#include "../binary_reader.h"
+#include "../util.h"
+
+int player_hp_handle(struct player *player, struct packet *packet)
 {
-	struct client_uuid *client_uuid = (struct client_uuid *)packet->data;
-
-	/*
-	 * No need to copy here, just reparent the UUID field from the packet data
-	 * to the player structure since we aren't going to use it anywhere else.
-	 */
+	struct player_hp *player_hp = (struct player_hp *)packet->data;
 	
-	player->uuid = talloc_steal(player, client_uuid->uuid);
+	player->life = player_hp->life;
+	player->life_max = player_hp->life_max;
 
+	printf("%s: player %s hp: %d/%d\n", __FUNCTION__, player->name, player->life, player->life_max);
+	
 	return 0;
 }
 
-int client_uuid_new(TALLOC_CTX *ctx, const struct player *player, const char *uuid, struct packet **out_packet)
+int player_hp_new(TALLOC_CTX *ctx, const struct player *player, uint16_t life, uint16_t life_max, struct packet **out_packet)
 {
 	int ret = -1;
 	TALLOC_CTX *temp_context;
 	struct packet *packet;
-	struct client_uuid *client_uuid;
-	
+
 	temp_context = talloc_new(NULL);
 	if (temp_context == NULL) {
-		_ERROR("%s: out of memory allocating temp context for packet %d\n", __FUNCTION__, PACKET_TYPE_CLIENT_UUID);
+		_ERROR("%s: out of memory allocating temp context for packet %d\n", __FUNCTION__, PACKET_TYPE_PLAYER_HP);
 		ret = -ENOMEM;
 		goto out;
 	}
 
 	packet = talloc(temp_context, struct packet);
 	if (packet == NULL) {
-		_ERROR("%s: out of memory allocating packet type %d\n", __FUNCTION__, PACKET_TYPE_CLIENT_UUID);
+		_ERROR("%s: out of memory allocating packet %d\n", __FUNCTION__, PACKET_TYPE_PLAYER_HP);
 		ret = -ENOMEM;
 		goto out;
 	}
 
-	client_uuid = talloc(temp_context, struct client_uuid);
-	if (client_uuid == NULL) {
-		_ERROR("%s: out of memory allocating client_uuid.\n", __FUNCTION__);
-		ret = -ENOMEM;
-		goto out;
-	}
-	
-	packet->type = PACKET_TYPE_CLIENT_UUID;
-	packet->len = PACKET_HEADER_SIZE + PACKET_LEN_CLIENT_UUID;
+	/*
+	 * Packet has no payload.
+	 */
 
-	client_uuid->uuid = talloc_strdup(client_uuid, uuid);
-	
-	packet->data = (void *)talloc_steal(packet, client_uuid);
+	packet->type = PACKET_TYPE_PLAYER_HP;
+	packet->len = PACKET_HEADER_SIZE;
+	packet->data = NULL;
 
 	*out_packet = (struct packet *)talloc_steal(ctx, packet);
 
@@ -85,13 +77,11 @@ out:
 	return ret;
 }
 
-int client_uuid_read(struct packet *packet, const uv_buf_t *buf)
+int player_hp_read(struct packet *packet, const uv_buf_t *buf)
 {
-	int ret = -1, pos = 0, uuid_len = 0;
+	int ret = -1, pos = 0;
 	TALLOC_CTX *temp_context;
-	struct client_uuid *client_uuid;
-
-	char *uuid;
+	struct player_hp *player_hp;
 
 	temp_context = talloc_new(NULL);
 	if (temp_context == NULL) {
@@ -100,19 +90,20 @@ int client_uuid_read(struct packet *packet, const uv_buf_t *buf)
 		goto out;
 	}
 
-	client_uuid = talloc_zero(temp_context, struct client_uuid);
-	if (client_uuid == NULL) {
+	player_hp = talloc_zero(temp_context, struct player_hp);
+	if (player_hp == NULL) {
 		_ERROR("%s: out of memory allocating player info.\n", __FUNCTION__);
 		ret = -ENOMEM;
 		goto out;
 	}
 
-	binary_reader_read_string_buffer(buf->base, pos, &uuid_len, &uuid);
+	player_hp->id = buf->base[pos++];
+	player_hp->life = *(uint16_t *)(buf->base + pos);
+	pos += sizeof(uint16_t);
+	player_hp->life_max = *(uint16_t *)(buf->base + pos);
 
-	client_uuid->uuid = talloc_strdup(client_uuid, uuid);
-
-	packet->data = (void *)talloc_steal(packet, client_uuid);
-
+	packet->data = talloc_steal(packet, player_hp);
+	
 	ret = 0;
 out:
 	talloc_free(temp_context);

@@ -36,10 +36,16 @@ struct game;
 struct player {
     uint32_t id;
 	char *name;
+	char *uuid;
 	char *remote_addr;
 	uint16_t remote_port;
 	struct game *game;
     uv_tcp_t *handle;
+	
+	uint16_t life;
+	uint16_t life_max;
+	uint16_t mana;
+	uint16_t mana_max;
 	
 	struct packet *incoming_packet;
 };

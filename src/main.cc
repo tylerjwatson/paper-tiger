@@ -18,6 +18,7 @@
  * along with upgraded-guacamole.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdbool.h>
 #include <string.h>
 #include <time.h>
 #include <errno.h>
@@ -35,7 +36,7 @@
 #include "game.h"
 #include "world.h"
 
-#define GUAC_OPTIONS "w:"
+#define GUAC_OPTIONS "sw:"
 
 
 #ifdef __cplusplus
@@ -43,6 +44,7 @@ extern "C" {
 #endif
 
 static const char *options_worldPath = NULL;
+static bool options_console = true;
 
 static int parse_command_line(int argc, char **argv)
 {
@@ -52,6 +54,9 @@ static int parse_command_line(int argc, char **argv)
 
 	while ((c = getopt(argc, argv, GUAC_OPTIONS)) != -1) {
 		switch (c) {
+		case 's':
+			options_console = false;
+			break;
 		case 'w':
 			options_worldPath = optarg;
 			break;
@@ -100,7 +105,7 @@ int main(int argc, char **argv)
 		goto out;
 	}
 
-	if (console_new(game, game, &game->console) < 0) {
+	if (options_console == true && console_new(game, game, &game->console) < 0) {
 		_ERROR("Initializing console failed.\n");
 		ret = -1;
 		goto out;
@@ -129,11 +134,18 @@ int main(int argc, char **argv)
 
 	printf("\n");
 
-	console_init(game->console);
+	if (game->console) {
+		console_init(game->console);
+	}
+	
 	game_start_event_loop(game);
 
 	uv_timer_stop(game->update_handle);
-	uv_read_stop((uv_stream_t *)game->console->console_handle);
+	
+	if (game->console) {
+		uv_read_stop((uv_stream_t *)game->console->console_handle);
+	}
+	
 	uv_read_stop((uv_stream_t *)game->server->tcp_handle);
 
 	uv_close((uv_handle_t *)game->update_handle, NULL);

@@ -50,7 +50,7 @@ static inline void __sleep(double msec)
 static void __game_update(uv_timer_t *timer)
 {
 	struct game *game = (struct game *)timer->data;
-
+ 
 	//TODO: Update the game shit.
 }
 
@@ -66,7 +66,7 @@ int game_find_next_slot(struct game *context)
 			return i;
 		}
 	}
-	
+
 	return -1;
 }
 
@@ -86,7 +86,7 @@ int game_new(TALLOC_CTX *context, struct game **out_context)
 	}
 
 	gameContext = talloc_zero(tempContext, struct game);
-	
+
 	/*
 	 * Init game stuff here
 	 */
