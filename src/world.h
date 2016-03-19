@@ -93,27 +93,66 @@ enum relogic_file_type {
 	relogic_file_type_player
 };
 
+/**
+ * Structure which describes a Terraria world.  The structure contains a pointer to
+ * all the tiles and everything the world needs to operate correctly.
+ */
 struct world {
+	/**
+	 * Internal unique world identifier.
+	 */
 	int32_t worldID;
-	char *world_name;		/* World name */
-	char *world_path;		/* Fully-qualified path to the world file */
+	
+	/** 
+	 * World name
+	 */
+	char *world_name;		
+	
+	/** Fully-qualified path to the world file */
+	char *world_path;
+	
+	/**
+	 * World version as recorded in the world file.
+	 */
 	int version;
-	uint16_t num_positions;		/* Number of elements in the positions array */
-	int32_t *positions;			/* Array of position data */
-	uint16_t num_important;		/* Number of elements in the importance array */
-	int8_t *important;		/* Array of importance data */
+	
+	/** Number of elements in the positions array */
+	uint16_t num_positions;
+	
+	/** Array of position data */
+	int32_t *positions;
+	
+	/** Number of elements in the importance array */
+	uint16_t num_important;
+	
+	/** Array of importance data */
+	int8_t *important;
 
 	float left_world;
 	float right_world;
 	float top_world;
 	float bottom_world;
 
-	uint32_t max_tiles_x;
-	uint32_t max_tiles_y;
+	/** 
+	 * The number of tiles in the world's X axis.
+	 */
+	uint32_t max_tiles_x;		
+	
+	/** 
+	 * The number of tiles i n the world's Y axis.
+	 */
+	uint32_t max_tiles_y;		
 
+	/*
+	 * DateTime stamp of when the world file was created
+	 */
 	int64_t creation_time;
 
+	/*
+	 * Indicates whether the world has expert mode enabled
+	 */
 	bool expert_mode;
+	
 	int8_t moon_type;
 	int32_t tree_x[3];
 	int32_t tree_style[4];
@@ -122,7 +161,12 @@ struct world {
 	int32_t ice_back_style;
 	int32_t jungle_back_style;
 	int32_t hell_back_style;
+	
+	/*
+	 * Coordinates for the spawn point in the map.
+	 */
 	struct vector_2d spawn_tile;
+	
 	double world_surface;
 	double rock_layer;
 	double temp_time;
@@ -130,8 +174,18 @@ struct world {
 	bool temp_blood_moon;
 	int32_t temp_moon_phase;
 	bool temp_eclipse;
+	
+	/*
+	 * Contains the coordinates of the map's dungeon.
+	 */
 	struct vector_2d dungeon;
+	
+	/*
+	 * 	A list of flags relating to events that have happened in the
+	 * world.
+	 */
 	struct world_flags flags;
+	
 	uint8_t shadow_orb_count;
 	int32_t altar_count;
 
@@ -157,22 +211,52 @@ struct world {
 
 	int32_t cultist_delay;
 	int32_t angler_quest;
+	
+	/**
+	 * The number of angler string elements in the anglers array.
+	 */
 	int32_t num_anglers;
+	
+	/**
+	 * Angler text array
+	 */
 	char **anglers;
+	
 	bool saved_angler;
 
 	bool saved_stylist;
 	bool saved_tax_collector;
 
+	/**
+	 * Number of elements in the kill counts table
+	 */
 	int16_t num_kill_counts;
+	
+	/**
+	 * Array of kill counts
+	 */
 	int32_t *kill_counts;
 
+	/**
+	 * Indicates whether world time runs at normal speed or fast speed.
+	 */
 	bool fast_forward_time;
 
+	/**
+	 * 2D array of tile structures which make up the world.
+	 */
 	struct tile **tiles;
 
+	/**
+	 * Reference to a binary reader which is used to read data from
+	 * the world file specified on the command line.
+	 */
 	struct binary_reader_context *reader;
-	int _is_loaded;					/* Indicates if world_init has completed */
+	
+	/**
+	 * Indicates if world_init has completed
+	 */
+	int _is_loaded; 
 };
 
 int world_new(TALLOC_CTX *parent, const char *world_path, struct world **out_world);

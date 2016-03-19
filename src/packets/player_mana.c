@@ -60,10 +60,6 @@ int player_mana_new(TALLOC_CTX *ctx, const struct player *player, uint16_t life,
 		goto out;
 	}
 
-	/*
-	 * Packet has no payload.
-	 */
-
 	packet->type = PACKET_TYPE_PLAYER_MANA;
 	packet->len = PACKET_HEADER_SIZE;
 	packet->data = NULL;
@@ -85,14 +81,14 @@ int player_mana_read(struct packet *packet, const uv_buf_t *buf)
 
 	temp_context = talloc_new(NULL);
 	if (temp_context == NULL) {
-		_ERROR("%s: out of memory allocating temp context for player info.\n", __FUNCTION__);
+		_ERROR("%s: out of memory allocating temp context for player mana.\n", __FUNCTION__);
 		ret = -ENOMEM;
 		goto out;
 	}
 
 	player_mana = talloc_zero(temp_context, struct player_mana);
 	if (player_mana == NULL) {
-		_ERROR("%s: out of memory allocating player info.\n", __FUNCTION__);
+		_ERROR("%s: out of memory allocating player mana packet.\n", __FUNCTION__);
 		ret = -ENOMEM;
 		goto out;
 	}

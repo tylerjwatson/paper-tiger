@@ -36,13 +36,20 @@
 #include "game.h"
 #include "world.h"
 
-#define GUAC_OPTIONS "sw:"
-
+#define OPTIONS "sw:"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+/**
+ * @defgroup paper-tiger The Paper Tiger API
+ * 
+ * Paper Tiger is an open-source Terraria server that aims to implement
+ * official Terraria clients in a more efficient and cross-platform
+ * manner.
+ */
+	
 static const char *options_worldPath = NULL;
 static bool options_console = true;
 
@@ -52,7 +59,7 @@ static int parse_command_line(int argc, char **argv)
 
 	opterr = 0;
 
-	while ((c = getopt(argc, argv, GUAC_OPTIONS)) != -1) {
+	while ((c = getopt(argc, argv, OPTIONS)) != -1) {
 		switch (c) {
 		case 's':
 			options_console = false;
@@ -75,7 +82,7 @@ int main(int argc, char **argv)
 	clock_t start;
 	clock_t diff;
 
-	printf("Upgraded Guacamole Terraria Server\n");
+	printf("Paper Tiger Terraria Server\n");
 	printf(" by Tyler W. <tyler@tw.id.au>\n\n");
 
 	parse_command_line(argc, argv);
