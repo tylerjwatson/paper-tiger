@@ -1,6 +1,7 @@
 .kdev4/
 .idea/
 doc/ 
+gh-pages/
 CMakeCache.txt
 CMakeFiles
 CMakeScripts
