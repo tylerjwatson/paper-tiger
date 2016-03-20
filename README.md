@@ -59,38 +59,17 @@ $ xcodebuild
 
 ### Building on Windows
 
+* Install CMake for Windows
 * Install Visual Studio 2015 Community with C++ support.
   * _Note:_ MFC is not required.
-
-
-## Windows Dependencies
-
-Building on Windows has been tested with Visual Studio 2015.
-
-* Visual Studio 2015 with C/C++ support
-* CMake for Windows
-
-## Build instructions
-
-* Make sure you have all the dependencies installed on your system.
-
-### Linux
-
-```bash
-$ git clone https://github.com/tylerjwatson/paper-tiger.git
-$ cd paper-tiger
-$ mkdir build && cd build
-$ cmake -DCMAKE_BUILD_TYPE=Debug ..
-$ make
-```
-
-### Windows
-
-* Run CMake and point it to your `paper-tiger` directory
-* Tell it to generate a `Visual Studio 14` project
-* Output it to the `build` folder
-* Open `paper-tiger.sln` in VS
-* Build and enjoy
+* Clone the source: `git clone https://github.com/tylerjwatson/paper-tiger.git` using CLI tools or the Github desktop client
+* Use CMake GUI to generate a Visual Studio Solution
+  1. Run CMake GUI
+  2. In the `Where is the source code` box, choose the directory that the Paper Tiger source code was cloned into, eg. `C:\src\paper-tiger`
+  3. In the `Where to build the binaries` box, choose another directory in which the build files shall be placed.
+  3. Press `Configure`, then `Generate`.
+  4. Navigate to the build directory as specified in step 3, and open the `paper-tiger.sln` file in Visual Studio
+  5. Build and enjoy.
 
 ## Running Paper Tiger
 
@@ -99,3 +78,4 @@ $ make
 * `-w <path>` - Loads a world file at `<path>`
 * `-s` - Silent mode, do not open or accept console commands.
 
+Run `paper-tiger` or `paper-tiger.exe` in the console to launch it.
