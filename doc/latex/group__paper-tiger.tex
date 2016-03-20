@@ -12,6 +12,8 @@ Paper Tiger is an open-\/source Terraria server that aims to implement official 
 \begin{DoxyCompactList}\small\item\em The console and command subsystem uses libuv tty handles to read input from stdin (or another source) in a cross-\/platform manner, and pass the string input to the command system once the parameters have been parsed. \end{DoxyCompactList}\item 
 \hyperlink{group__game}{Game system}
 \begin{DoxyCompactList}\small\item\em The game system is the root of all server mechanics and serves as the game environment. \end{DoxyCompactList}\item 
+\hyperlink{group__packet}{Packet subsystem}
+\begin{DoxyCompactList}\small\item\em The packet subsystem provides a mechanism to read and write encoded Terraria messages to Terraria clients. \end{DoxyCompactList}\item 
 \hyperlink{group__server}{Server subsystem}
 \begin{DoxyCompactList}\small\item\em The server subsystem lives inside the {\ttfamily game} context, and is responsible for managing and talking to connected clients via the {\itshape Terraria} protocol. \end{DoxyCompactList}\end{DoxyCompactItemize}
 

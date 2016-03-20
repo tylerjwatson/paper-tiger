@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['num_5fanglers',['num_anglers',['../structworld.html#a47df9b52c97b07873d7df3335105b66d',1,'world']]],
-  ['num_5fimportant',['num_important',['../structworld.html#abed08d529398af7384a71a3987e2d38b',1,'world']]],
-  ['num_5fkill_5fcounts',['num_kill_counts',['../structworld.html#a44c9cbedbbda339519f414c896335126',1,'world']]],
-  ['num_5fpositions',['num_positions',['../structworld.html#afff4585b8422e4b8082e5f67164ee528',1,'world']]]
+  ['max_5ftiles_5fx',['max_tiles_x',['../structworld.html#a1896dcfbf468780dccd7077fff5e1eef',1,'world']]],
+  ['max_5ftiles_5fy',['max_tiles_y',['../structworld.html#a824fe6eb1899c94a0f92db0f776a3350',1,'world']]],
+  ['ms_5fper_5fframe',['ms_per_frame',['../structgame.html#aa9d50b55cf6dae7b73b4a451ba683f19',1,'game']]]
 ];

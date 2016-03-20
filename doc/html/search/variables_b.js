@@ -1,8 +1,7 @@
 var searchData=
 [
-  ['parameters',['parameters',['../structconsole__command.html#addb373441c0b9810dc7417b490ff39e8',1,'console_command']]],
-  ['player_5fslots',['player_slots',['../structgame.html#a596626558fdf713fe288226b8d2380ec',1,'game']]],
-  ['players',['players',['../structgame.html#ac35cf57540b1ffe43f32ed655711b0d0',1,'game']]],
-  ['port',['port',['../structserver.html#a8a4c46346a063f664085f4a89610f1ae',1,'server']]],
-  ['positions',['positions',['../structworld.html#a77c78ba04f2c9d9ec440303b4c5c9315',1,'world']]]
+  ['num_5fanglers',['num_anglers',['../structworld.html#a47df9b52c97b07873d7df3335105b66d',1,'world']]],
+  ['num_5fimportant',['num_important',['../structworld.html#abed08d529398af7384a71a3987e2d38b',1,'world']]],
+  ['num_5fkill_5fcounts',['num_kill_counts',['../structworld.html#a44c9cbedbbda339519f414c896335126',1,'world']]],
+  ['num_5fpositions',['num_positions',['../structworld.html#afff4585b8422e4b8082e5f67164ee528',1,'world']]]
 ];

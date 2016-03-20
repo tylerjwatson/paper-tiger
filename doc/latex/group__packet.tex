@@ -1,0 +1,168 @@
+\hypertarget{group__packet}{}\section{Packet subsystem}
+\label{group__packet}\index{Packet subsystem@{Packet subsystem}}
+
+
+The packet subsystem provides a mechanism to read and write encoded Terraria messages to Terraria clients.  
+
+
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structpacket}{packet}
+\begin{DoxyCompactList}\small\item\em Describes a Terraria message. \end{DoxyCompactList}\item 
+struct \hyperlink{structpacket__handler}{packet\+\_\+handler}
+\begin{DoxyCompactList}\small\item\em Describes a packet handler in the packet handler table. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef int($\ast$ \hyperlink{group__packet_ga10aa1174318b280e6772d66ef7ff010e}{packet\+\_\+write\+\_\+cb}) (\hyperlink{group__talloc_ga8a521b1347c0e37b84eb942db8fa9beb}{T\+A\+L\+L\+O\+C\+\_\+\+C\+T\+X} $\ast$context, const struct \hyperlink{structpacket}{packet} $\ast$\hyperlink{structpacket}{packet}, const struct \hyperlink{structplayer}{player} $\ast$\hyperlink{structplayer}{player}, uv\+\_\+buf\+\_\+t $\ast$buffer)
+\begin{DoxyCompactList}\small\item\em Function to call in order for the server to do something with a message that has been received from the client. \end{DoxyCompactList}\item 
+typedef int($\ast$ \hyperlink{group__packet_ga60dc8d100ec60f5abb142f1f2253e6b2}{packet\+\_\+read\+\_\+cb}) (struct \hyperlink{structpacket}{packet} $\ast$\hyperlink{structpacket}{packet}, const uv\+\_\+buf\+\_\+t $\ast$buffer)
+\begin{DoxyCompactList}\small\item\em Function to call to translate a packet from a network buffer to a fully-\/qualified {\ttfamily struct packet}. \end{DoxyCompactList}\item 
+typedef int($\ast$ \hyperlink{group__packet_ga9d343d646c5c1e052d61561702a4bf3e}{packet\+\_\+handle\+\_\+cb}) (struct \hyperlink{structplayer}{player} $\ast$\hyperlink{structplayer}{player}, struct \hyperlink{structpacket}{packet} $\ast$\hyperlink{structpacket}{packet})
+\begin{DoxyCompactList}\small\item\em Function to be called when a message is to be handled by the server. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structpacket__handler}{packet\+\_\+handler} $\ast$ \hyperlink{group__packet_gae1a0e160a43c079e2d7962f47f58bf58}{packet\+\_\+handler\+\_\+for\+\_\+type} (uint8\+\_\+t type)
+\begin{DoxyCompactList}\small\item\em Retrieves a pointer to the registered packet handler for the message type specified. \end{DoxyCompactList}\item 
+\hypertarget{group__packet_gac1eeb3e87dd58880b8845a81d790511a}{}void {\bfseries packet\+\_\+write\+\_\+header} (uint8\+\_\+t type, uint16\+\_\+t len, uv\+\_\+buf\+\_\+t $\ast$buf, int $\ast$pos)\label{group__packet_gac1eeb3e87dd58880b8845a81d790511a}
+
+\item 
+\hypertarget{group__packet_ga369495736b1aa87c1a27a60fc9501d90}{}int {\bfseries packet\+\_\+read\+\_\+header} (const uv\+\_\+buf\+\_\+t $\ast$buf, uint8\+\_\+t $\ast$out\+\_\+type, uint16\+\_\+t $\ast$out\+\_\+len)\label{group__packet_ga369495736b1aa87c1a27a60fc9501d90}
+
+\item 
+\hypertarget{group__packet_gae618365b8e6293ce17a773149a384fcf}{}int {\bfseries packet\+\_\+new} (\hyperlink{group__talloc_ga8a521b1347c0e37b84eb942db8fa9beb}{T\+A\+L\+L\+O\+C\+\_\+\+C\+T\+X} $\ast$ctx, struct \hyperlink{structplayer}{player} $\ast$\hyperlink{structplayer}{player}, const uv\+\_\+buf\+\_\+t $\ast$buf, struct \hyperlink{structpacket}{packet} $\ast$$\ast$out\+\_\+packet)\label{group__packet_gae618365b8e6293ce17a773149a384fcf}
+
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group__packet_ga7b613bc0cf0d706a0c825dadfc6840d2}{}uint16\+\_\+t \hyperlink{group__packet_ga7b613bc0cf0d706a0c825dadfc6840d2}{packet\+::len}\label{group__packet_ga7b613bc0cf0d706a0c825dadfc6840d2}
+
+\begin{DoxyCompactList}\small\item\em The packet length including the 3-\/byte message header, in bytes. \end{DoxyCompactList}\item 
+\hypertarget{group__packet_ga53b4fdec86403ff886583182dfae176e}{}uint8\+\_\+t \hyperlink{group__packet_ga53b4fdec86403ff886583182dfae176e}{packet\+::type}\label{group__packet_ga53b4fdec86403ff886583182dfae176e}
+
+\begin{DoxyCompactList}\small\item\em The Terraria message type. \end{DoxyCompactList}\item 
+\hypertarget{group__packet_gad3115ffc58cc55bae08635ed965c4768}{}void $\ast$ \hyperlink{group__packet_gad3115ffc58cc55bae08635ed965c4768}{packet\+::data}\label{group__packet_gad3115ffc58cc55bae08635ed965c4768}
+
+\begin{DoxyCompactList}\small\item\em A pointer to the packet payload object that was deserialized using the {\ttfamily packet\+\_\+read\+\_\+cb} function inside the packet handler table. \end{DoxyCompactList}\item 
+\hypertarget{group__packet_gacda150a3844cee9928fc89d9c1e0204e}{}uint8\+\_\+t {\bfseries packet\+\_\+handler\+::type}\label{group__packet_gacda150a3844cee9928fc89d9c1e0204e}
+
+\item 
+\hypertarget{group__packet_ga043987d5914119b6cb9fd322cad1731c}{}\hyperlink{group__packet_ga60dc8d100ec60f5abb142f1f2253e6b2}{packet\+\_\+read\+\_\+cb} {\bfseries packet\+\_\+handler\+::read\+\_\+func}\label{group__packet_ga043987d5914119b6cb9fd322cad1731c}
+
+\item 
+\hypertarget{group__packet_ga83b542606e8c009aa6da139d5a89ed58}{}\hyperlink{group__packet_ga9d343d646c5c1e052d61561702a4bf3e}{packet\+\_\+handle\+\_\+cb} {\bfseries packet\+\_\+handler\+::handle\+\_\+func}\label{group__packet_ga83b542606e8c009aa6da139d5a89ed58}
+
+\item 
+\hypertarget{group__packet_ga54b6b0734e245ed023ef11387ec04c66}{}\hyperlink{group__packet_ga10aa1174318b280e6772d66ef7ff010e}{packet\+\_\+write\+\_\+cb} {\bfseries packet\+\_\+handler\+::write\+\_\+func}\label{group__packet_ga54b6b0734e245ed023ef11387ec04c66}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+The packet subsystem provides a mechanism to read and write encoded Terraria messages to Terraria clients. 
+
+All Terraria messages have a header consisting of 3 bytes; the packet length as a 16-\/bit unsigned integer, and a single-\/byte message type specifier.
+
+Terraria messages are all encoded into one packet structure ({\ttfamily struct packet}) which contains the header fields and a generic pointer (called {\ttfamily data}) which points to the structure containing the body of the message, decoded by the packet system by a call to the registered {\bfseries Read} handler for that packet type.
+
+Each packet has its own implementation in {\ttfamily src/packets} and are handled in an object-\/oriented manner. Packet implementations must implement any number of three functions in the packet handler table in {\ttfamily src/packets.\+c}\+:
+
+\begin{TabularC}{3}
+\hline
+\rowcolor{lightgray}{\bf Function }&{\bf Prototype }&{\bf Description  }\\\cline{1-3}
+Read &{\ttfamily int ($\ast$packet\+\_\+read\+\_\+cb)(struct packet $\ast$packet, uv\+\_\+buf\+\_\+t $\ast$buf)} &Packet read functions are responsible for filling the body of the {\ttfamily struct packet} out once the header information has been parsed. Memory for the packet body must be {\ttfamily talloc}ated underneath the {\ttfamily struct packet} so it may be freed when the packet is released. At the return of this handler function, the {\ttfamily data} member of {\ttfamily struct packet} must point to a valid structure containing the contents of the packet body. \\\cline{1-3}
+Write &{\ttfamily int ($\ast$packet\+\_\+write\+\_\+cb)(T\+A\+L\+L\+O\+C\+\_\+\+C\+T\+X $\ast$context, const struct packet $\ast$packet, const struct player $\ast$player, uv\+\_\+buf\+\_\+t $\ast$buffer)} &Packet write functions are responsible for serializing the {\ttfamily struct packet} instance into a buffer for sending to a client. This function is responsible for allocating enough room in the uv\+\_\+buf\+\_\+t structure to accomodate the entire message which must be {\ttfamily talloc}ated underneath the context pointed to by {\ttfamily context}. \\\cline{1-3}
+Handle &{\ttfamily int ($\ast$packet\+\_\+handle\+\_\+cb)(struct player $\ast$player, struct packet $\ast$packet)} &Packet handle functions are called in order for the server to do something with a message that has been received from the client. Implement this function to do something with a packet once it has been received. {\bfseries Note\+:} Do not directly free the structure in the handle functions, as they are destroyted automatically at the return of this function. \\\cline{1-3}
+\end{TabularC}
+Packet implementations may provide {\ttfamily new} constructor functions to aid creating of packets in order for them to be sent to clients via {\ttfamily server\+\_\+send\+\_\+packet}. 
+
+\subsection{Typedef Documentation}
+\hypertarget{group__packet_ga9d343d646c5c1e052d61561702a4bf3e}{}\index{Packet subsystem@{Packet subsystem}!packet\+\_\+handle\+\_\+cb@{packet\+\_\+handle\+\_\+cb}}
+\index{packet\+\_\+handle\+\_\+cb@{packet\+\_\+handle\+\_\+cb}!Packet subsystem@{Packet subsystem}}
+\subsubsection[{packet\+\_\+handle\+\_\+cb}]{\setlength{\rightskip}{0pt plus 5cm}typedef int($\ast$ packet\+\_\+handle\+\_\+cb) (struct {\bf player} $\ast${\bf player}, struct {\bf packet} $\ast${\bf packet})}\label{group__packet_ga9d343d646c5c1e052d61561702a4bf3e}
+
+
+Function to be called when a message is to be handled by the server. 
+
+This function gets called by the packet subsystem when it has a message for the server to process.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em player} & A pointer to the player who sent the message\\
+\hline
+\mbox{\tt in}  & {\em packet} & A pointer to the message received from the player\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+{\ttfamily 0} if the packet handling succeeded, {\ttfamily $<$ 0} otherwise, or if the handler would like the server to fatally exit upon a condition. 
+\end{DoxyReturn}
+\hypertarget{group__packet_ga60dc8d100ec60f5abb142f1f2253e6b2}{}\index{Packet subsystem@{Packet subsystem}!packet\+\_\+read\+\_\+cb@{packet\+\_\+read\+\_\+cb}}
+\index{packet\+\_\+read\+\_\+cb@{packet\+\_\+read\+\_\+cb}!Packet subsystem@{Packet subsystem}}
+\subsubsection[{packet\+\_\+read\+\_\+cb}]{\setlength{\rightskip}{0pt plus 5cm}typedef int($\ast$ packet\+\_\+read\+\_\+cb) (struct {\bf packet} $\ast${\bf packet}, const uv\+\_\+buf\+\_\+t $\ast$buffer)}\label{group__packet_ga60dc8d100ec60f5abb142f1f2253e6b2}
+
+
+Function to call to translate a packet from a network buffer to a fully-\/qualified {\ttfamily struct packet}. 
+
+Packet read functions are responsible for filling the body of the {\ttfamily struct packet} out once the header information has been parsed. Memory for the packet body must be {\ttfamily talloc}ated underneath the {\ttfamily struct packet} so it may be freed when the packet is released. At the return of this handler function, the {\ttfamily data} member of {\ttfamily struct packet} must point to a valid structure containing the contents of the packet body.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em packet} & A pointer to a partially-\/allocated packet structure. The {\ttfamily len} and {\ttfamily type} members of this function are pre-\/filled\\
+\hline
+\mbox{\tt in}  & {\em buffer} & A pointer to an allocated network buffer in which to deserialize the Terraria message from.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+{\ttfamily 0} if the decoding was successful, {\ttfamily $<$ 0} otherwise.
+\end{DoxyReturn}
+\begin{DoxyRemark}{Remarks}
+This function is responsible for setting the {\ttfamily data} member of the packet structure pointed to by {\itshape packet}. All memory for the packets body must be {\ttfamily talloc}ated underneath the {\itshape packet} context so it may be freed when the packet is no longer required.
+\end{DoxyRemark}
+At the return of this function, the {\ttfamily data} member of the packet must point to a valid packet body, or {\ttfamily N\+U\+L\+L} if the packet does not have a body. \hypertarget{group__packet_ga10aa1174318b280e6772d66ef7ff010e}{}\index{Packet subsystem@{Packet subsystem}!packet\+\_\+write\+\_\+cb@{packet\+\_\+write\+\_\+cb}}
+\index{packet\+\_\+write\+\_\+cb@{packet\+\_\+write\+\_\+cb}!Packet subsystem@{Packet subsystem}}
+\subsubsection[{packet\+\_\+write\+\_\+cb}]{\setlength{\rightskip}{0pt plus 5cm}typedef int($\ast$ packet\+\_\+write\+\_\+cb) ({\bf T\+A\+L\+L\+O\+C\+\_\+\+C\+T\+X} $\ast$context, const struct {\bf packet} $\ast${\bf packet}, const struct {\bf player} $\ast${\bf player}, uv\+\_\+buf\+\_\+t $\ast$buffer)}\label{group__packet_ga10aa1174318b280e6772d66ef7ff010e}
+
+
+Function to call in order for the server to do something with a message that has been received from the client. 
+
+Implement this function to do something with a packet once it has been received. {\bfseries Note\+:} Do not directly free the structure in the handle functions, as they are destroyted automatically at the return of this function.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em context} & The talloc context object in which any buffer memory must be allocated underneath, so it may be freed when the packet is no longer in use.\\
+\hline
+\mbox{\tt in}  & {\em packet} & An instance of the packet of the same type to have its contents serialized\\
+\hline
+\mbox{\tt in}  & {\em player} & A player who will receive the encoded message once it has been filled into the buffer for sending\\
+\hline
+\mbox{\tt in}  & {\em buffer} & A pointer to an unallocated uv\+\_\+buf\+\_\+t structure. {\bfseries The write handler is responsible for allocating the buffer structure and its buffers with enough room to contain the encoded packet}. The buffer will be freed when the talloc context pointed to by {\itshape context} is freed.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+{\ttfamily 0} if the encoding was successful, {\ttfamily $<$ 0} otherwise. 
+\end{DoxyReturn}
+
+
+\subsection{Function Documentation}
+\hypertarget{group__packet_gae1a0e160a43c079e2d7962f47f58bf58}{}\index{Packet subsystem@{Packet subsystem}!packet\+\_\+handler\+\_\+for\+\_\+type@{packet\+\_\+handler\+\_\+for\+\_\+type}}
+\index{packet\+\_\+handler\+\_\+for\+\_\+type@{packet\+\_\+handler\+\_\+for\+\_\+type}!Packet subsystem@{Packet subsystem}}
+\subsubsection[{packet\+\_\+handler\+\_\+for\+\_\+type(uint8\+\_\+t type)}]{\setlength{\rightskip}{0pt plus 5cm}struct {\bf packet\+\_\+handler}$\ast$ packet\+\_\+handler\+\_\+for\+\_\+type (
+\begin{DoxyParamCaption}
+\item[{uint8\+\_\+t}]{type}
+\end{DoxyParamCaption}
+)}\label{group__packet_gae1a0e160a43c079e2d7962f47f58bf58}
+
+
+Retrieves a pointer to the registered packet handler for the message type specified. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em type} & The type of message to retrieve the handler structure for\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A pointer to the packet handler if one owas found in the packet handler table if one was found by the message type, or N\+U\+L\+L if one was not found or there was an error. 
+\end{DoxyReturn}

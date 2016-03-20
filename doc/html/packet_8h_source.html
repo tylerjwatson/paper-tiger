@@ -116,53 +116,60 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &lt;stdint.h&gt;</span></div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;</div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">#include &quot;talloc/talloc.h&quot;</span></div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="comment">//#include &quot;player.h&quot;</span></div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">#define PACKET_HEADER_SIZE 3</span></div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="preprocessor">#ifdef __cplusplus</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="keyword">extern</span> <span class="stringliteral">&quot;C&quot;</span> {</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="keyword">struct </span><a class="code" href="structplayer.html">player</a>;</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;</div>
-<div class="line"><a name="l00038"></a><span class="lineno"><a class="line" href="structpacket.html">   38</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structpacket.html">packet</a> {</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    uint16_t len;</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    uint8_t type;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="comment">//struct player *player;</span></div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keywordtype">void</span> *data;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;};</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="keyword">typedef</span> int (*packet_write_cb)(<a class="code" href="group__talloc.html#ga8a521b1347c0e37b84eb942db8fa9beb">TALLOC_CTX</a> *context, <span class="keyword">const</span> <span class="keyword">struct </span><a class="code" href="structpacket.html">packet</a> *<a class="code" href="structpacket.html">packet</a>, <span class="keyword">const</span> <span class="keyword">struct </span><a class="code" href="structplayer.html">player</a> *<a class="code" href="structplayer.html">player</a>, uv_buf_t *buffer);</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="keyword">typedef</span> int (*packet_read_cb)(<span class="keyword">struct </span>packet *packet, <span class="keyword">const</span> uv_buf_t *buffer);</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="keyword">typedef</span> int (*packet_handle_cb)(<span class="keyword">struct </span>player *player, <span class="keyword">struct </span>packet *packet);</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div>
-<div class="line"><a name="l00051"></a><span class="lineno"><a class="line" href="structpacket__handler.html">   51</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structpacket__handler.html">packet_handler</a> {</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    uint8_t type;</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    packet_read_cb read_func;</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    packet_handle_cb handle_func;</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    packet_write_cb write_func;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;};</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="keyword">struct </span><a class="code" href="structpacket__handler.html">packet_handler</a> *packet_handler_for_type(uint8_t type);</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="keywordtype">void</span> packet_write_header(uint8_t type, uint16_t len, uv_buf_t *buf, <span class="keywordtype">int</span> *pos);</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="keywordtype">int</span> packet_read_header(<span class="keyword">const</span> uv_buf_t *buf, uint8_t *out_type, uint16_t *out_len);</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="keywordtype">int</span> packet_new(<a class="code" href="group__talloc.html#ga8a521b1347c0e37b84eb942db8fa9beb">TALLOC_CTX</a> *ctx, <span class="keyword">struct</span> player *player, <span class="keyword">const</span> uv_buf_t *buf, <span class="keyword">struct</span> packet **out_packet);</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="preprocessor">#ifdef __cplusplus</span></div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;}</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* _HAVE_PACKET_H */</span><span class="preprocessor"></span></div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">#define PACKET_HEADER_SIZE 3</span></div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor">#ifdef __cplusplus</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="keyword">extern</span> <span class="stringliteral">&quot;C&quot;</span> {</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="keyword">struct </span><a class="code" href="structplayer.html">player</a>;</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;</div>
+<div class="line"><a name="l00072"></a><span class="lineno"><a class="line" href="structpacket.html">   72</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structpacket.html">packet</a> {</div>
+<div class="line"><a name="l00076"></a><span class="lineno"><a class="line" href="group__packet.html#ga7b613bc0cf0d706a0c825dadfc6840d2">   76</a></span>&#160;    uint16_t <a class="code" href="group__packet.html#ga7b613bc0cf0d706a0c825dadfc6840d2">len</a>;</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    </div>
+<div class="line"><a name="l00081"></a><span class="lineno"><a class="line" href="group__packet.html#ga53b4fdec86403ff886583182dfae176e">   81</a></span>&#160;    uint8_t <a class="code" href="group__packet.html#ga53b4fdec86403ff886583182dfae176e">type</a>;</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;</div>
+<div class="line"><a name="l00087"></a><span class="lineno"><a class="line" href="group__packet.html#gad3115ffc58cc55bae08635ed965c4768">   87</a></span>&#160;    <span class="keywordtype">void</span> *<a class="code" href="group__packet.html#gad3115ffc58cc55bae08635ed965c4768">data</a>;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;};</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;</div>
+<div class="line"><a name="l00114"></a><span class="lineno"><a class="line" href="group__packet.html#ga10aa1174318b280e6772d66ef7ff010e">  114</a></span>&#160;<span class="keyword">typedef</span> int (*<a class="code" href="group__packet.html#ga10aa1174318b280e6772d66ef7ff010e">packet_write_cb</a>)(<a class="code" href="group__talloc.html#ga8a521b1347c0e37b84eb942db8fa9beb">TALLOC_CTX</a> *context, <span class="keyword">const</span> <span class="keyword">struct </span><a class="code" href="structpacket.html">packet</a> *<a class="code" href="structpacket.html">packet</a>, <span class="keyword">const</span> <span class="keyword">struct </span><a class="code" href="structplayer.html">player</a> *<a class="code" href="structplayer.html">player</a>, uv_buf_t *buffer);</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;</div>
+<div class="line"><a name="l00141"></a><span class="lineno"><a class="line" href="group__packet.html#ga60dc8d100ec60f5abb142f1f2253e6b2">  141</a></span>&#160;<span class="keyword">typedef</span> int (*<a class="code" href="group__packet.html#ga60dc8d100ec60f5abb142f1f2253e6b2">packet_read_cb</a>)(<span class="keyword">struct </span>packet *packet, <span class="keyword">const</span> uv_buf_t *buffer);</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;</div>
+<div class="line"><a name="l00158"></a><span class="lineno"><a class="line" href="group__packet.html#ga9d343d646c5c1e052d61561702a4bf3e">  158</a></span>&#160;<span class="keyword">typedef</span> int (*<a class="code" href="group__packet.html#ga9d343d646c5c1e052d61561702a4bf3e">packet_handle_cb</a>)(<span class="keyword">struct </span>player *player, <span class="keyword">struct </span>packet *packet);</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;</div>
+<div class="line"><a name="l00166"></a><span class="lineno"><a class="line" href="structpacket__handler.html">  166</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structpacket__handler.html">packet_handler</a> {</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    uint8_t type;</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <a class="code" href="group__packet.html#ga60dc8d100ec60f5abb142f1f2253e6b2">packet_read_cb</a> read_func;</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    <a class="code" href="group__packet.html#ga9d343d646c5c1e052d61561702a4bf3e">packet_handle_cb</a> handle_func;</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    <a class="code" href="group__packet.html#ga10aa1174318b280e6772d66ef7ff010e">packet_write_cb</a> write_func;</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;};</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;<span class="keyword">struct </span><a class="code" href="structpacket__handler.html">packet_handler</a> *<a class="code" href="group__packet.html#gae1a0e160a43c079e2d7962f47f58bf58">packet_handler_for_type</a>(uint8_t type);</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;<span class="keywordtype">void</span> packet_write_header(uint8_t type, uint16_t len, uv_buf_t *buf, <span class="keywordtype">int</span> *pos);</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;<span class="keywordtype">int</span> packet_read_header(<span class="keyword">const</span> uv_buf_t *buf, uint8_t *out_type, uint16_t *out_len);</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;<span class="keywordtype">int</span> packet_new(<a class="code" href="group__talloc.html#ga8a521b1347c0e37b84eb942db8fa9beb">TALLOC_CTX</a> *ctx, <span class="keyword">struct</span> player *player, <span class="keyword">const</span> uv_buf_t *buf, <span class="keyword">struct</span> packet **out_packet);</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;<span class="preprocessor">#ifdef __cplusplus</span></div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;}</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* _HAVE_PACKET_H */</span><span class="preprocessor"></span></div>
 <div class="ttc" id="group__talloc_html_ga8a521b1347c0e37b84eb942db8fa9beb"><div class="ttname"><a href="group__talloc.html#ga8a521b1347c0e37b84eb942db8fa9beb">TALLOC_CTX</a></div><div class="ttdeci">void TALLOC_CTX</div><div class="ttdoc">Define a talloc parent type. </div><div class="ttdef"><b>Definition:</b> talloc.h:74</div></div>
-<div class="ttc" id="structpacket__handler_html"><div class="ttname"><a href="structpacket__handler.html">packet_handler</a></div><div class="ttdef"><b>Definition:</b> packet.h:51</div></div>
-<div class="ttc" id="structpacket_html"><div class="ttname"><a href="structpacket.html">packet</a></div><div class="ttdef"><b>Definition:</b> packet.h:38</div></div>
+<div class="ttc" id="group__packet_html_ga9d343d646c5c1e052d61561702a4bf3e"><div class="ttname"><a href="group__packet.html#ga9d343d646c5c1e052d61561702a4bf3e">packet_handle_cb</a></div><div class="ttdeci">int(* packet_handle_cb)(struct player *player, struct packet *packet)</div><div class="ttdoc">Function to be called when a message is to be handled by the server. </div><div class="ttdef"><b>Definition:</b> packet.h:158</div></div>
+<div class="ttc" id="structpacket__handler_html"><div class="ttname"><a href="structpacket__handler.html">packet_handler</a></div><div class="ttdoc">Describes a packet handler in the packet handler table. </div><div class="ttdef"><b>Definition:</b> packet.h:166</div></div>
+<div class="ttc" id="group__packet_html_gae1a0e160a43c079e2d7962f47f58bf58"><div class="ttname"><a href="group__packet.html#gae1a0e160a43c079e2d7962f47f58bf58">packet_handler_for_type</a></div><div class="ttdeci">struct packet_handler * packet_handler_for_type(uint8_t type)</div><div class="ttdoc">Retrieves a pointer to the registered packet handler for the message type specified. </div><div class="ttdef"><b>Definition:</b> packet.c:43</div></div>
+<div class="ttc" id="group__packet_html_ga7b613bc0cf0d706a0c825dadfc6840d2"><div class="ttname"><a href="group__packet.html#ga7b613bc0cf0d706a0c825dadfc6840d2">packet::len</a></div><div class="ttdeci">uint16_t len</div><div class="ttdoc">The packet length including the 3-byte message header, in bytes. </div><div class="ttdef"><b>Definition:</b> packet.h:76</div></div>
+<div class="ttc" id="structpacket_html"><div class="ttname"><a href="structpacket.html">packet</a></div><div class="ttdoc">Describes a Terraria message. </div><div class="ttdef"><b>Definition:</b> packet.h:72</div></div>
+<div class="ttc" id="group__packet_html_ga53b4fdec86403ff886583182dfae176e"><div class="ttname"><a href="group__packet.html#ga53b4fdec86403ff886583182dfae176e">packet::type</a></div><div class="ttdeci">uint8_t type</div><div class="ttdoc">The Terraria message type. </div><div class="ttdef"><b>Definition:</b> packet.h:81</div></div>
+<div class="ttc" id="group__packet_html_ga60dc8d100ec60f5abb142f1f2253e6b2"><div class="ttname"><a href="group__packet.html#ga60dc8d100ec60f5abb142f1f2253e6b2">packet_read_cb</a></div><div class="ttdeci">int(* packet_read_cb)(struct packet *packet, const uv_buf_t *buffer)</div><div class="ttdoc">Function to call to translate a packet from a network buffer to a fully-qualified struct packet...</div><div class="ttdef"><b>Definition:</b> packet.h:141</div></div>
 <div class="ttc" id="structplayer_html"><div class="ttname"><a href="structplayer.html">player</a></div><div class="ttdef"><b>Definition:</b> player.h:36</div></div>
+<div class="ttc" id="group__packet_html_ga10aa1174318b280e6772d66ef7ff010e"><div class="ttname"><a href="group__packet.html#ga10aa1174318b280e6772d66ef7ff010e">packet_write_cb</a></div><div class="ttdeci">int(* packet_write_cb)(TALLOC_CTX *context, const struct packet *packet, const struct player *player, uv_buf_t *buffer)</div><div class="ttdoc">Function to call in order for the server to do something with a message that has been received from t...</div><div class="ttdef"><b>Definition:</b> packet.h:114</div></div>
+<div class="ttc" id="group__packet_html_gad3115ffc58cc55bae08635ed965c4768"><div class="ttname"><a href="group__packet.html#gad3115ffc58cc55bae08635ed965c4768">packet::data</a></div><div class="ttdeci">void * data</div><div class="ttdoc">A pointer to the packet payload object that was deserialized using the packet_read_cb function inside...</div><div class="ttdef"><b>Definition:</b> packet.h:87</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

@@ -1,18 +1,32 @@
 \hypertarget{structpacket}{}\section{packet Struct Reference}
 \label{structpacket}\index{packet@{packet}}
+
+
+Describes a Terraria message.  
+
+
+
+
+{\ttfamily \#include $<$packet.\+h$>$}
+
 \subsection*{Data Fields}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{structpacket_a7b613bc0cf0d706a0c825dadfc6840d2}{}uint16\+\_\+t {\bfseries len}\label{structpacket_a7b613bc0cf0d706a0c825dadfc6840d2}
+\hypertarget{group__packet_ga7b613bc0cf0d706a0c825dadfc6840d2}{}uint16\+\_\+t \hyperlink{group__packet_ga7b613bc0cf0d706a0c825dadfc6840d2}{len}\label{group__packet_ga7b613bc0cf0d706a0c825dadfc6840d2}
 
-\item 
-\hypertarget{structpacket_a53b4fdec86403ff886583182dfae176e}{}uint8\+\_\+t {\bfseries type}\label{structpacket_a53b4fdec86403ff886583182dfae176e}
+\begin{DoxyCompactList}\small\item\em The packet length including the 3-\/byte message header, in bytes. \end{DoxyCompactList}\item 
+\hypertarget{group__packet_ga53b4fdec86403ff886583182dfae176e}{}uint8\+\_\+t \hyperlink{group__packet_ga53b4fdec86403ff886583182dfae176e}{type}\label{group__packet_ga53b4fdec86403ff886583182dfae176e}
 
-\item 
-\hypertarget{structpacket_ad3115ffc58cc55bae08635ed965c4768}{}void $\ast$ {\bfseries data}\label{structpacket_ad3115ffc58cc55bae08635ed965c4768}
+\begin{DoxyCompactList}\small\item\em The Terraria message type. \end{DoxyCompactList}\item 
+\hypertarget{group__packet_gad3115ffc58cc55bae08635ed965c4768}{}void $\ast$ \hyperlink{group__packet_gad3115ffc58cc55bae08635ed965c4768}{data}\label{group__packet_gad3115ffc58cc55bae08635ed965c4768}
 
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em A pointer to the packet payload object that was deserialized using the {\ttfamily packet\+\_\+read\+\_\+cb} function inside the packet handler table. \end{DoxyCompactList}\end{DoxyCompactItemize}
 
+
+\subsection{Detailed Description}
+Describes a Terraria message. 
+
+Contains the packet header information and a pointer to the concrete object which contains the body of the Terraria message. 
 
 The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
 \item 

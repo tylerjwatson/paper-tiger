@@ -86,23 +86,34 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div class="summary">
 <a href="#pub-attribs">Data Fields</a>  </div>
   <div class="headertitle">
-<div class="title">packet Struct Reference</div>  </div>
+<div class="title">packet Struct Reference<div class="ingroups"><a class="el" href="group__paper-tiger.html">The Paper Tiger API</a> &raquo; <a class="el" href="group__packet.html">Packet subsystem</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>Describes a Terraria message.  
+ <a href="structpacket.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="packet_8h_source.html">packet.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Data Fields</h2></td></tr>
-<tr class="memitem:a7b613bc0cf0d706a0c825dadfc6840d2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7b613bc0cf0d706a0c825dadfc6840d2"></a>
-uint16_t&#160;</td><td class="memItemRight" valign="bottom"><b>len</b></td></tr>
-<tr class="separator:a7b613bc0cf0d706a0c825dadfc6840d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a53b4fdec86403ff886583182dfae176e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a53b4fdec86403ff886583182dfae176e"></a>
-uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>type</b></td></tr>
-<tr class="separator:a53b4fdec86403ff886583182dfae176e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad3115ffc58cc55bae08635ed965c4768"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad3115ffc58cc55bae08635ed965c4768"></a>
-void *&#160;</td><td class="memItemRight" valign="bottom"><b>data</b></td></tr>
-<tr class="separator:ad3115ffc58cc55bae08635ed965c4768"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga7b613bc0cf0d706a0c825dadfc6840d2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga7b613bc0cf0d706a0c825dadfc6840d2"></a>
+uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__packet.html#ga7b613bc0cf0d706a0c825dadfc6840d2">len</a></td></tr>
+<tr class="memdesc:ga7b613bc0cf0d706a0c825dadfc6840d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">The packet length including the 3-byte message header, in bytes. <br /></td></tr>
+<tr class="separator:ga7b613bc0cf0d706a0c825dadfc6840d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga53b4fdec86403ff886583182dfae176e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga53b4fdec86403ff886583182dfae176e"></a>
+uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__packet.html#ga53b4fdec86403ff886583182dfae176e">type</a></td></tr>
+<tr class="memdesc:ga53b4fdec86403ff886583182dfae176e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The Terraria message type. <br /></td></tr>
+<tr class="separator:ga53b4fdec86403ff886583182dfae176e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad3115ffc58cc55bae08635ed965c4768"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gad3115ffc58cc55bae08635ed965c4768"></a>
+void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__packet.html#gad3115ffc58cc55bae08635ed965c4768">data</a></td></tr>
+<tr class="memdesc:gad3115ffc58cc55bae08635ed965c4768"><td class="mdescLeft">&#160;</td><td class="mdescRight">A pointer to the packet payload object that was deserialized using the <code>packet_read_cb</code> function inside the packet handler table. <br /></td></tr>
+<tr class="separator:gad3115ffc58cc55bae08635ed965c4768"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<hr/>The documentation for this struct was generated from the following file:<ul>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Describes a Terraria message. </p>
+<p>Contains the packet header information and a pointer to the concrete object which contains the body of the Terraria message. </p>
+</div><hr/>The documentation for this struct was generated from the following file:<ul>
 <li>src/<a class="el" href="packet_8h_source.html">packet.h</a></li>
 </ul>
 </div><!-- contents -->

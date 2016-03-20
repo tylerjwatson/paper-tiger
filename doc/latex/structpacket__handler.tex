@@ -1,21 +1,37 @@
 \hypertarget{structpacket__handler}{}\section{packet\+\_\+handler Struct Reference}
 \label{structpacket__handler}\index{packet\+\_\+handler@{packet\+\_\+handler}}
+
+
+Describes a packet handler in the packet handler table.  
+
+
+
+
+{\ttfamily \#include $<$packet.\+h$>$}
+
 \subsection*{Data Fields}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{structpacket__handler_acda150a3844cee9928fc89d9c1e0204e}{}uint8\+\_\+t {\bfseries type}\label{structpacket__handler_acda150a3844cee9928fc89d9c1e0204e}
+\hypertarget{group__packet_gacda150a3844cee9928fc89d9c1e0204e}{}uint8\+\_\+t {\bfseries type}\label{group__packet_gacda150a3844cee9928fc89d9c1e0204e}
 
 \item 
-\hypertarget{structpacket__handler_a043987d5914119b6cb9fd322cad1731c}{}packet\+\_\+read\+\_\+cb {\bfseries read\+\_\+func}\label{structpacket__handler_a043987d5914119b6cb9fd322cad1731c}
+\hypertarget{group__packet_ga043987d5914119b6cb9fd322cad1731c}{}\hyperlink{group__packet_ga60dc8d100ec60f5abb142f1f2253e6b2}{packet\+\_\+read\+\_\+cb} {\bfseries read\+\_\+func}\label{group__packet_ga043987d5914119b6cb9fd322cad1731c}
 
 \item 
-\hypertarget{structpacket__handler_a83b542606e8c009aa6da139d5a89ed58}{}packet\+\_\+handle\+\_\+cb {\bfseries handle\+\_\+func}\label{structpacket__handler_a83b542606e8c009aa6da139d5a89ed58}
+\hypertarget{group__packet_ga83b542606e8c009aa6da139d5a89ed58}{}\hyperlink{group__packet_ga9d343d646c5c1e052d61561702a4bf3e}{packet\+\_\+handle\+\_\+cb} {\bfseries handle\+\_\+func}\label{group__packet_ga83b542606e8c009aa6da139d5a89ed58}
 
 \item 
-\hypertarget{structpacket__handler_a54b6b0734e245ed023ef11387ec04c66}{}packet\+\_\+write\+\_\+cb {\bfseries write\+\_\+func}\label{structpacket__handler_a54b6b0734e245ed023ef11387ec04c66}
+\hypertarget{group__packet_ga54b6b0734e245ed023ef11387ec04c66}{}\hyperlink{group__packet_ga10aa1174318b280e6772d66ef7ff010e}{packet\+\_\+write\+\_\+cb} {\bfseries write\+\_\+func}\label{group__packet_ga54b6b0734e245ed023ef11387ec04c66}
 
 \end{DoxyCompactItemize}
 
+
+\subsection{Detailed Description}
+Describes a packet handler in the packet handler table. 
+
+Contains function pointers to the implementation functions to read, write and handle Terraria messages.
+
+These are statically set in the packet handlers table. 
 
 The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
 \item 
