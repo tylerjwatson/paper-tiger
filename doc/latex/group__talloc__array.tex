@@ -1,0 +1,88 @@
+\hypertarget{group__talloc__array}{}\section{The talloc array functions}
+\label{group__talloc__array}\index{The talloc array functions@{The talloc array functions}}
+
+
+Talloc contains some handy helpers for handling Arrays conveniently.  
+
+
+\subsection*{Modules}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{group__talloc__string}{The talloc string functions.}
+\begin{DoxyCompactList}\small\item\em talloc string allocation and manipulation functions. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group__talloc__array_ga5c983d8943ef7fcfd5dc6cc6bf171c41}{}\#define {\bfseries talloc\+\_\+array}(ctx,  type,  count)~(type $\ast$)\+\_\+talloc\+\_\+array(ctx, sizeof(type), count, \#type)\label{group__talloc__array_ga5c983d8943ef7fcfd5dc6cc6bf171c41}
+
+\item 
+\hypertarget{group__talloc__array_ga37c71e3d64f8a63885d790abcabfb4aa}{}\#define {\bfseries talloc\+\_\+array\+\_\+size}(ctx,  size,  count)~\+\_\+talloc\+\_\+array(ctx, size, count, \+\_\+\+\_\+location\+\_\+\+\_\+)\label{group__talloc__array_ga37c71e3d64f8a63885d790abcabfb4aa}
+
+\item 
+\hypertarget{group__talloc__array_gac0da5eb862940491a9a3b5d70fb2f897}{}\#define {\bfseries talloc\+\_\+array\+\_\+ptrtype}(ctx,  ptr,  count)~(\+\_\+\+T\+A\+L\+L\+O\+C\+\_\+\+T\+Y\+P\+E\+O\+F(ptr))talloc\+\_\+array\+\_\+size(ctx, sizeof($\ast$(ptr)), count)\label{group__talloc__array_gac0da5eb862940491a9a3b5d70fb2f897}
+
+\item 
+\hypertarget{group__talloc__array_ga7e22e1dbb92741e99e508a785265f5f6}{}\#define {\bfseries talloc\+\_\+array\+\_\+length}(ctx)~(\hyperlink{group__talloc__ref_ga0cbdb71be91a8a1e8f9dc6486beb690f}{talloc\+\_\+get\+\_\+size}(ctx)/sizeof($\ast$ctx))\label{group__talloc__array_ga7e22e1dbb92741e99e508a785265f5f6}
+
+\item 
+\hypertarget{group__talloc__array_ga949870bfdff40c923978f2a07885df62}{}\#define {\bfseries talloc\+\_\+zero\+\_\+array}(ctx,  type,  count)~(type $\ast$)\+\_\+talloc\+\_\+zero\+\_\+array(ctx, sizeof(type), count, \#type)\label{group__talloc__array_ga949870bfdff40c923978f2a07885df62}
+
+\item 
+\hypertarget{group__talloc__array_ga2b7e4d8578cc005659f87a4f2d385609}{}\#define {\bfseries talloc\+\_\+realloc}(ctx,  p,  type,  count)~(type $\ast$)\+\_\+talloc\+\_\+realloc\+\_\+array(ctx, p, sizeof(type), count, \#type)\label{group__talloc__array_ga2b7e4d8578cc005659f87a4f2d385609}
+
+\item 
+\hypertarget{group__talloc__array_gaaf79d75dac6dcbbfa0910069b300f748}{}\#define {\bfseries talloc\+\_\+realloc\+\_\+size}(ctx,  ptr,  size)~\+\_\+talloc\+\_\+realloc(ctx, ptr, size, \+\_\+\+\_\+location\+\_\+\+\_\+)\label{group__talloc__array_gaaf79d75dac6dcbbfa0910069b300f748}
+
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group__talloc__array_ga99cea1d4b906880802cf2f6d9ab5f10f}{}void $\ast$ {\bfseries \+\_\+talloc\+\_\+array} (const void $\ast$ctx, size\+\_\+t el\+\_\+size, unsigned count, const char $\ast$name)\label{group__talloc__array_ga99cea1d4b906880802cf2f6d9ab5f10f}
+
+\item 
+\hypertarget{group__talloc__array_ga0e753918bcd7ce011986352f2d0aeb89}{}void $\ast$ {\bfseries \+\_\+talloc\+\_\+zero\+\_\+array} (const void $\ast$ctx, size\+\_\+t el\+\_\+size, unsigned count, const char $\ast$name)\label{group__talloc__array_ga0e753918bcd7ce011986352f2d0aeb89}
+
+\item 
+\hypertarget{group__talloc__array_ga0e9053a375fc9fd108f9e91f60faeda5}{}void $\ast$ {\bfseries \+\_\+talloc\+\_\+realloc\+\_\+array} (const void $\ast$ctx, void $\ast$ptr, size\+\_\+t el\+\_\+size, unsigned count, const char $\ast$name)\label{group__talloc__array_ga0e9053a375fc9fd108f9e91f60faeda5}
+
+\item 
+\hypertarget{group__talloc__array_ga8fa7466343f5670d70c36e7f29879ab0}{}void $\ast$ {\bfseries \+\_\+talloc\+\_\+realloc} (const void $\ast$context, void $\ast$ptr, size\+\_\+t size, const char $\ast$name)\label{group__talloc__array_ga8fa7466343f5670d70c36e7f29879ab0}
+
+\item 
+void $\ast$ \hyperlink{group__talloc__array_ga6e41faa2e58dd692511063221ae2ff7b}{talloc\+\_\+realloc\+\_\+fn} (const void $\ast$context, void $\ast$ptr, size\+\_\+t size)
+\begin{DoxyCompactList}\small\item\em Provide a function version of talloc\+\_\+realloc\+\_\+size. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Talloc contains some handy helpers for handling Arrays conveniently. 
+
+
+
+\subsection{Function Documentation}
+\hypertarget{group__talloc__array_ga6e41faa2e58dd692511063221ae2ff7b}{}\index{The talloc array functions@{The talloc array functions}!talloc\+\_\+realloc\+\_\+fn@{talloc\+\_\+realloc\+\_\+fn}}
+\index{talloc\+\_\+realloc\+\_\+fn@{talloc\+\_\+realloc\+\_\+fn}!The talloc array functions@{The talloc array functions}}
+\subsubsection[{talloc\+\_\+realloc\+\_\+fn(const void $\ast$context, void $\ast$ptr, size\+\_\+t size)}]{\setlength{\rightskip}{0pt plus 5cm}void$\ast$ talloc\+\_\+realloc\+\_\+fn (
+\begin{DoxyParamCaption}
+\item[{const void $\ast$}]{context, }
+\item[{void $\ast$}]{ptr, }
+\item[{size\+\_\+t}]{size}
+\end{DoxyParamCaption}
+)}\label{group__talloc__array_ga6e41faa2e58dd692511063221ae2ff7b}
+
+
+Provide a function version of talloc\+\_\+realloc\+\_\+size. 
+
+This is a non-\/macro version of talloc\+\_\+realloc(), which is useful as libraries sometimes want a ralloc function pointer. A realloc() implementation encapsulates the functionality of malloc(), free() and realloc() in one call, which is why it is useful to be able to pass around a single function pointer.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em context} & The parent context used if ptr is N\+U\+L\+L.\\
+\hline
+\mbox{\tt in}  & {\em ptr} & The chunk to be resized.\\
+\hline
+\mbox{\tt in}  & {\em size} & The new chunk size.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The new chunk, N\+U\+L\+L on error. 
+\end{DoxyReturn}

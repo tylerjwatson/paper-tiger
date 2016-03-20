@@ -1,0 +1,111 @@
+\hypertarget{group__game}{}\section{Game system}
+\label{group__game}\index{Game system@{Game system}}
+
+
+The game system is the root of all server mechanics and serves as the game environment.  
+
+
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structgame}{game}
+\begin{DoxyCompactList}\small\item\em Describes a game context. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{group__game_ga41778fe633eab7e582b77f526d1bc2bc}{game\+\_\+find\+\_\+next\+\_\+slot} (struct \hyperlink{structgame}{game} $\ast$context)
+\begin{DoxyCompactList}\small\item\em finds the next free slot from the game\textquotesingle{}s player slot bitmap \end{DoxyCompactList}\item 
+int \hyperlink{group__game_ga88814baf2c6a6420c803184a99025d58}{game\+\_\+start\+\_\+event\+\_\+loop} (struct \hyperlink{structgame}{game} $\ast$context)
+\begin{DoxyCompactList}\small\item\em starts the game\textquotesingle{}s event loop \end{DoxyCompactList}\item 
+int \hyperlink{group__game_ga6646ca0fed74050e1e89e716fd9af25f}{game\+\_\+new} (\hyperlink{group__talloc_ga8a521b1347c0e37b84eb942db8fa9beb}{T\+A\+L\+L\+O\+C\+\_\+\+C\+T\+X} $\ast$context, struct \hyperlink{structgame}{game} $\ast$$\ast$out\+\_\+context)
+\begin{DoxyCompactList}\small\item\em Allocates a new game context. \end{DoxyCompactList}\item 
+int \hyperlink{group__game_ga08208c25319f60c6f5cccdee8b895cb4}{game\+\_\+update\+\_\+loop\+\_\+init} (struct \hyperlink{structgame}{game} $\ast$\hyperlink{structgame}{game})
+\begin{DoxyCompactList}\small\item\em Initializes the game update timer which fires at every tickrate interval. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+The game system is the root of all server mechanics and serves as the game environment. 
+
+In the {\ttfamily talloc} heirarchy, all memory is allocated underneath the game context, and its free should close and release all memory and subsystems to do with the game context. In other words, freeing the game context should completely stop and release the entire game.
+
+As paper tiger is object-\/oriented, the game environment is not set in globals or statics. Any data related to the the game or the game\textquotesingle{}s environment must be allocated underneath the game context in the talloc heirarchy, and stored as one of the members in the game structure, or any substructure underneath the game context.
+
+The game context contains references to the {\bfseries world} systems, the {\bfseries player} systems, and the {\bfseries server} systems so that none of the systems exist in a fixed address space and may be fully cleaned up on a call to {\ttfamily talloc\+\_\+free(game)}. 
+
+\subsection{Function Documentation}
+\hypertarget{group__game_ga41778fe633eab7e582b77f526d1bc2bc}{}\index{Game system@{Game system}!game\+\_\+find\+\_\+next\+\_\+slot@{game\+\_\+find\+\_\+next\+\_\+slot}}
+\index{game\+\_\+find\+\_\+next\+\_\+slot@{game\+\_\+find\+\_\+next\+\_\+slot}!Game system@{Game system}}
+\subsubsection[{game\+\_\+find\+\_\+next\+\_\+slot(struct game $\ast$context)}]{\setlength{\rightskip}{0pt plus 5cm}int game\+\_\+find\+\_\+next\+\_\+slot (
+\begin{DoxyParamCaption}
+\item[{struct {\bf game} $\ast$}]{context}
+\end{DoxyParamCaption}
+)}\label{group__game_ga41778fe633eab7e582b77f526d1bc2bc}
+
+
+finds the next free slot from the game\textquotesingle{}s player slot bitmap 
+
+Finds the next free slot in the game context\textquotesingle{}s player slot bitmap and returns it to the caller. Exchanges the slot to {\ttfamily 1 (used)} before returning it, so subsequent calls to this function will not return the same I\+D.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em context} & A pointer to the game context in which to find the next free player slot for\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The I\+D of the next free player slot ({\ttfamily $>$= 0}) if a player slot exists, or -\/1 if there are no more slots available or there was an error. 
+\end{DoxyReturn}
+\hypertarget{group__game_ga6646ca0fed74050e1e89e716fd9af25f}{}\index{Game system@{Game system}!game\+\_\+new@{game\+\_\+new}}
+\index{game\+\_\+new@{game\+\_\+new}!Game system@{Game system}}
+\subsubsection[{game\+\_\+new(\+T\+A\+L\+L\+O\+C\+\_\+\+C\+T\+X $\ast$context, struct game $\ast$$\ast$out\+\_\+context)}]{\setlength{\rightskip}{0pt plus 5cm}int game\+\_\+new (
+\begin{DoxyParamCaption}
+\item[{{\bf T\+A\+L\+L\+O\+C\+\_\+\+C\+T\+X} $\ast$}]{context, }
+\item[{struct {\bf game} $\ast$$\ast$}]{out\+\_\+context}
+\end{DoxyParamCaption}
+)}\label{group__game_ga6646ca0fed74050e1e89e716fd9af25f}
+
+
+Allocates a new game context. 
+
+Allocates a new game context under a parent talloc context pointed to by {\itshape context}. \hypertarget{group__game_ga88814baf2c6a6420c803184a99025d58}{}\index{Game system@{Game system}!game\+\_\+start\+\_\+event\+\_\+loop@{game\+\_\+start\+\_\+event\+\_\+loop}}
+\index{game\+\_\+start\+\_\+event\+\_\+loop@{game\+\_\+start\+\_\+event\+\_\+loop}!Game system@{Game system}}
+\subsubsection[{game\+\_\+start\+\_\+event\+\_\+loop(struct game $\ast$context)}]{\setlength{\rightskip}{0pt plus 5cm}int game\+\_\+start\+\_\+event\+\_\+loop (
+\begin{DoxyParamCaption}
+\item[{struct {\bf game} $\ast$}]{context}
+\end{DoxyParamCaption}
+)}\label{group__game_ga88814baf2c6a6420c803184a99025d58}
+
+
+starts the game\textquotesingle{}s event loop 
+
+Starts the game\textquotesingle{}s event loop. This function will block until the loop is closed with calls to {\itshape uv\+\_\+close}, or the loop somehow otherwise terminates.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em context} & A pointer to the game context in which to start the event loop.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+This function currently always returns {\ttfamily 0}. 
+\end{DoxyReturn}
+\hypertarget{group__game_ga08208c25319f60c6f5cccdee8b895cb4}{}\index{Game system@{Game system}!game\+\_\+update\+\_\+loop\+\_\+init@{game\+\_\+update\+\_\+loop\+\_\+init}}
+\index{game\+\_\+update\+\_\+loop\+\_\+init@{game\+\_\+update\+\_\+loop\+\_\+init}!Game system@{Game system}}
+\subsubsection[{game\+\_\+update\+\_\+loop\+\_\+init(struct game $\ast$game)}]{\setlength{\rightskip}{0pt plus 5cm}int game\+\_\+update\+\_\+loop\+\_\+init (
+\begin{DoxyParamCaption}
+\item[{struct {\bf game} $\ast$}]{game}
+\end{DoxyParamCaption}
+)}\label{group__game_ga08208c25319f60c6f5cccdee8b895cb4}
+
+
+Initializes the game update timer which fires at every tickrate interval. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em game} & A pointer to the game context in which to start the timer\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+{\ttfamily 0} if the update loop was initialized successfully, {\ttfamily $<$ 0} otherwise.
+\end{DoxyReturn}
+\begin{DoxyRemark}{Remarks}
+The game update timer is a libuv timer, which is smart enough to adjust itself according to the time it takes for the game update procedure to finish. 
+\end{DoxyRemark}

@@ -1,0 +1,377 @@
+\hypertarget{group__talloc__debug}{}\section{The talloc debugging support functions}
+\label{group__talloc__debug}\index{The talloc debugging support functions@{The talloc debugging support functions}}
+
+
+To aid memory debugging, talloc contains routines to inspect the currently allocated memory hierarchy.  
+
+
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group__talloc__debug_ga6d768b15869983da2040e3665fef9fdf}{}\#define {\bfseries T\+A\+L\+L\+O\+C\+\_\+\+M\+A\+X\+\_\+\+D\+E\+P\+T\+H}~10000\label{group__talloc__debug_ga6d768b15869983da2040e3665fef9fdf}
+
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{group__talloc__debug_ga10ceb5acd36e5b97e623907af140d954}{talloc\+\_\+report\+\_\+depth\+\_\+cb} (const void $\ast$ptr, int depth, int max\+\_\+depth, void($\ast$callback)(const void $\ast$ptr,           int depth, int max\+\_\+depth,           int is\+\_\+ref,           void $\ast$private\+\_\+data), void $\ast$private\+\_\+data)
+\begin{DoxyCompactList}\small\item\em Walk a complete talloc hierarchy. \end{DoxyCompactList}\item 
+void \hyperlink{group__talloc__debug_ga13062669ca8e4b787911c206e339f61c}{talloc\+\_\+report\+\_\+depth\+\_\+file} (const void $\ast$ptr, int depth, int max\+\_\+depth, F\+I\+L\+E $\ast$f)
+\begin{DoxyCompactList}\small\item\em Print a talloc hierarchy. \end{DoxyCompactList}\item 
+void \hyperlink{group__talloc__debug_ga66136eb6105416bfcbd390ce6a4fc89c}{talloc\+\_\+report\+\_\+full} (const void $\ast$ptr, F\+I\+L\+E $\ast$f)
+\begin{DoxyCompactList}\small\item\em Print a summary report of all memory used by ptr. \end{DoxyCompactList}\item 
+void \hyperlink{group__talloc__debug_ga4f4ff95ce5a95f61cc453fc943e3de65}{talloc\+\_\+report} (const void $\ast$ptr, F\+I\+L\+E $\ast$f)
+\begin{DoxyCompactList}\small\item\em Print a summary report of all memory used by ptr. \end{DoxyCompactList}\item 
+void \hyperlink{group__talloc__debug_gad50534c2b22274a94c722f0790ae102f}{talloc\+\_\+enable\+\_\+null\+\_\+tracking} (void)
+\begin{DoxyCompactList}\small\item\em Enable tracking the use of N\+U\+L\+L memory contexts. \end{DoxyCompactList}\item 
+void \hyperlink{group__talloc__debug_gabd90af3895fee1960e90590fabe92a99}{talloc\+\_\+enable\+\_\+null\+\_\+tracking\+\_\+no\+\_\+autofree} (void)
+\begin{DoxyCompactList}\small\item\em Enable tracking the use of N\+U\+L\+L memory contexts. \end{DoxyCompactList}\item 
+void \hyperlink{group__talloc__debug_ga2d7d9d0b7c8ca726c537080f20de97e1}{talloc\+\_\+disable\+\_\+null\+\_\+tracking} (void)
+\begin{DoxyCompactList}\small\item\em Disable tracking of the N\+U\+L\+L memory context. \end{DoxyCompactList}\item 
+void \hyperlink{group__talloc__debug_gac6f0c065b4ed391acb5c74240a8647bc}{talloc\+\_\+enable\+\_\+leak\+\_\+report} (void)
+\begin{DoxyCompactList}\small\item\em Enable leak report when a program exits. \end{DoxyCompactList}\item 
+void \hyperlink{group__talloc__debug_gab01ab00014902d25e9eaba9fd172821c}{talloc\+\_\+enable\+\_\+leak\+\_\+report\+\_\+full} (void)
+\begin{DoxyCompactList}\small\item\em Enable full leak report when a program exits. \end{DoxyCompactList}\item 
+void \hyperlink{group__talloc__debug_ga37273c95255f727c2e50be93ffe8d90d}{talloc\+\_\+set\+\_\+abort\+\_\+fn} (void($\ast$abort\+\_\+fn)(const char $\ast$reason))
+\begin{DoxyCompactList}\small\item\em Set a custom \char`\"{}abort\char`\"{} function that is called on serious error. \end{DoxyCompactList}\item 
+void \hyperlink{group__talloc__debug_ga5694661cc56931d6edfd926043e43cce}{talloc\+\_\+set\+\_\+log\+\_\+fn} (void($\ast$log\+\_\+fn)(const char $\ast$message))
+\begin{DoxyCompactList}\small\item\em Set a logging function. \end{DoxyCompactList}\item 
+void \hyperlink{group__talloc__debug_ga28b5f73a0dc144abc1c4a231d2d2842f}{talloc\+\_\+set\+\_\+log\+\_\+stderr} (void)
+\begin{DoxyCompactList}\small\item\em Set stderr as the output for logs. \end{DoxyCompactList}\item 
+int \hyperlink{group__talloc__debug_ga28e83930f76844782e500a6041a2d452}{talloc\+\_\+set\+\_\+memlimit} (const void $\ast$ctx, size\+\_\+t max\+\_\+size)
+\begin{DoxyCompactList}\small\item\em Set a max memory limit for the current context hierarchy This affects all children of this context and constrain any allocation in the hierarchy to never exceed the limit set. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+To aid memory debugging, talloc contains routines to inspect the currently allocated memory hierarchy. 
+
+
+
+\subsection{Function Documentation}
+\hypertarget{group__talloc__debug_ga2d7d9d0b7c8ca726c537080f20de97e1}{}\index{The talloc debugging support functions@{The talloc debugging support functions}!talloc\+\_\+disable\+\_\+null\+\_\+tracking@{talloc\+\_\+disable\+\_\+null\+\_\+tracking}}
+\index{talloc\+\_\+disable\+\_\+null\+\_\+tracking@{talloc\+\_\+disable\+\_\+null\+\_\+tracking}!The talloc debugging support functions@{The talloc debugging support functions}}
+\subsubsection[{talloc\+\_\+disable\+\_\+null\+\_\+tracking(void)}]{\setlength{\rightskip}{0pt plus 5cm}void talloc\+\_\+disable\+\_\+null\+\_\+tracking (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{group__talloc__debug_ga2d7d9d0b7c8ca726c537080f20de97e1}
+
+
+Disable tracking of the N\+U\+L\+L memory context. 
+
+This disables tracking of the N\+U\+L\+L memory context. \hypertarget{group__talloc__debug_gac6f0c065b4ed391acb5c74240a8647bc}{}\index{The talloc debugging support functions@{The talloc debugging support functions}!talloc\+\_\+enable\+\_\+leak\+\_\+report@{talloc\+\_\+enable\+\_\+leak\+\_\+report}}
+\index{talloc\+\_\+enable\+\_\+leak\+\_\+report@{talloc\+\_\+enable\+\_\+leak\+\_\+report}!The talloc debugging support functions@{The talloc debugging support functions}}
+\subsubsection[{talloc\+\_\+enable\+\_\+leak\+\_\+report(void)}]{\setlength{\rightskip}{0pt plus 5cm}void talloc\+\_\+enable\+\_\+leak\+\_\+report (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{group__talloc__debug_gac6f0c065b4ed391acb5c74240a8647bc}
+
+
+Enable leak report when a program exits. 
+
+This enables calling of talloc\+\_\+report(\+N\+U\+L\+L, stderr) when the program exits. In Samba4 this is enabled by using the --leak-\/report command line option.
+
+For it to be useful, this function must be called before any other talloc function as it establishes a \char`\"{}null context\char`\"{} that acts as the top of the tree. If you don\textquotesingle{}t call this function first then passing N\+U\+L\+L to \hyperlink{group__talloc__debug_ga4f4ff95ce5a95f61cc453fc943e3de65}{talloc\+\_\+report()} or \hyperlink{group__talloc__debug_ga66136eb6105416bfcbd390ce6a4fc89c}{talloc\+\_\+report\+\_\+full()} won\textquotesingle{}t give you the full tree printout.
+
+Here is a typical talloc report\+:
+
+
+\begin{DoxyCode}
+1 talloc report on 'null\_context' (total 267 bytes in 15 blocks)
+2      libcli/auth/spnego\_parse.c:55  contains     31 bytes in   2 blocks
+3      libcli/auth/spnego\_parse.c:55  contains     31 bytes in   2 blocks
+4      iconv(UTF8,CP850)              contains     42 bytes in   2 blocks
+5      libcli/auth/spnego\_parse.c:55  contains     31 bytes in   2 blocks
+6      iconv(CP850,UTF8)              contains     42 bytes in   2 blocks
+7      iconv(UTF8,UTF-16LE)           contains     45 bytes in   2 blocks
+8      iconv(UTF-16LE,UTF8)           contains     45 bytes in   2 blocks
+\end{DoxyCode}
+ \hypertarget{group__talloc__debug_gab01ab00014902d25e9eaba9fd172821c}{}\index{The talloc debugging support functions@{The talloc debugging support functions}!talloc\+\_\+enable\+\_\+leak\+\_\+report\+\_\+full@{talloc\+\_\+enable\+\_\+leak\+\_\+report\+\_\+full}}
+\index{talloc\+\_\+enable\+\_\+leak\+\_\+report\+\_\+full@{talloc\+\_\+enable\+\_\+leak\+\_\+report\+\_\+full}!The talloc debugging support functions@{The talloc debugging support functions}}
+\subsubsection[{talloc\+\_\+enable\+\_\+leak\+\_\+report\+\_\+full(void)}]{\setlength{\rightskip}{0pt plus 5cm}void talloc\+\_\+enable\+\_\+leak\+\_\+report\+\_\+full (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{group__talloc__debug_gab01ab00014902d25e9eaba9fd172821c}
+
+
+Enable full leak report when a program exits. 
+
+This enables calling of talloc\+\_\+report\+\_\+full(\+N\+U\+L\+L, stderr) when the program exits. In Samba4 this is enabled by using the --leak-\/report-\/full command line option.
+
+For it to be useful, this function must be called before any other talloc function as it establishes a \char`\"{}null context\char`\"{} that acts as the top of the tree. If you don\textquotesingle{}t call this function first then passing N\+U\+L\+L to \hyperlink{group__talloc__debug_ga4f4ff95ce5a95f61cc453fc943e3de65}{talloc\+\_\+report()} or \hyperlink{group__talloc__debug_ga66136eb6105416bfcbd390ce6a4fc89c}{talloc\+\_\+report\+\_\+full()} won\textquotesingle{}t give you the full tree printout.
+
+Here is a typical full report\+:
+
+
+\begin{DoxyCode}
+1 full talloc report on 'root' (total 18 bytes in 8 blocks)
+2      p1                             contains     18 bytes in   7 blocks (ref 0)
+3      r1                             contains     13 bytes in   2 blocks (ref 0)
+4      reference to: p2
+5      p2                             contains      1 bytes in   1 blocks (ref 1)
+6      x3                             contains      1 bytes in   1 blocks (ref 0)
+7      x2                             contains      1 bytes in   1 blocks (ref 0)
+8      x1                             contains      1 bytes in   1 blocks (ref 0)
+\end{DoxyCode}
+ \hypertarget{group__talloc__debug_gad50534c2b22274a94c722f0790ae102f}{}\index{The talloc debugging support functions@{The talloc debugging support functions}!talloc\+\_\+enable\+\_\+null\+\_\+tracking@{talloc\+\_\+enable\+\_\+null\+\_\+tracking}}
+\index{talloc\+\_\+enable\+\_\+null\+\_\+tracking@{talloc\+\_\+enable\+\_\+null\+\_\+tracking}!The talloc debugging support functions@{The talloc debugging support functions}}
+\subsubsection[{talloc\+\_\+enable\+\_\+null\+\_\+tracking(void)}]{\setlength{\rightskip}{0pt plus 5cm}void talloc\+\_\+enable\+\_\+null\+\_\+tracking (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{group__talloc__debug_gad50534c2b22274a94c722f0790ae102f}
+
+
+Enable tracking the use of N\+U\+L\+L memory contexts. 
+
+This enables tracking of the N\+U\+L\+L memory context without enabling leak reporting on exit. Useful for when you want to do your own leak reporting call via talloc\+\_\+report\+\_\+null\+\_\+full(); \hypertarget{group__talloc__debug_gabd90af3895fee1960e90590fabe92a99}{}\index{The talloc debugging support functions@{The talloc debugging support functions}!talloc\+\_\+enable\+\_\+null\+\_\+tracking\+\_\+no\+\_\+autofree@{talloc\+\_\+enable\+\_\+null\+\_\+tracking\+\_\+no\+\_\+autofree}}
+\index{talloc\+\_\+enable\+\_\+null\+\_\+tracking\+\_\+no\+\_\+autofree@{talloc\+\_\+enable\+\_\+null\+\_\+tracking\+\_\+no\+\_\+autofree}!The talloc debugging support functions@{The talloc debugging support functions}}
+\subsubsection[{talloc\+\_\+enable\+\_\+null\+\_\+tracking\+\_\+no\+\_\+autofree(void)}]{\setlength{\rightskip}{0pt plus 5cm}void talloc\+\_\+enable\+\_\+null\+\_\+tracking\+\_\+no\+\_\+autofree (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{group__talloc__debug_gabd90af3895fee1960e90590fabe92a99}
+
+
+Enable tracking the use of N\+U\+L\+L memory contexts. 
+
+This enables tracking of the N\+U\+L\+L memory context without enabling leak reporting on exit. Useful for when you want to do your own leak reporting call via talloc\+\_\+report\+\_\+null\+\_\+full(); \hypertarget{group__talloc__debug_ga4f4ff95ce5a95f61cc453fc943e3de65}{}\index{The talloc debugging support functions@{The talloc debugging support functions}!talloc\+\_\+report@{talloc\+\_\+report}}
+\index{talloc\+\_\+report@{talloc\+\_\+report}!The talloc debugging support functions@{The talloc debugging support functions}}
+\subsubsection[{talloc\+\_\+report(const void $\ast$ptr, F\+I\+L\+E $\ast$f)}]{\setlength{\rightskip}{0pt plus 5cm}void talloc\+\_\+report (
+\begin{DoxyParamCaption}
+\item[{const void $\ast$}]{ptr, }
+\item[{F\+I\+L\+E $\ast$}]{f}
+\end{DoxyParamCaption}
+)}\label{group__talloc__debug_ga4f4ff95ce5a95f61cc453fc943e3de65}
+
+
+Print a summary report of all memory used by ptr. 
+
+This function prints a summary report of all memory used by ptr. One line of report is printed for each immediate child of ptr, showing the total memory and number of blocks used by that child.
+
+You can pass N\+U\+L\+L for the pointer, in which case a report is printed for the top level memory context, but only if \hyperlink{group__talloc__debug_gac6f0c065b4ed391acb5c74240a8647bc}{talloc\+\_\+enable\+\_\+leak\+\_\+report()} or \hyperlink{group__talloc__debug_gab01ab00014902d25e9eaba9fd172821c}{talloc\+\_\+enable\+\_\+leak\+\_\+report\+\_\+full()} has been called.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em ptr} & The talloc chunk.\\
+\hline
+\mbox{\tt in}  & {\em f} & The file handle to print to.\\
+\hline
+\end{DoxyParams}
+Example\+: 
+\begin{DoxyCode}
+1 unsigned int *a, *b;
+2 a = talloc(NULL, unsigned int);
+3 b = talloc(a, unsigned int);
+4 fprintf(stderr, "Summary of memory tree for a:\(\backslash\)n");
+5 talloc\_report(a, stderr);
+\end{DoxyCode}
+
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{group__talloc__debug_ga66136eb6105416bfcbd390ce6a4fc89c}{talloc\+\_\+report\+\_\+full()} 
+\end{DoxySeeAlso}
+\hypertarget{group__talloc__debug_ga10ceb5acd36e5b97e623907af140d954}{}\index{The talloc debugging support functions@{The talloc debugging support functions}!talloc\+\_\+report\+\_\+depth\+\_\+cb@{talloc\+\_\+report\+\_\+depth\+\_\+cb}}
+\index{talloc\+\_\+report\+\_\+depth\+\_\+cb@{talloc\+\_\+report\+\_\+depth\+\_\+cb}!The talloc debugging support functions@{The talloc debugging support functions}}
+\subsubsection[{talloc\+\_\+report\+\_\+depth\+\_\+cb(const void $\ast$ptr, int depth, int max\+\_\+depth, void($\ast$callback)(const void $\ast$ptr,           int depth, int max\+\_\+depth,           int is\+\_\+ref,           void $\ast$private\+\_\+data), void $\ast$private\+\_\+data)}]{\setlength{\rightskip}{0pt plus 5cm}void talloc\+\_\+report\+\_\+depth\+\_\+cb (
+\begin{DoxyParamCaption}
+\item[{const void $\ast$}]{ptr, }
+\item[{int}]{depth, }
+\item[{int}]{max\+\_\+depth, }
+\item[{void($\ast$)(const void $\ast$ptr,                                   int depth, int max\+\_\+depth,                                   int is\+\_\+ref,                                   void $\ast$private\+\_\+data)}]{callback, }
+\item[{void $\ast$}]{private\+\_\+data}
+\end{DoxyParamCaption}
+)}\label{group__talloc__debug_ga10ceb5acd36e5b97e623907af140d954}
+
+
+Walk a complete talloc hierarchy. 
+
+This provides a more flexible reports than \hyperlink{group__talloc__debug_ga4f4ff95ce5a95f61cc453fc943e3de65}{talloc\+\_\+report()}. It will recursively call the callback for the entire tree of memory referenced by the pointer. References in the tree are passed with is\+\_\+ref = 1 and the pointer that is referenced.
+
+You can pass N\+U\+L\+L for the pointer, in which case a report is printed for the top level memory context, but only if \hyperlink{group__talloc__debug_gac6f0c065b4ed391acb5c74240a8647bc}{talloc\+\_\+enable\+\_\+leak\+\_\+report()} or \hyperlink{group__talloc__debug_gab01ab00014902d25e9eaba9fd172821c}{talloc\+\_\+enable\+\_\+leak\+\_\+report\+\_\+full()} has been called.
+
+The recursion is stopped when depth $>$= max\+\_\+depth. max\+\_\+depth = -\/1 means only stop at leaf nodes.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em ptr} & The talloc chunk.\\
+\hline
+\mbox{\tt in}  & {\em depth} & Internal parameter to control recursion. Call with 0.\\
+\hline
+\mbox{\tt in}  & {\em max\+\_\+depth} & Maximum recursion level.\\
+\hline
+\mbox{\tt in}  & {\em callback} & Function to be called on every chunk.\\
+\hline
+\mbox{\tt in}  & {\em private\+\_\+data} & Private pointer passed to callback. \\
+\hline
+\end{DoxyParams}
+\hypertarget{group__talloc__debug_ga13062669ca8e4b787911c206e339f61c}{}\index{The talloc debugging support functions@{The talloc debugging support functions}!talloc\+\_\+report\+\_\+depth\+\_\+file@{talloc\+\_\+report\+\_\+depth\+\_\+file}}
+\index{talloc\+\_\+report\+\_\+depth\+\_\+file@{talloc\+\_\+report\+\_\+depth\+\_\+file}!The talloc debugging support functions@{The talloc debugging support functions}}
+\subsubsection[{talloc\+\_\+report\+\_\+depth\+\_\+file(const void $\ast$ptr, int depth, int max\+\_\+depth, F\+I\+L\+E $\ast$f)}]{\setlength{\rightskip}{0pt plus 5cm}void talloc\+\_\+report\+\_\+depth\+\_\+file (
+\begin{DoxyParamCaption}
+\item[{const void $\ast$}]{ptr, }
+\item[{int}]{depth, }
+\item[{int}]{max\+\_\+depth, }
+\item[{F\+I\+L\+E $\ast$}]{f}
+\end{DoxyParamCaption}
+)}\label{group__talloc__debug_ga13062669ca8e4b787911c206e339f61c}
+
+
+Print a talloc hierarchy. 
+
+This provides a more flexible reports than \hyperlink{group__talloc__debug_ga4f4ff95ce5a95f61cc453fc943e3de65}{talloc\+\_\+report()}. It will let you specify the depth and max\+\_\+depth.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em ptr} & The talloc chunk.\\
+\hline
+\mbox{\tt in}  & {\em depth} & Internal parameter to control recursion. Call with 0.\\
+\hline
+\mbox{\tt in}  & {\em max\+\_\+depth} & Maximum recursion level.\\
+\hline
+\mbox{\tt in}  & {\em f} & The file handle to print to. \\
+\hline
+\end{DoxyParams}
+\hypertarget{group__talloc__debug_ga66136eb6105416bfcbd390ce6a4fc89c}{}\index{The talloc debugging support functions@{The talloc debugging support functions}!talloc\+\_\+report\+\_\+full@{talloc\+\_\+report\+\_\+full}}
+\index{talloc\+\_\+report\+\_\+full@{talloc\+\_\+report\+\_\+full}!The talloc debugging support functions@{The talloc debugging support functions}}
+\subsubsection[{talloc\+\_\+report\+\_\+full(const void $\ast$ptr, F\+I\+L\+E $\ast$f)}]{\setlength{\rightskip}{0pt plus 5cm}void talloc\+\_\+report\+\_\+full (
+\begin{DoxyParamCaption}
+\item[{const void $\ast$}]{ptr, }
+\item[{F\+I\+L\+E $\ast$}]{f}
+\end{DoxyParamCaption}
+)}\label{group__talloc__debug_ga66136eb6105416bfcbd390ce6a4fc89c}
+
+
+Print a summary report of all memory used by ptr. 
+
+This provides a more detailed report than \hyperlink{group__talloc__debug_ga4f4ff95ce5a95f61cc453fc943e3de65}{talloc\+\_\+report()}. It will recursively print the entire tree of memory referenced by the pointer. References in the tree are shown by giving the name of the pointer that is referenced.
+
+You can pass N\+U\+L\+L for the pointer, in which case a report is printed for the top level memory context, but only if \hyperlink{group__talloc__debug_gac6f0c065b4ed391acb5c74240a8647bc}{talloc\+\_\+enable\+\_\+leak\+\_\+report()} or \hyperlink{group__talloc__debug_gab01ab00014902d25e9eaba9fd172821c}{talloc\+\_\+enable\+\_\+leak\+\_\+report\+\_\+full()} has been called.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em ptr} & The talloc chunk.\\
+\hline
+\mbox{\tt in}  & {\em f} & The file handle to print to.\\
+\hline
+\end{DoxyParams}
+Example\+: 
+\begin{DoxyCode}
+1 unsigned int *a, *b;
+2 a = talloc(NULL, unsigned int);
+3 b = talloc(a, unsigned int);
+4 fprintf(stderr, "Dumping memory tree for a:\(\backslash\)n");
+5 talloc\_report\_full(a, stderr);
+\end{DoxyCode}
+
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{group__talloc__debug_ga4f4ff95ce5a95f61cc453fc943e3de65}{talloc\+\_\+report()} 
+\end{DoxySeeAlso}
+\hypertarget{group__talloc__debug_ga37273c95255f727c2e50be93ffe8d90d}{}\index{The talloc debugging support functions@{The talloc debugging support functions}!talloc\+\_\+set\+\_\+abort\+\_\+fn@{talloc\+\_\+set\+\_\+abort\+\_\+fn}}
+\index{talloc\+\_\+set\+\_\+abort\+\_\+fn@{talloc\+\_\+set\+\_\+abort\+\_\+fn}!The talloc debugging support functions@{The talloc debugging support functions}}
+\subsubsection[{talloc\+\_\+set\+\_\+abort\+\_\+fn(void($\ast$abort\+\_\+fn)(const char $\ast$reason))}]{\setlength{\rightskip}{0pt plus 5cm}void talloc\+\_\+set\+\_\+abort\+\_\+fn (
+\begin{DoxyParamCaption}
+\item[{void($\ast$)(const char $\ast$reason)}]{abort\+\_\+fn}
+\end{DoxyParamCaption}
+)}\label{group__talloc__debug_ga37273c95255f727c2e50be93ffe8d90d}
+
+
+Set a custom \char`\"{}abort\char`\"{} function that is called on serious error. 
+
+The default \char`\"{}abort\char`\"{} function is {\ttfamily abort()}.
+
+The \char`\"{}abort\char`\"{} function is called when\+:
+
+
+\begin{DoxyItemize}
+\item talloc\+\_\+get\+\_\+type\+\_\+abort() fails 
+\item the provided pointer is not a valid talloc context 
+\item when the context meta data are invalid 
+\item when access after free is detected 
+\end{DoxyItemize}
+
+Example\+:
+
+
+\begin{DoxyCode}
+1 void my\_abort(const char *reason)
+2 \{
+3      fprintf(stderr, "talloc abort: %s\(\backslash\)n", reason);
+4      abort();
+5 \}
+6 
+7      talloc\_set\_abort\_fn(my\_abort);
+\end{DoxyCode}
+
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em abort\+\_\+fn} & The new \char`\"{}abort\char`\"{} function.\\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{group__talloc__debug_ga5694661cc56931d6edfd926043e43cce}{talloc\+\_\+set\+\_\+log\+\_\+fn()} 
+
+talloc\+\_\+get\+\_\+type() 
+\end{DoxySeeAlso}
+\hypertarget{group__talloc__debug_ga5694661cc56931d6edfd926043e43cce}{}\index{The talloc debugging support functions@{The talloc debugging support functions}!talloc\+\_\+set\+\_\+log\+\_\+fn@{talloc\+\_\+set\+\_\+log\+\_\+fn}}
+\index{talloc\+\_\+set\+\_\+log\+\_\+fn@{talloc\+\_\+set\+\_\+log\+\_\+fn}!The talloc debugging support functions@{The talloc debugging support functions}}
+\subsubsection[{talloc\+\_\+set\+\_\+log\+\_\+fn(void($\ast$log\+\_\+fn)(const char $\ast$message))}]{\setlength{\rightskip}{0pt plus 5cm}void talloc\+\_\+set\+\_\+log\+\_\+fn (
+\begin{DoxyParamCaption}
+\item[{void($\ast$)(const char $\ast$message)}]{log\+\_\+fn}
+\end{DoxyParamCaption}
+)}\label{group__talloc__debug_ga5694661cc56931d6edfd926043e43cce}
+
+
+Set a logging function. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em log\+\_\+fn} & The logging function.\\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{group__talloc__debug_ga28b5f73a0dc144abc1c4a231d2d2842f}{talloc\+\_\+set\+\_\+log\+\_\+stderr()} 
+
+\hyperlink{group__talloc__debug_ga37273c95255f727c2e50be93ffe8d90d}{talloc\+\_\+set\+\_\+abort\+\_\+fn()} 
+\end{DoxySeeAlso}
+\hypertarget{group__talloc__debug_ga28b5f73a0dc144abc1c4a231d2d2842f}{}\index{The talloc debugging support functions@{The talloc debugging support functions}!talloc\+\_\+set\+\_\+log\+\_\+stderr@{talloc\+\_\+set\+\_\+log\+\_\+stderr}}
+\index{talloc\+\_\+set\+\_\+log\+\_\+stderr@{talloc\+\_\+set\+\_\+log\+\_\+stderr}!The talloc debugging support functions@{The talloc debugging support functions}}
+\subsubsection[{talloc\+\_\+set\+\_\+log\+\_\+stderr(void)}]{\setlength{\rightskip}{0pt plus 5cm}void talloc\+\_\+set\+\_\+log\+\_\+stderr (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{group__talloc__debug_ga28b5f73a0dc144abc1c4a231d2d2842f}
+
+
+Set stderr as the output for logs. 
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{group__talloc__debug_ga5694661cc56931d6edfd926043e43cce}{talloc\+\_\+set\+\_\+log\+\_\+fn()} 
+
+\hyperlink{group__talloc__debug_ga37273c95255f727c2e50be93ffe8d90d}{talloc\+\_\+set\+\_\+abort\+\_\+fn()} 
+\end{DoxySeeAlso}
+\hypertarget{group__talloc__debug_ga28e83930f76844782e500a6041a2d452}{}\index{The talloc debugging support functions@{The talloc debugging support functions}!talloc\+\_\+set\+\_\+memlimit@{talloc\+\_\+set\+\_\+memlimit}}
+\index{talloc\+\_\+set\+\_\+memlimit@{talloc\+\_\+set\+\_\+memlimit}!The talloc debugging support functions@{The talloc debugging support functions}}
+\subsubsection[{talloc\+\_\+set\+\_\+memlimit(const void $\ast$ctx, size\+\_\+t max\+\_\+size)}]{\setlength{\rightskip}{0pt plus 5cm}int talloc\+\_\+set\+\_\+memlimit (
+\begin{DoxyParamCaption}
+\item[{const void $\ast$}]{ctx, }
+\item[{size\+\_\+t}]{max\+\_\+size}
+\end{DoxyParamCaption}
+)}\label{group__talloc__debug_ga28e83930f76844782e500a6041a2d452}
+
+
+Set a max memory limit for the current context hierarchy This affects all children of this context and constrain any allocation in the hierarchy to never exceed the limit set. 
+
+The limit can be removed by setting 0 (unlimited) as the max\+\_\+size by calling the funciton again on the sam context. Memory limits can also be nested, meaning a hild can have a stricter memory limit than a parent. Memory limits are enforced only at memory allocation time. Stealing a context into a \textquotesingle{}limited\textquotesingle{} hierarchy properly updates memory usage but does {\itshape not} cause failure if the move causes the new parent to exceed its limits. However any further allocation on that hierarchy will then fail.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em ctx} & The talloc context to set the limit on \\
+\hline
+\mbox{\tt in}  & {\em max\+\_\+size} & The (new) max\+\_\+size \\
+\hline
+\end{DoxyParams}

@@ -1,0 +1,247 @@
+\hypertarget{group__talloc__ref}{}\section{The talloc reference function.}
+\label{group__talloc__ref}\index{The talloc reference function.@{The talloc reference function.}}
+
+
+This module contains the definitions around talloc references.  
+
+
+\subsection*{Modules}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{group__talloc__array}{The talloc array functions}
+\begin{DoxyCompactList}\small\item\em Talloc contains some handy helpers for handling Arrays conveniently. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group__talloc__ref_gaa31ec88dc1174f500625c92f3c15f054}{}\#define {\bfseries talloc\+\_\+reference}(ctx,  ptr)~(\+\_\+\+T\+A\+L\+L\+O\+C\+\_\+\+T\+Y\+P\+E\+O\+F(ptr))\+\_\+talloc\+\_\+reference\+\_\+loc((ctx),(ptr), \+\_\+\+\_\+location\+\_\+\+\_\+)\label{group__talloc__ref_gaa31ec88dc1174f500625c92f3c15f054}
+
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{group__talloc__ref_ga1d70927673b42a6d2e42823307280502}{talloc\+\_\+increase\+\_\+ref\+\_\+count} (const void $\ast$ptr)
+\begin{DoxyCompactList}\small\item\em Increase the reference count of a talloc chunk. \end{DoxyCompactList}\item 
+size\+\_\+t \hyperlink{group__talloc__ref_gac8bc504b29c4a0b3252e69f14a241035}{talloc\+\_\+reference\+\_\+count} (const void $\ast$ptr)
+\begin{DoxyCompactList}\small\item\em Get the number of references to a talloc chunk. \end{DoxyCompactList}\item 
+\hypertarget{group__talloc__ref_gafe478eebc954a90bf11ffee3ea73b885}{}void $\ast$ {\bfseries \+\_\+talloc\+\_\+reference\+\_\+loc} (const void $\ast$context, const void $\ast$ptr, const char $\ast$location)\label{group__talloc__ref_gafe478eebc954a90bf11ffee3ea73b885}
+
+\item 
+int \hyperlink{group__talloc__ref_ga8054dd3561f33dd4a0d6942839868bb5}{talloc\+\_\+unlink} (const void $\ast$context, void $\ast$ptr)
+\begin{DoxyCompactList}\small\item\em Remove a specific parent from a talloc chunk. \end{DoxyCompactList}\item 
+void $\ast$ \hyperlink{group__talloc__ref_ga68f90d9a904bc2125b9bb60146f004de}{talloc\+\_\+autofree\+\_\+context} (void)
+\begin{DoxyCompactList}\small\item\em Provide a talloc context that is freed at program exit. \end{DoxyCompactList}\item 
+size\+\_\+t \hyperlink{group__talloc__ref_ga0cbdb71be91a8a1e8f9dc6486beb690f}{talloc\+\_\+get\+\_\+size} (const void $\ast$ctx)
+\begin{DoxyCompactList}\small\item\em Get the size of a talloc chunk. \end{DoxyCompactList}\item 
+void \hyperlink{group__talloc__ref_gaba977c578a3d871e6f1ec53b67495ce2}{talloc\+\_\+show\+\_\+parents} (const void $\ast$context, F\+I\+L\+E $\ast$file)
+\begin{DoxyCompactList}\small\item\em Show the parentage of a context. \end{DoxyCompactList}\item 
+int \hyperlink{group__talloc__ref_ga7d00105b11e2a92a2e6972b3d0df0ba5}{talloc\+\_\+is\+\_\+parent} (const void $\ast$context, const void $\ast$ptr)
+\begin{DoxyCompactList}\small\item\em Check if a context is parent of a talloc chunk. \end{DoxyCompactList}\item 
+void $\ast$ \hyperlink{group__talloc__ref_gad08d78c3987437a5753efc55379f0566}{talloc\+\_\+reparent} (const void $\ast$old\+\_\+parent, const void $\ast$new\+\_\+parent, const void $\ast$ptr)
+\begin{DoxyCompactList}\small\item\em Change the parent context of a talloc pointer. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This module contains the definitions around talloc references. 
+
+
+
+\subsection{Function Documentation}
+\hypertarget{group__talloc__ref_ga68f90d9a904bc2125b9bb60146f004de}{}\index{The talloc reference function.@{The talloc reference function.}!talloc\+\_\+autofree\+\_\+context@{talloc\+\_\+autofree\+\_\+context}}
+\index{talloc\+\_\+autofree\+\_\+context@{talloc\+\_\+autofree\+\_\+context}!The talloc reference function.@{The talloc reference function.}}
+\subsubsection[{talloc\+\_\+autofree\+\_\+context(void)}]{\setlength{\rightskip}{0pt plus 5cm}void$\ast$ talloc\+\_\+autofree\+\_\+context (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{group__talloc__ref_ga68f90d9a904bc2125b9bb60146f004de}
+
+
+Provide a talloc context that is freed at program exit. 
+
+This is a handy utility function that returns a talloc context which will be automatically freed on program exit. This can be used to reduce the noise in memory leak reports.
+
+Never use this in code that might be used in objects loaded with dlopen and unloaded with dlclose. \hyperlink{group__talloc__ref_ga68f90d9a904bc2125b9bb60146f004de}{talloc\+\_\+autofree\+\_\+context()} internally uses atexit(3). Some platforms like modern Linux handles this fine, but for example Free\+B\+S\+D does not deal well with dlopen() and atexit() used simultaneously\+: dlclose() does not clean up the list of atexit-\/handlers, so when the program exits the code that was registered from within \hyperlink{group__talloc__ref_ga68f90d9a904bc2125b9bb60146f004de}{talloc\+\_\+autofree\+\_\+context()} is gone, the program crashes at exit.
+
+\begin{DoxyReturn}{Returns}
+A talloc context, N\+U\+L\+L on error. 
+\end{DoxyReturn}
+\hypertarget{group__talloc__ref_ga0cbdb71be91a8a1e8f9dc6486beb690f}{}\index{The talloc reference function.@{The talloc reference function.}!talloc\+\_\+get\+\_\+size@{talloc\+\_\+get\+\_\+size}}
+\index{talloc\+\_\+get\+\_\+size@{talloc\+\_\+get\+\_\+size}!The talloc reference function.@{The talloc reference function.}}
+\subsubsection[{talloc\+\_\+get\+\_\+size(const void $\ast$ctx)}]{\setlength{\rightskip}{0pt plus 5cm}size\+\_\+t talloc\+\_\+get\+\_\+size (
+\begin{DoxyParamCaption}
+\item[{const void $\ast$}]{ctx}
+\end{DoxyParamCaption}
+)}\label{group__talloc__ref_ga0cbdb71be91a8a1e8f9dc6486beb690f}
+
+
+Get the size of a talloc chunk. 
+
+This function lets you know the amount of memory allocated so far by this context. It does N\+O\+T account for subcontext memory. This can be used to calculate the size of an array.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em ctx} & The talloc chunk.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The size of the talloc chunk. 
+\end{DoxyReturn}
+\hypertarget{group__talloc__ref_ga1d70927673b42a6d2e42823307280502}{}\index{The talloc reference function.@{The talloc reference function.}!talloc\+\_\+increase\+\_\+ref\+\_\+count@{talloc\+\_\+increase\+\_\+ref\+\_\+count}}
+\index{talloc\+\_\+increase\+\_\+ref\+\_\+count@{talloc\+\_\+increase\+\_\+ref\+\_\+count}!The talloc reference function.@{The talloc reference function.}}
+\subsubsection[{talloc\+\_\+increase\+\_\+ref\+\_\+count(const void $\ast$ptr)}]{\setlength{\rightskip}{0pt plus 5cm}int talloc\+\_\+increase\+\_\+ref\+\_\+count (
+\begin{DoxyParamCaption}
+\item[{const void $\ast$}]{ptr}
+\end{DoxyParamCaption}
+)}\label{group__talloc__ref_ga1d70927673b42a6d2e42823307280502}
+
+
+Increase the reference count of a talloc chunk. 
+
+The talloc\+\_\+increase\+\_\+ref\+\_\+count(ptr) function is exactly equivalent to\+:
+
+
+\begin{DoxyCode}
+1 talloc\_reference(NULL, ptr);
+\end{DoxyCode}
+
+
+You can use either syntax, depending on which you think is clearer in your code.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em ptr} & The pointer to increase the reference count.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 on success, -\/1 on error. 
+\end{DoxyReturn}
+\hypertarget{group__talloc__ref_ga7d00105b11e2a92a2e6972b3d0df0ba5}{}\index{The talloc reference function.@{The talloc reference function.}!talloc\+\_\+is\+\_\+parent@{talloc\+\_\+is\+\_\+parent}}
+\index{talloc\+\_\+is\+\_\+parent@{talloc\+\_\+is\+\_\+parent}!The talloc reference function.@{The talloc reference function.}}
+\subsubsection[{talloc\+\_\+is\+\_\+parent(const void $\ast$context, const void $\ast$ptr)}]{\setlength{\rightskip}{0pt plus 5cm}int talloc\+\_\+is\+\_\+parent (
+\begin{DoxyParamCaption}
+\item[{const void $\ast$}]{context, }
+\item[{const void $\ast$}]{ptr}
+\end{DoxyParamCaption}
+)}\label{group__talloc__ref_ga7d00105b11e2a92a2e6972b3d0df0ba5}
+
+
+Check if a context is parent of a talloc chunk. 
+
+This checks if context is referenced in the talloc hierarchy above ptr.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em context} & The assumed talloc context.\\
+\hline
+\mbox{\tt in}  & {\em ptr} & The talloc chunk to check.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Return 1 if this is the case, 0 if not. 
+\end{DoxyReturn}
+\hypertarget{group__talloc__ref_gac8bc504b29c4a0b3252e69f14a241035}{}\index{The talloc reference function.@{The talloc reference function.}!talloc\+\_\+reference\+\_\+count@{talloc\+\_\+reference\+\_\+count}}
+\index{talloc\+\_\+reference\+\_\+count@{talloc\+\_\+reference\+\_\+count}!The talloc reference function.@{The talloc reference function.}}
+\subsubsection[{talloc\+\_\+reference\+\_\+count(const void $\ast$ptr)}]{\setlength{\rightskip}{0pt plus 5cm}size\+\_\+t talloc\+\_\+reference\+\_\+count (
+\begin{DoxyParamCaption}
+\item[{const void $\ast$}]{ptr}
+\end{DoxyParamCaption}
+)}\label{group__talloc__ref_gac8bc504b29c4a0b3252e69f14a241035}
+
+
+Get the number of references to a talloc chunk. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em ptr} & The pointer to retrieve the reference count from.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The number of references. 
+\end{DoxyReturn}
+\hypertarget{group__talloc__ref_gad08d78c3987437a5753efc55379f0566}{}\index{The talloc reference function.@{The talloc reference function.}!talloc\+\_\+reparent@{talloc\+\_\+reparent}}
+\index{talloc\+\_\+reparent@{talloc\+\_\+reparent}!The talloc reference function.@{The talloc reference function.}}
+\subsubsection[{talloc\+\_\+reparent(const void $\ast$old\+\_\+parent, const void $\ast$new\+\_\+parent, const void $\ast$ptr)}]{\setlength{\rightskip}{0pt plus 5cm}void$\ast$ talloc\+\_\+reparent (
+\begin{DoxyParamCaption}
+\item[{const void $\ast$}]{old\+\_\+parent, }
+\item[{const void $\ast$}]{new\+\_\+parent, }
+\item[{const void $\ast$}]{ptr}
+\end{DoxyParamCaption}
+)}\label{group__talloc__ref_gad08d78c3987437a5753efc55379f0566}
+
+
+Change the parent context of a talloc pointer. 
+
+The function changes the parent context of a talloc pointer. It is typically used when the context that the pointer is currently a child of is going to be freed and you wish to keep the memory for a longer time.
+
+The difference between \hyperlink{group__talloc__ref_gad08d78c3987437a5753efc55379f0566}{talloc\+\_\+reparent()} and talloc\+\_\+steal() is that \hyperlink{group__talloc__ref_gad08d78c3987437a5753efc55379f0566}{talloc\+\_\+reparent()} can specify which parent you wish to change. This is useful when a pointer has multiple parents via references.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em old\+\_\+parent} & \\
+\hline
+\mbox{\tt in}  & {\em new\+\_\+parent} & \\
+\hline
+\mbox{\tt in}  & {\em ptr} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Return the pointer you passed. It does not have any failure modes. 
+\end{DoxyReturn}
+\hypertarget{group__talloc__ref_gaba977c578a3d871e6f1ec53b67495ce2}{}\index{The talloc reference function.@{The talloc reference function.}!talloc\+\_\+show\+\_\+parents@{talloc\+\_\+show\+\_\+parents}}
+\index{talloc\+\_\+show\+\_\+parents@{talloc\+\_\+show\+\_\+parents}!The talloc reference function.@{The talloc reference function.}}
+\subsubsection[{talloc\+\_\+show\+\_\+parents(const void $\ast$context, F\+I\+L\+E $\ast$file)}]{\setlength{\rightskip}{0pt plus 5cm}void talloc\+\_\+show\+\_\+parents (
+\begin{DoxyParamCaption}
+\item[{const void $\ast$}]{context, }
+\item[{F\+I\+L\+E $\ast$}]{file}
+\end{DoxyParamCaption}
+)}\label{group__talloc__ref_gaba977c578a3d871e6f1ec53b67495ce2}
+
+
+Show the parentage of a context. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em context} & The talloc context to look at.\\
+\hline
+\mbox{\tt in}  & {\em file} & The output to use, a file, stdout or stderr. \\
+\hline
+\end{DoxyParams}
+\hypertarget{group__talloc__ref_ga8054dd3561f33dd4a0d6942839868bb5}{}\index{The talloc reference function.@{The talloc reference function.}!talloc\+\_\+unlink@{talloc\+\_\+unlink}}
+\index{talloc\+\_\+unlink@{talloc\+\_\+unlink}!The talloc reference function.@{The talloc reference function.}}
+\subsubsection[{talloc\+\_\+unlink(const void $\ast$context, void $\ast$ptr)}]{\setlength{\rightskip}{0pt plus 5cm}int talloc\+\_\+unlink (
+\begin{DoxyParamCaption}
+\item[{const void $\ast$}]{context, }
+\item[{void $\ast$}]{ptr}
+\end{DoxyParamCaption}
+)}\label{group__talloc__ref_ga8054dd3561f33dd4a0d6942839868bb5}
+
+
+Remove a specific parent from a talloc chunk. 
+
+The function removes a specific parent from ptr. The context passed must either be a context used in talloc\+\_\+reference() with this pointer, or must be a direct parent of ptr.
+
+You can just use talloc\+\_\+free() instead of \hyperlink{group__talloc__ref_ga8054dd3561f33dd4a0d6942839868bb5}{talloc\+\_\+unlink()} if there is at maximum one parent. This behaviour has been changed since the release of version 2.\+0. Further informations in the description of \char`\"{}talloc\+\_\+free\char`\"{}.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em context} & The talloc parent to remove.\\
+\hline
+\mbox{\tt in}  & {\em ptr} & The talloc ptr you want to remove the parent from.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 on success, -\/1 on error.
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+If the parent has already been removed using talloc\+\_\+free() then this function will fail and will return -\/1. Likewise, if ptr is N\+U\+L\+L, then the function will make no modifications and return -\/1.
+\end{DoxyNote}
+Example\+: 
+\begin{DoxyCode}
+1 unsigned int *a, *b, *c;
+2 a = talloc(NULL, unsigned int);
+3 b = talloc(NULL, unsigned int);
+4 c = talloc(a, unsigned int);
+5 // b also serves as a parent of c.
+6 talloc\_reference(b, c);
+7 talloc\_unlink(b, c);
+\end{DoxyCode}
+ 
