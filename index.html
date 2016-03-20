@@ -16,7 +16,6 @@
       <a href="https://github.com/tylerjwatson/paper-tiger" class="btn">View on GitHub</a>
       <a href="https://github.com/tylerjwatson/paper-tiger/zipball/master" class="btn">Download .zip</a>
       <a href="https://github.com/tylerjwatson/paper-tiger/tarball/master" class="btn">Download .tar.gz</a>
-	  <a href="https://tylerjwatson.github.io/paper-tiger/doc/html" class="btn">API Documentation</a>
     </section>
 
     <section class="main-content">
@@ -25,55 +24,98 @@
 
 <p>Paper Tiger is an experimental Terraria server written in C for OSX, WIN32 and Linux systems.</p>
 
-<p>Paper Tiger is free, and released under GPL version 2, which you can find in the <code>LICENSE</code> file.</p>
+<p>Paper Tiger aims to implement as much as possible of the official server from Re-Logic, in an efficient and cross-platform manner, with included extras such as scripting support, plugin support, and extra security features.  Paper Tiger is designed to not require any external third-party runtimes on Linux or OSX (such as <code>mono</code>), and is packagable and runnable as a system service.</p>
+
+<p>Paper Tiger is designed for the official Terraria client, and does <em>not</em> support third-party, or unlicensed Terraria clients.</p>
+
+<p>Paper Tiger is free, and released under the GPLv2, which you can find in the <code>LICENSE</code> file.</p>
 
 <h2>
-<a id="linux-dependencies" class="anchor" href="#linux-dependencies" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Linux Dependencies</h2>
+<a id="technical-information" class="anchor" href="#technical-information" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Technical Information</h2>
 
-<ul>
-<li><code>gcc</code></li>
-<li><code>cmake</code></li>
-</ul>
+<p>Paper tiger is written in a mix of C and C++ and is heavily based on the event-loop paradigm based on <a href="https://github.com/libuv/libuv">libuv</a>.  </p>
 
-<h2>
-<a id="windows-dependencies" class="anchor" href="#windows-dependencies" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Windows Dependencies</h2>
+<p>libuv provides a cross-platform event loop mechanism, and Paper Tiger leverages this feature to efficiently implement a gameserver in a cross-platform manner without having to deal with threading between POSIX and Win32 environments.  The game's event loop (see <code>struct game</code>) is responsible for handling stream I/O from all the connected clients as well as the game update routines and console input.</p>
 
-<p>Building on Windows has been tested with Visual Studio 2015.</p>
-
-<ul>
-<li>Visual Studio 2015 with C/C++ support</li>
-<li>CMake for Windows</li>
-</ul>
+<p>The software is primarily written in in C, however there are some parts of the system which leverate c++11 features. One such feature is the parameter parser (see <code>src/param.cc</code>) where a cross-platform regex implementation was needed. </p>
 
 <h2>
-<a id="build-instructions" class="anchor" href="#build-instructions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Build instructions</h2>
+<a id="platforms" class="anchor" href="#platforms" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Platforms</h2>
 
-<ul>
-<li>Make sure you have all the dependencies installed on your system.</li>
-</ul>
+<p>Paper Tiger has been tested to build run on Linux (Fedora 23), MacOSX 10.10, and Windows 10. </p>
+
+<h2>
+<a id="building-paper-tiger" class="anchor" href="#building-paper-tiger" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Building Paper Tiger</h2>
+
+<p>Paper Tiger currently has been tested to build on MacOSX, Linux, and Windows.  Building for all platforms requires <a href="https://cmake.org/">CMake</a>.</p>
+
+<p><strong>Note:</strong> Building on windows <em>does not</em> require MINGW or Cygwin.</p>
 
 <h3>
-<a id="linux" class="anchor" href="#linux" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Linux</h3>
+<a id="building-on-linux" class="anchor" href="#building-on-linux" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Building on Linux</h3>
 
-<div class="highlight highlight-source-shell"><pre>$ git clone https://github.com/tylerjwatson/paper-tiger.git
+<ul>
+<li>Install the build dependencies: <code>make</code>, <code>cmake</code>, <code>gcc-c++</code>, <code>libuv-devel</code>
+</li>
+<li>Clone the source: <code>git clone https://github.com/tylerjwatson/paper-tiger.git</code>
+</li>
+<li>Use CMake to build:</li>
+</ul>
+
+<div class="highlight highlight-source-shell"><pre>
 $ <span class="pl-c1">cd</span> paper-tiger
 $ mkdir build <span class="pl-k">&amp;&amp;</span> <span class="pl-c1">cd</span> build
-$ cmake -DCMAKE_BUILD_TYPE=Debug ..
-$ make</pre></div>
+$ cmake ..
+$ make
+</pre></div>
 
 <h3>
-<a id="windows" class="anchor" href="#windows" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Windows</h3>
+<a id="building-on-osx" class="anchor" href="#building-on-osx" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Building on OSX</h3>
 
 <ul>
-<li>Run CMake and point it to your <code>paper-tiger</code> directory</li>
-<li>Tell it to generate a <code>Visual Studio 14</code> project</li>
-<li>Output it to the <code>build</code> folder</li>
-<li>Open <code>paper-tiger.sln</code> in VS</li>
-<li>Build and enjoy</li>
+<li>Install the build dependencies. <code>cmake</code>, <code>libuv</code>.  I used homebrew for this.</li>
+<li>Install, and accept the license terms for XCode</li>
+<li>Clone the source: <code>git clone https://github.com/tylerjwatson/paper-tiger.git</code>
+</li>
+<li>Open <code>Terminal.app</code>, and use CMake to build:</li>
+</ul>
+
+<div class="highlight highlight-source-shell"><pre>
+$ <span class="pl-c1">cd</span> paper-tiger
+$ mkdir build <span class="pl-k">&amp;&amp;</span> <span class="pl-c1">cd</span> build
+$ cmake -G XCode ..
+$ xcodebuild
+</pre></div>
+
+<h3>
+<a id="building-on-windows" class="anchor" href="#building-on-windows" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Building on Windows</h3>
+
+<ul>
+<li>Install CMake for Windows</li>
+<li>Install Visual Studio 2015 Community with C++ support.
+
+<ul>
+<li>
+<em>Note:</em> MFC is not required.</li>
+</ul>
+</li>
+<li>Clone the source: <code>git clone https://github.com/tylerjwatson/paper-tiger.git</code> using CLI tools or the Github desktop client</li>
+<li>Use CMake GUI to generate a Visual Studio Solution
+
+<ol>
+<li>Run CMake GUI</li>
+<li>In the <code>Where is the source code</code> box, choose the directory that the Paper Tiger source code was cloned into, eg. <code>C:\src\paper-tiger</code>
+</li>
+<li>In the <code>Where to build the binaries</code> box, choose another directory in which the build files shall be placed.</li>
+<li>Press <code>Configure</code>, then <code>Generate</code>.</li>
+<li>Navigate to the build directory as specified in step 3, and open the <code>paper-tiger.sln</code> file in Visual Studio</li>
+<li>Build and enjoy.</li>
+</ol>
+</li>
 </ul>
 
 <h2>
-<a id="running-guac" class="anchor" href="#running-guac" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Running guac</h2>
+<a id="running-paper-tiger" class="anchor" href="#running-paper-tiger" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Running Paper Tiger</h2>
 
 <p><code>paper-tiger</code> (or <code>paper-tiger.exe</code> on Windows) currently only accepts the following commandline params</p>
 
@@ -84,6 +126,8 @@ $ make</pre></div>
 <li>
 <code>-s</code> - Silent mode, do not open or accept console commands.</li>
 </ul>
+
+<p>Run <code>paper-tiger</code> or <code>paper-tiger.exe</code> in the console to launch it.</p>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/tylerjwatson/paper-tiger">Paper-tiger</a> is maintained by <a href="https://github.com/tylerjwatson">tylerjwatson</a>.</span>
