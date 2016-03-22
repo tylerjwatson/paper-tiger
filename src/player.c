@@ -18,15 +18,21 @@
  * along with upgraded-guacamole.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "player.h"
 #include "game.h"
 #include "util.h"
 
+static void __player_handle_close(uv_handle_t *handle)
+{
+	talloc_free(handle);
+}
+
 static int __player_destructor(struct player *player)
 {
-	uv_close((uv_handle_t *)player->handle, NULL);
+	_ERROR("%s (%d) has disconnected.\n", player->name, player->remote_addr);
+	
 	bitmap_clear(player->game->player_slots, player->id);
+	player->game->players[player->id] = NULL;
 }
 
 int player_new(TALLOC_CTX *context, const struct game *game, int id, struct player **out_player)
@@ -60,5 +66,23 @@ out:
 
 void player_close(struct player *player)
 {
+	if (player->handle != NULL) {
+		/*
+		 * If the TCP handle is connected, the player's memory cannot
+		 * be freed until the player handle close callback has been called,
+		 * only then may the memory claimed by the TCP handle be freed.
+		 */
+		uv_close((uv_handle_t *)player->handle, __player_handle_close);
+		
+		/*
+		 * Re-parent the TCP handle's memory underneath the game context whilst
+		 * it is still closing.  The memory will be freed once the handle close
+		 * callback gets called.  This way the player structure can still get
+		 * deallocated and exchanged to null whilst the handle is still being
+		 * closed by the loop.
+		 */
+		talloc_steal(player->game, player->handle);
+	}
+
 	talloc_free(player);
 }

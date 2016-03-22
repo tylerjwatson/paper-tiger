@@ -19,6 +19,7 @@
 */
 #include <string.h>
 
+#include "player.h"
 #include "console.h"
 #include "game.h"
 #include "util.h"
@@ -47,10 +48,34 @@ static int __handle_quit(struct game *game, struct console_command *command)
 	return 0;
 }
 
-static int __num_handlers = 2;
+static int __handle_disconnect(struct game *game, struct console_command *command)
+{
+	int slot;
+	struct player *player;
+	
+	if (command->parameters == NULL || strlen(command->parameters) == 0) {
+		_ERROR("%s: slot required.  syntax: /disconnect {slot}\n", command->command_name);
+		return 0;
+	}
+
+	slot = atoi(command->parameters);
+	player = game->players[slot];
+	
+	if (player == NULL) {
+		_ERROR("%s: there is no player at slot %d.\n", command->command_name, slot);
+		return 0;
+	}
+	
+	player_close(player);
+	
+	return 0;
+}
+
 static struct console_command_handler __command_handlers[] = {
 	{ .command_name = "test", .handler = __handle_test },
 	{ .command_name = "quit", .handler = __handle_quit },
+	{ .command_name = "disconnect", .handler = __handle_disconnect },
+	{ .command_name = "dc", .handler = __handle_disconnect },
 	{ 0, 0 }
 };
 
@@ -79,7 +104,7 @@ static void __print_prompt(uv_stream_t *stream)
 
 static void __on_read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 {
-	char *command_copy;
+	char *command_copy, *command_copy_base;
 	char *parameters;
 	struct game *game = (struct game *)stream->data;
 	struct console_command_handler *handler;
@@ -89,17 +114,22 @@ static void __on_read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 		goto out;
 	}
 
-	command_copy = strdup(buf->base);
-	if (command_copy == NULL) {
+	command_copy_base = (char *)malloc(nread + 1);
+	if (command_copy_base == NULL) {
 		goto out;
 	}
+
+	memcpy(command_copy_base, buf->base, nread);
+	command_copy_base[nread] = '\0';
 
 	/*
 	 * We are not interested in the preceding slash, skip the pointer
 	 * by one to tar over the fact that it even exists.
 	 */
-	if (command_copy[0] == '/') {
-		command_copy++;
+	if (command_copy_base[0] == '/') {
+		command_copy = command_copy_base + 1;
+	} else {
+		command_copy = command_copy_base;
 	}
 
 	/*
@@ -113,9 +143,7 @@ static void __on_read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 		goto out;
 	}
 
-	for (int i = 0; i < __num_handlers; i++) {
-		handler = &__command_handlers[i];
-
+	for (handler = __command_handlers; handler->command_name != NULL; handler++) {
 		if (strcmp(handler->command_name, command_copy) != 0) {
 			continue;
 		}
@@ -134,9 +162,11 @@ static void __on_read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 	_ERROR("console: error: %s: unknown command.\n", command_copy);
 
 command_copy_free:
-	free(command_copy);
+	free(command_copy_base);
 out:
-	talloc_free(buf->base);
+	if (buf->base != NULL) {
+		talloc_free(buf->base);
+	}
 
 	__print_prompt(stream);
 }
