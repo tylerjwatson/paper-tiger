@@ -149,7 +149,7 @@ void __on_connection(uv_stream_t *handle, int status)
 	player->handle = client_handle;
 	player->handle->data = player;
 	
-	uv_tcp_getpeername((uv_tcp_t *)&client_handle, (struct sockaddr *)&peer, &name_len);
+	uv_tcp_getpeername((uv_tcp_t *)client_handle, (struct sockaddr *)&peer, &name_len);
 	uv_inet_ntop(AF_INET, &peer.sin_addr, remote_addr, sizeof(remote_addr));
 	
 	player->remote_addr = talloc_strdup(player, remote_addr);

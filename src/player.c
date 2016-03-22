@@ -29,7 +29,7 @@ static void __player_handle_close(uv_handle_t *handle)
 
 static int __player_destructor(struct player *player)
 {
-	_ERROR("%s (%d) has disconnected.\n", player->name, player->remote_addr);
+	_ERROR("%s (%s) has disconnected.\n", player->name, player->remote_addr);
 	
 	bitmap_clear(player->game->player_slots, player->id);
 	player->game->players[player->id] = NULL;
