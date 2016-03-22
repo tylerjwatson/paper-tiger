@@ -21,12 +21,23 @@
 #include <string.h>
 
 #include "continue_connecting2.h"
+#include "world_info.h"
+
 #include "../player.h"
 #include "../packet.h"
+#include "../server.h"
 #include "../util.h"
 
 int continue_connecting2_handle(struct player *player, struct packet *packet)
 {
-	//TODO: Send world information
+	struct packet *world_info;
+
+	if (world_info_new(player, player, &world_info) < 0) {
+		_ERROR("%s: error creating world info packet.\n", __FUNCTION__);
+		return -1;
+	}
+
+	server_send_packet(player, world_info);
+
 	return 0;
 }
