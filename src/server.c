@@ -33,13 +33,14 @@ static int __handle_packet(struct player *player, struct packet *packet, const u
 
 	packet_handler = packet_handler_for_type(packet->type);
 	if (packet_handler == NULL) {
-	/*	_ERROR("%s: unknown packet type %d from slot %d.\n", __FUNCTION__,
-			packet->type,
-			packet->player->id);*/
 		return -1;
 	}
 
-	if ((ret = packet_handler->read_func(packet, buf)) < 0) {
+	/*
+	 * If the read handler for the function is NULL then we are safe
+	 * to assume that the packet has no body.
+	 */
+	if (packet_handler->read_func != NULL && (ret = packet_handler->read_func(packet, buf)) < 0) {
 		_ERROR("%s: packet parsing failed for slot %d.\n", __FUNCTION__, 
 			player->id);
 		return ret;
@@ -58,7 +59,7 @@ static void __on_read(uv_stream_t *stream, ssize_t len, const uv_buf_t *buf)
 	struct player *player = (struct player *)stream->data;
 
 	if (len < 0) {
-		_ERROR("%s: %s while reading from slot %d\n", __FUNCTION__, uv_err_name(len), player->id);
+		//_ERROR("%s: %s while reading from slot %d\n", __FUNCTION__, uv_err_name(len), player->id);
 		player_close(player);
 		return;
 	}
@@ -73,9 +74,6 @@ static void __on_read(uv_stream_t *stream, ssize_t len, const uv_buf_t *buf)
 			goto player_out;
 		}
 
-		/*printf("%s: slot %d packet: header=%d, len=%d\n", __FUNCTION__, player->id, 
-			player->incoming_packet->type, player->incoming_packet->len);
-			*/
 		if (player->incoming_packet->len == PACKET_HEADER_SIZE) {
 			goto handle_packet;
 		} 
