@@ -31,12 +31,10 @@
 int player_mana_handle(struct player *player, struct packet *packet)
 {
 	struct player_mana *player_mana = (struct player_mana *)packet->data;
-	
+
 	player->mana = player_mana->mana;
 	player->mana_max = player_mana->mana_max;
 
-	printf("%s: player %s mana: %d/%d\n", __FUNCTION__, player->name, player->mana, player->mana_max);
-	
 	return 0;
 }
 

@@ -31,6 +31,8 @@ add_executable(paper-tiger
 
 	src/packets/client_uuid.h
 	src/packets/client_uuid.c
+	src/packets/continue_connecting2.h
+	src/packets/continue_connecting2.c
 	src/packets/continue_connecting.h
 	src/packets/continue_connecting.c
 	src/packets/player_info.h

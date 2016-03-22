@@ -25,6 +25,7 @@
 
 #include "packets/connect_request.h"
 #include "packets/continue_connecting.h"
+#include "packets/continue_connecting2.h"
 #include "packets/player_info.h"
 #include "packets/client_uuid.h"
 #include "packets/player_hp.h"
@@ -34,6 +35,7 @@ static struct packet_handler packet_handlers[] = {
 	{ .type = PACKET_TYPE_CONNECT_REQUEST, .read_func = connect_request_read, .handle_func = connect_request_handle },
 	{ .type = PACKET_TYPE_CONTINUE_CONNECTING, .read_func = NULL, .handle_func = NULL, .write_func = continue_connecting_write },
 	{ .type = PACKET_TYPE_PLAYER_INFO, .read_func = player_info_read, .handle_func = player_info_handle, .write_func = NULL },
+	{ .type = PACKET_TYPE_CONTINUE_CONNECTING2, .read_func = NULL, .handle_func = continue_connecting2_handle, .write_func = NULL },
 	{ .type = PACKET_TYPE_PLAYER_HP, .read_func = player_hp_read, .handle_func = player_hp_handle, .write_func = NULL },
 	{ .type = PACKET_TYPE_PLAYER_MANA, .read_func = player_mana_read, .handle_func = player_mana_handle, .write_func = NULL },
 	{ .type = PACKET_TYPE_CLIENT_UUID, .read_func = client_uuid_read, .handle_func = client_uuid_handle, .write_func = NULL },

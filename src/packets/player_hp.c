@@ -35,8 +35,6 @@ int player_hp_handle(struct player *player, struct packet *packet)
 	player->life = player_hp->life;
 	player->life_max = player_hp->life_max;
 
-	printf("%s: player %s hp: %d/%d\n", __FUNCTION__, player->name, player->life, player->life_max);
-	
 	return 0;
 }
 
