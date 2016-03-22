@@ -170,6 +170,7 @@ static void __on_write(uv_write_t *req, int status)
 
 int server_send_packet(const struct player *player, const struct packet *packet)
 {
+	TALLOC_CTX *temp_context;
 	uv_write_t *write_request;
 	uv_buf_t bufs[2];
 	struct packet_handler *packet_handler;
@@ -177,17 +178,25 @@ int server_send_packet(const struct player *player, const struct packet *packet)
 	int pos = 0;
 	int ret = -1;
 
-	write_request = talloc(player, uv_write_t);
+	temp_context = talloc_new(NULL);
+	if (temp_context == NULL) {
+		_ERROR("%s: out of memory allocating temporary context for packet buffers.\n", __FUNCTION__);
+		ret = -ENOMEM;
+		goto out;
+	}
+	
+	write_request = talloc(temp_context, uv_write_t);
 	if (write_request == NULL) {
 		_ERROR("%s: out of memory writing packet to slot %d\n", __FUNCTION__, player->id);
-		return -ENOMEM;
+		ret = -ENOMEM;
+		goto out;
 	}
 
 	header_buf = talloc_size(write_request, PACKET_HEADER_SIZE);
 	if (header_buf == NULL) {
 		_ERROR("%s: out of memory allocating packet header buffer for slot %d.\n", __FUNCTION__, player->id);
 		ret = -ENOMEM;
-		goto header_error;
+		goto out;
 	}
 
 	bufs[0] = uv_buf_init(header_buf, PACKET_HEADER_SIZE);
@@ -198,14 +207,14 @@ int server_send_packet(const struct player *player, const struct packet *packet)
 	packet_handler = packet_handler_for_type(packet->type);
 	if (packet_handler == NULL) {
 		_ERROR("%s: could not find packet handler for type %d for slot %d.\n", __FUNCTION__, packet->type, player->id);
-		ret = -ENOMEM;
-		goto error;
+		ret = -1;
+		goto out;
 	}
 
-	if (packet_handler->write_func != NULL && packet_handler->write_func((struct player *)player, packet, player, &bufs[1]) < 0) {
+	if (packet_handler->write_func != NULL && packet_handler->write_func(write_request, packet, player, &bufs[1]) < 0) {
 		_ERROR("%s: error in write handler for packet type %d slot %d.\n", __FUNCTION__, packet->type, player->id);
 		ret = -1;
-		goto error;
+		goto out;
 	}
 
 	write_request->data = (void *)player;
@@ -216,18 +225,15 @@ int server_send_packet(const struct player *player, const struct packet *packet)
 	 */
 	*(uint16_t *)bufs[0].base += (uint16_t)bufs[1].len;
 
-	if (uv_write(write_request, (uv_stream_t *)player->handle, bufs, bufs[1].base != NULL ? 2 : 1, __on_write) < 0) {
+	
+	if (uv_write(talloc_steal(player->handle, write_request), (uv_stream_t *)player->handle, bufs, bufs[1].base != NULL ? 2 : 1, __on_write) < 0) {
 		_ERROR("%s: write failed to slot %d.\n", __FUNCTION__, player->id);
-		goto error;
+		goto out;
 	}
 
 	ret = 0;
-
-	return ret;
-error:
-	talloc_free(write_request);
-header_error:
-	talloc_free(header_buf);
+out:
+	talloc_free(temp_context);
 
 	return ret;
 }
