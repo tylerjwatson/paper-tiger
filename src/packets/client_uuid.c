@@ -92,6 +92,7 @@ int client_uuid_read(struct packet *packet, const uv_buf_t *buf)
 	struct client_uuid *client_uuid;
 
 	char *uuid;
+	char *uuid_copy;
 
 	temp_context = talloc_new(NULL);
 	if (temp_context == NULL) {
@@ -109,8 +110,17 @@ int client_uuid_read(struct packet *packet, const uv_buf_t *buf)
 
 	binary_reader_read_string_buffer(buf->base, pos, &uuid_len, &uuid);
 
-	client_uuid->uuid = talloc_strdup(client_uuid, uuid);
+	uuid_copy = talloc_size(temp_context, uuid_len + 1);
+	if (uuid_copy == NULL) {
+		_ERROR("%s: out of memory allocating uuid.\n", __FUNCTION__);
+		ret = -ENOMEM;
+		goto out;
+	}
+	
+	memcpy(uuid_copy, uuid, uuid_len);
+	uuid_copy[uuid_len] = '\0';
 
+	client_uuid->uuid = talloc_steal(client_uuid, uuid_copy);
 	packet->data = (void *)talloc_steal(packet, client_uuid);
 
 	ret = 0;
