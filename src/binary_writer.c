@@ -26,9 +26,9 @@
 #include "binary_writer.h"
 #include "util.h"
 
-static int __7_bit_len(int value)
+int binary_writer_7bit_len(int value)
 {
-	int count = 0;
+	int count = 1;
 
 	uint32_t v = (uint32_t) value;   // support negative numbers
 	while (v >= 0x80) {
@@ -50,30 +50,21 @@ void binary_writer_write_7bit_int(char *buf, int value, int *pos)
 	}
 
 	buf[*pos] = (uint8_t)v;
+	(*pos)++;
 }
 
-int binary_writer_write_string(TALLOC_CTX *context, const char *src, char **out_string)
+int binary_writer_write_string(char *dest, const char *src)
 {
 	int len, pos = 0;
-	char *string;
-
+	
 	len = strlen(src);
 
 	/*
 	 * 7-bit encoded length goes at the start of the string.
-	 * Count how many bytes are in the 7-bit length to make
-	 * room for it.
 	 */
-	string = talloc_size(context, len + __7_bit_len(len));
-	if (string == NULL) {
-		_ERROR("%s: out of memory allocating string for binary write.\n", __FUNCTION__);
-		return -ENOMEM;
-	}
 
-	binary_writer_write_7bit_int(string, len, &pos);
-	memcpy(string + pos, src, len); 
+	binary_writer_write_7bit_int(dest, len, &pos);
+	memcpy(dest + pos, src, len); 
 
-	*out_string = string;
-
-	return 0;
+	return len + binary_writer_7bit_len(len);
 }

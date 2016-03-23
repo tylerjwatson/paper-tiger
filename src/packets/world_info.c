@@ -21,14 +21,13 @@
 #include <string.h>
 #include <stdbool.h> 
 
-
 #include "world_info.h"
 #include "../world.h"
 #include "../game.h"
 #include "../packet.h"
 #include "../player.h"
 
-
+#include "../talloc/talloc.h"
 #include "../binary_reader.h"
 #include "../binary_writer.h"
 #include "../util.h"
@@ -38,6 +37,61 @@
 static inline void bit_toggle(uint8_t *bit, int n, bool value)
 {
 	*bit ^= (-value ^ *bit) & (1 << n);
+}
+
+static int __fill_world_info_buffer(struct world_info *world_info, char *buffer)
+{
+	int pos = 0;
+	
+	pos += binary_writer_write_value(buffer + pos, world_info->time);
+	pos += binary_writer_write_value(buffer + pos, world_info->day_info);
+	pos += binary_writer_write_value(buffer + pos, world_info->moon_phase);
+	pos += binary_writer_write_value(buffer + pos, world_info->max_tile_x);
+	pos += binary_writer_write_value(buffer + pos, world_info->max_tile_y);
+	pos += binary_writer_write_value(buffer + pos, world_info->spawn_tile_x);
+	pos += binary_writer_write_value(buffer + pos, world_info->spawn_tile_y);
+	pos += binary_writer_write_value(buffer + pos, world_info->world_surface);
+	pos += binary_writer_write_value(buffer + pos, world_info->rock_layer);
+	pos += binary_writer_write_value(buffer + pos, world_info->world_id);
+	pos += binary_writer_write_string(buffer + pos, world_info->world_name);
+	pos += binary_writer_write_value(buffer + pos, world_info->moon_type);
+	pos += binary_writer_write_value(buffer + pos, world_info->bg_tree);
+	pos += binary_writer_write_value(buffer + pos, world_info->bg_corrupt);
+	pos += binary_writer_write_value(buffer + pos, world_info->bg_jungle);
+	pos += binary_writer_write_value(buffer + pos, world_info->bg_snow);
+	pos += binary_writer_write_value(buffer + pos, world_info->bg_hallow);
+	pos += binary_writer_write_value(buffer + pos, world_info->bg_crimson);
+	pos += binary_writer_write_value(buffer + pos, world_info->bg_desert);
+	pos += binary_writer_write_value(buffer + pos, world_info->bg_ocean);
+	pos += binary_writer_write_value(buffer + pos, world_info->style_ice_back);
+	pos += binary_writer_write_value(buffer + pos, world_info->style_jungle_back);
+	pos += binary_writer_write_value(buffer + pos, world_info->style_hell_back);
+	pos += binary_writer_write_value(buffer + pos, world_info->wind_speed_set);
+	pos += binary_writer_write_value(buffer + pos, world_info->num_clouds);
+	
+	for(int i = 0; i < ARRAY_SIZEOF(world_info->tree_x); i++) {
+		pos += binary_writer_write_value(buffer + pos, world_info->tree_x[i]);
+	}
+	
+	for(int i = 0; i < ARRAY_SIZEOF(world_info->tree_style); i++) {
+		pos += binary_writer_write_value(buffer + pos, world_info->tree_style[i]);
+	}
+	
+	for(int i = 0; i < ARRAY_SIZEOF(world_info->cave_back_x); i++) {
+		pos += binary_writer_write_value(buffer + pos, world_info->cave_back_x[i]);
+	}
+	
+	for(int i = 0; i < ARRAY_SIZEOF(world_info->cave_back_style); i++) {
+		pos += binary_writer_write_value(buffer + pos, world_info->cave_back_style[i]);
+	}
+	
+	pos += binary_writer_write_value(buffer + pos, world_info->max_raining);
+	pos += binary_writer_write_value(buffer + pos, world_info->flags_1);
+	pos += binary_writer_write_value(buffer + pos, world_info->flags_2);
+	pos += binary_writer_write_value(buffer + pos, world_info->flags_3);
+	pos += binary_writer_write_value(buffer + pos, world_info->flags_4);
+
+	return pos;
 }
 
 static void __fill_world_info(struct world *world, struct world_info *world_info)
@@ -54,7 +108,7 @@ static void __fill_world_info(struct world *world, struct world_info *world_info
 	world_info->world_surface = world->world_surface;
 	world_info->rock_layer = world->rock_layer;
 	world_info->world_id = world->worldID;
-	binary_writer_write_string(world_info, world->world_name, &world_info->world_name);
+	world_info->world_name = talloc_strdup(world_info, world->world_name);
 	world_info->moon_type = world->moon_type;
 	world_info->bg_tree = world->bg[0];
 	world_info->bg_corrupt = world->bg[1];
@@ -69,25 +123,25 @@ static void __fill_world_info(struct world *world, struct world_info *world_info
 	world_info->style_hell_back = world->hell_back_style;
 	world_info->wind_speed_set = world->wind_speed;
 	world_info->num_clouds = world->num_clouds;
-	
+
 	for(int i = 0; i < ARRAY_SIZEOF(world->tree_x); i++) {
 		world_info->tree_x[i] = world->tree_x[i];
 	}
-	
+
 	for(int i = 0; i < ARRAY_SIZEOF(world->tree_style); i++) {
 		world_info->tree_style[i] = world->tree_style[i];
 	}
-	
+
 	for(int i = 0; i < ARRAY_SIZEOF(world->cave_back_x); i++) {
 		world_info->cave_back_x[i] = world->cave_back_x[i];
 	}
-	
+
 	for(int i = 0; i < ARRAY_SIZEOF(world->cave_back_style); i++) {
 		world_info->cave_back_style[i] = world->cave_back_style[i];
 	}
-	
+
 	world_info->max_raining = world->max_rain;
-	
+
 	bit_toggle(&world_info->flags_1, 0, world->flags.shadow_orb_smashed);
 	bit_toggle(&world_info->flags_1, 1, world->flags.downed_boss_1);
 	bit_toggle(&world_info->flags_1, 2, world->flags.downed_boss_2);
@@ -105,7 +159,7 @@ static void __fill_world_info(struct world *world, struct world_info *world_info
 	bit_toggle(&world_info->flags_2, 5, world->flags.crimson);
 	bit_toggle(&world_info->flags_2, 6, 0 /* Pumpkin moon */);
 	bit_toggle(&world_info->flags_2, 7, 0 /* Snow moon */);
-	
+
 	bit_toggle(&world_info->flags_3, 0, world->expert_mode);
 	bit_toggle(&world_info->flags_3, 1, world->fast_forward_time);
 	bit_toggle(&world_info->flags_3, 2, 0 /* Slime rain */);
@@ -114,16 +168,7 @@ static void __fill_world_info(struct world *world, struct world_info *world_info
 	bit_toggle(&world_info->flags_3, 5, world->flags.downed_fishron);
 	bit_toggle(&world_info->flags_3, 6, world->flags.downed_martians);
 	bit_toggle(&world_info->flags_3, 7, world->flags.downed_ancient_cultist);
-	
-	bit_toggle(&world_info->flags_3, 0, world->expert_mode);
-	bit_toggle(&world_info->flags_3, 1, world->fast_forward_time);
-	bit_toggle(&world_info->flags_3, 2, 0 /* Slime rain */);
-	bit_toggle(&world_info->flags_3, 3, world->flags.downed_slime_king);
-	bit_toggle(&world_info->flags_3, 4, world->flags.downed_queen_bee);
-	bit_toggle(&world_info->flags_3, 5, world->flags.downed_fishron);
-	bit_toggle(&world_info->flags_3, 6, world->flags.downed_martians);
-	bit_toggle(&world_info->flags_3, 7, world->flags.downed_ancient_cultist);
-	
+
 	bit_toggle(&world_info->flags_4, 0, world->flags.downed_moonlord);
 	bit_toggle(&world_info->flags_4, 1, world->flags.downed_halloween_king);
 	bit_toggle(&world_info->flags_4, 2, world->flags.downed_halloween_tree);
@@ -135,6 +180,15 @@ static void __fill_world_info(struct world *world, struct world_info *world_info
 
 	world_info->invasion_type = world->invasion_type;
 	world_info->lobby_id = 0;
+}
+
+int world_info_write(TALLOC_CTX *context, const struct packet *packet, const struct player *player, uv_buf_t buf)
+{
+	struct world_info *world_info = (struct world_info *)packet->data;
+	int name_len = strlen(world_info->world_name);
+	int packet_len = __fill_world_info_buffer(world_info, buf.base);
+
+	return packet_len;
 }
 
 int world_info_new(TALLOC_CTX *ctx, const struct player *player, struct packet **out_packet)
@@ -159,15 +213,15 @@ int world_info_new(TALLOC_CTX *ctx, const struct player *player, struct packet *
 		goto out;
 	}
 
-	world_info = talloc(temp_context, struct world_info);
+	world_info = talloc_zero(temp_context, struct world_info);
 	if (world_info == NULL) {
 		_ERROR("%s: out of memory allocating world info structure.\n", __FUNCTION__);
 		ret = -ENOMEM;
 		goto out;
 	}
-	
+
 	__fill_world_info(world, world_info);
-	
+
 	packet->type = PACKET_TYPE_WORLD_INFO;
 	packet->len = PACKET_HEADER_SIZE;
 	packet->data = talloc_steal(packet, world_info);

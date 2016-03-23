@@ -27,6 +27,7 @@
 #include "talloc/talloc.h"
 
 #define PACKET_HEADER_SIZE 3
+#define PACKET_PAYLOAD_SIZE 0xFFFF
 
 #ifdef __cplusplus
 extern "C" {
@@ -111,7 +112,7 @@ struct packet {
  * @returns
  * `0` if the encoding was successful, `< 0` otherwise.
  */
-typedef int (*packet_write_cb)(TALLOC_CTX *context, const struct packet *packet, const struct player *player, uv_buf_t *buffer);
+typedef int (*packet_write_cb)(TALLOC_CTX *context, const struct packet *packet, const struct player *player, uv_buf_t buffer);
 
 /**
  * @brief Function to call to translate a packet from a network buffer to a fully-qualified `struct packet`.

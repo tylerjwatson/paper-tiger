@@ -87,19 +87,17 @@ static void __on_write(uv_write_t *req, int status)
 static void __print_prompt(uv_stream_t *stream)
 {
 	uv_write_t *req = talloc(stream->data, uv_write_t);
-	uv_buf_t buf = {
-		.base = "guac > ",
-		.len = 7
+	static uv_buf_t buf = {
+		.base = "[\033[32mserver\e[0m@paper-tiger] > ",
+		.len = 32
 	};
-	
+
 	if (req == NULL) {
 		_ERROR("%s: write request for console handle failed.\n", __FUNCTION__);
 		return;
 	}
-	
+
 	uv_write(req, stream, &buf, 1, __on_write);
-	
-	//printf("%s> ", "guac");
 }
 
 static void __on_read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
@@ -177,7 +175,7 @@ static void __alloc_buffer(uv_handle_t *handle, size_t suggested_size, uv_buf_t 
 	struct game *context = (struct game *)handle->data;
 	char *buffer;
 
-	if ((buffer = talloc_size(temp_context, suggested_size)) == NULL) {
+	if ((buffer = talloc_zero_size(temp_context, suggested_size)) == NULL) {
 		_ERROR("%s: Could not allocate %ld bytes for console input buffer.", __FUNCTION__, suggested_size);
 		goto out;
 	}

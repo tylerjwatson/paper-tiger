@@ -63,11 +63,8 @@ out:
 	return ret;
 }
 
-int continue_connecting_write(TALLOC_CTX *context, const struct packet *packet, const struct player *player, uv_buf_t *buf)
+int continue_connecting_write(TALLOC_CTX *context, const struct packet *packet, const struct player *player, uv_buf_t buf)
 {
-	*buf = uv_buf_init(talloc_size(context, PACKET_LEN_CONTINUE_CONNECTING), PACKET_LEN_CONTINUE_CONNECTING);
-
-	buf->base[0] = player->id;
-
-	return 0;
+	buf.base[0] = player->id;
+	return PACKET_LEN_CONTINUE_CONNECTING;
 }
