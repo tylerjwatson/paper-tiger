@@ -46,7 +46,7 @@ void binary_writer_write_7bit_int(char *buf, int value, int *pos)
 	while (v >= 0x80) {
 		buf[*pos] = (uint8_t)(v | 0x80);
 		v >>= 7;
-		*pos++;
+		(*pos)++;
 	}
 
 	buf[*pos] = (uint8_t)v;
