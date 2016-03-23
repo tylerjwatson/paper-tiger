@@ -38,7 +38,7 @@ static int __handle_test(struct game *game, struct console_command *command)
 	}
 
 	param_free(params);
-	
+
 	return 0;
 }
 
@@ -52,7 +52,8 @@ static int __handle_disconnect(struct game *game, struct console_command *comman
 {
 	int slot;
 	struct player *player;
-	
+	struct packet *disconnect;
+
 	if (command->parameters == NULL || strlen(command->parameters) == 0) {
 		_ERROR("%s: slot required.  syntax: /disconnect {slot}\n", command->command_name);
 		return 0;
@@ -60,14 +61,21 @@ static int __handle_disconnect(struct game *game, struct console_command *comman
 
 	slot = atoi(command->parameters);
 	player = game->players[slot];
-	
+
 	if (player == NULL) {
 		_ERROR("%s: there is no player at slot %d.\n", command->command_name, slot);
 		return 0;
 	}
-	
+
+	if (disconnect_new(player, player, "Test", &disconnect) < 0) {
+		_ERROR("%s: out of memory sending packet.\n", __FUNCTION__);
+		return -2;
+	}
+	server_send_packet(player, (const struct packet *)disconnect);
+	talloc_free(disconnect);
+
 	player_close(player);
-	
+
 	return 0;
 }
 
@@ -126,7 +134,8 @@ static void __on_read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 	 */
 	if (command_copy_base[0] == '/') {
 		command_copy = command_copy_base + 1;
-	} else {
+	}
+	else {
 		command_copy = command_copy_base;
 	}
 
@@ -136,7 +145,7 @@ static void __on_read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 	command_copy = strtok(command_copy, " ");
 	command_copy[strcspn(command_copy, "\r\n")] = '\0';
 	parameters = buf->base + strcspn(buf->base, " ");
-	
+
 	if (strlen(command_copy) == 0) {
 		goto out;
 	}
