@@ -31,6 +31,7 @@
 #include "packets/client_uuid.h"
 #include "packets/player_hp.h"
 #include "packets/player_mana.h"
+#include "packets/disconnect.h"
 
 static struct packet_handler packet_handlers[] = {
 	{ .type = PACKET_TYPE_CONNECT_REQUEST, .read_func = connect_request_read, .handle_func = connect_request_handle, .write_func = NULL },
@@ -41,6 +42,7 @@ static struct packet_handler packet_handlers[] = {
 	{ .type = PACKET_TYPE_PLAYER_HP, .read_func = player_hp_read, .handle_func = player_hp_handle, .write_func = NULL },
 	{ .type = PACKET_TYPE_PLAYER_MANA, .read_func = player_mana_read, .handle_func = player_mana_handle, .write_func = NULL },
 	{ .type = PACKET_TYPE_CLIENT_UUID, .read_func = client_uuid_read, .handle_func = client_uuid_handle, .write_func = NULL },
+	{ .type = PACKET_TYPE_DISCONNECT, .read_func = disconnect_read, .handle_func = disconnect_handle, .write_func = disconnect_write },
 	{ 0x00, NULL, NULL, NULL }
 };
 

@@ -46,6 +46,8 @@ add_executable(paper-tiger
 	src/packets/connect_request.c
 	src/packets/world_info.c
 	src/packets/world_info.h
+	src/packets/disconnect.c
+	src/packets/disconnect.h
 
 	src/packets/player_hp.h
 	src/packets/player_hp.c
