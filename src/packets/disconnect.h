@@ -1,6 +1,7 @@
 /*
 * upgraded-guacamole - A Terraria server written in C for POSIX operating systems
 * Copyright (C) 2016  Tyler Watson <tyler@tw.id.au>
+*					  DeathCradle <rt.luke.s@gmail.com>
 *
 * This file is part of upgraded-guacamole.
 *

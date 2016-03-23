@@ -1,6 +1,7 @@
 /*
 * upgraded-guacamole - A Terraria server written in C for POSIX operating systems
 * Copyright (C) 2016  Tyler Watson <tyler@tw.id.au>
+*					  DeathCradle <rt.luke.s@gmail.com>
 *
 * This file is part of upgraded-guacamole.
 *
@@ -96,7 +97,7 @@ int disconnect_read(struct packet *packet, const uv_buf_t *buf)
 
 	reason = talloc_size(temp_context, str_len + 1);
 	if (reason == NULL) {
-		_ERROR("%s: out of memory copying protocol version to packet.\n", __FUNCTION__);
+		_ERROR("%s: out of memory copying reason to packet.\n", __FUNCTION__);
 		ret = -ENOMEM;
 		goto out;
 	}
