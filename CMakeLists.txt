@@ -16,6 +16,11 @@ else()
 	include(FindLibUV)
 endif()
 
+include(FindZLIB)
+
+if(NOT ZLIB_FOUND)
+	message(FATAL_ERROR "zlib not found and is required.")
+endif()
 
 if(NOT LIBUV_FOUND)
 	message(FATAL_ERROR "LibUV not found and is required.")
@@ -23,7 +28,7 @@ endif()
 
 add_library(talloc STATIC src/talloc/talloc.c)
 
-include_directories("/usr/local/include" "${PROJECT_SOURCE_DIR}" "${LIBUV_INCLUDE_DIRS}") 
+include_directories("/usr/local/include" "${PROJECT_SOURCE_DIR}" "${LIBUV_INCLUDE_DIRS}" "${ZLIB_INCLUDE_DIRS}") 
 
 add_executable(paper-tiger
 	src/packet.c
@@ -74,9 +79,9 @@ add_executable(paper-tiger
 set_property(TARGET paper-tiger PROPERTY C_STANDARD 11)
 
 if(WIN32)
-	target_link_libraries(paper-tiger talloc "${LIBUV_LIBRARIES}")
+	target_link_libraries(paper-tiger talloc "${LIBUV_LIBRARIES}" "${ZLIB_LIBRARIES}")
 else()
-	target_link_libraries(paper-tiger talloc "${LIBUV_LIBRARIES}")
+	target_link_libraries(paper-tiger talloc "${LIBUV_LIBRARIES}" "${ZLIB_LIBRARIES}")
 endif()
 
 install(TARGETS paper-tiger RUNTIME DESTINATION bin)
