@@ -21,9 +21,9 @@
 #ifndef HAVE_BINARY_READER_H
 #define HAVE_BINARY_READER_H
 
+#include <stdint.h>
 #include <stdbool.h>
 #include "talloc/talloc.h"
-#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,6 +33,14 @@ struct binary_reader_context {
 	char *file_path;
 	FILE *fp;
 };
+
+#define binary_reader_read_value(src, type)		\
+	*(type *)src
+
+static inline int binary_reader_read_internal(const void *src, int n, void **out_value)
+{
+	return n;
+}
 
 int binary_reader_new(TALLOC_CTX *parent_context, const char *file_path, struct binary_reader_context **out_context);
 
