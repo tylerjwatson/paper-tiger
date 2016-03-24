@@ -1,36 +1,36 @@
 /*
- * upgraded-guacamole - A Terraria server written in C for POSIX operating systems
+ * paper-tiger - A Terraria server written in C for POSIX operating systems
  * Copyright (C) 2016  Tyler Watson <tyler@tw.id.au>
  *
- * This file is part of upgraded-guacamole.
+ * This file is part of paper-tiger.
  * 
- * upgraded-guacamole is free software: you can redistribute it and/or modify
+ * paper-tiger is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
  * 
- * upgraded-guacamole is distributed in the hope that it will be useful,
+ * paper-tiger is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
  * You should have received a copy of the GNU General Public License
- * along with upgraded-guacamole.  If not, see <http://www.gnu.org/licenses/>.
+ * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 
 #ifndef _HAVE_TILE_H
 #define _HAVE_TILE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "talloc/talloc.h"
 #include <stdint.h>
 #include "binary_reader.h"
 
 #define TILE_SECTION_WIDTH 100
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 enum {
 	WORLD_FILE_TILE_HAS_FLAGS = 1,
@@ -108,6 +108,8 @@ void tile_set_inactive(struct tile *tile, bool val);
 void tile_set_actuator(struct tile *tile, bool val);
 
 void tile_copy(const struct tile *src, struct tile *dest);
+
+int tile_pack(const struct tile *src, char *dest);
 
 #ifdef __cplusplus
 }
