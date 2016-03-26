@@ -48,11 +48,14 @@ add_executable(paper-tiger
 	src/packets/world_info.h
 	src/packets/disconnect.c
 	src/packets/disconnect.h
-
+	src/packets/get_section.c
+	src/packets/get_section.h
 	src/packets/player_hp.h
 	src/packets/player_hp.c
 	src/packets/player_mana.h
 	src/packets/player_mana.c
+
+	src/rect.h
 
 	src/binary_writer.c
 	src/binary_writer.h

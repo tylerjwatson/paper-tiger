@@ -34,14 +34,6 @@ struct binary_reader_context {
 	FILE *fp;
 };
 
-#define binary_reader_read_value(src, type)		\
-	*(type *)src
-
-static inline int binary_reader_read_internal(const void *src, int n, void **out_value)
-{
-	return n;
-}
-
 int binary_reader_new(TALLOC_CTX *parent_context, const char *file_path, struct binary_reader_context **out_context);
 
 size_t binary_reader_pos(struct binary_reader_context *context);

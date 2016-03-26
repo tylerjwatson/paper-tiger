@@ -30,8 +30,8 @@ extern "C" {
 struct rect {
 	int32_t x;
 	int32_t y;
-	int32_t w;
-	int32_t h;
+	int16_t w;
+	int16_t h;
 };
 
 #ifdef __cplusplus

@@ -34,11 +34,6 @@
 
 #define ARRAY_SIZEOF(a) sizeof(a)/sizeof(a[0])
 
-static inline void bit_toggle(uint8_t *bit, int n, bool value)
-{
-	*bit ^= (-value ^ *bit) & (1 << n);
-}
-
 static int __fill_world_info_buffer(struct world_info *world_info, char *buffer)
 {
 	int pos = 0;
@@ -96,17 +91,17 @@ static int __fill_world_info_buffer(struct world_info *world_info, char *buffer)
 
 static void __fill_world_info(struct world *world, struct world_info *world_info)
 {
-	world_info->time = world->temp_time;
-	bit_toggle(&world_info->day_info, 0, world->temp_day_time);
-	bit_toggle(&world_info->day_info, 1, world->temp_blood_moon);
-	bit_toggle(&world_info->day_info, 2, world->temp_eclipse);
+	world_info->time = (int)world->temp_time;
+	bit_toggle(world_info->day_info, 0, world->temp_day_time);
+	bit_toggle(world_info->day_info, 1, world->temp_blood_moon);
+	bit_toggle(world_info->day_info, 2, world->temp_eclipse);
 	world_info->moon_phase = world->temp_moon_phase;
 	world_info->max_tile_x = world->max_tiles_x;
 	world_info->max_tile_y = world->max_tiles_y;
 	world_info->spawn_tile_x = world->spawn_tile.x;
 	world_info->spawn_tile_y = world->spawn_tile.y;
-	world_info->world_surface = world->world_surface;
-	world_info->rock_layer = world->rock_layer;
+	world_info->world_surface = (int16_t)world->world_surface;
+	world_info->rock_layer = (int16_t)world->rock_layer;
 	world_info->world_id = world->worldID;
 	world_info->world_name = talloc_strdup(world_info, world->world_name);
 	world_info->moon_type = world->moon_type;
@@ -122,7 +117,7 @@ static void __fill_world_info(struct world *world, struct world_info *world_info
 	world_info->style_jungle_back = world->jungle_back_style;
 	world_info->style_hell_back = world->hell_back_style;
 	world_info->wind_speed_set = world->wind_speed;
-	world_info->num_clouds = world->num_clouds;
+	world_info->num_clouds = (uint8_t)world->num_clouds;
 
 	for(int i = 0; i < ARRAY_SIZEOF(world->tree_x); i++) {
 		world_info->tree_x[i] = world->tree_x[i];
@@ -142,41 +137,41 @@ static void __fill_world_info(struct world *world, struct world_info *world_info
 
 	world_info->max_raining = world->max_rain;
 
-	bit_toggle(&world_info->flags_1, 0, world->flags.shadow_orb_smashed);
-	bit_toggle(&world_info->flags_1, 1, world->flags.downed_boss_1);
-	bit_toggle(&world_info->flags_1, 2, world->flags.downed_boss_2);
-	bit_toggle(&world_info->flags_1, 3, world->flags.downed_boss_3);
-	bit_toggle(&world_info->flags_1, 4, world->flags.hard_mode);
-	bit_toggle(&world_info->flags_1, 5, world->flags.downed_clowns);
-	bit_toggle(&world_info->flags_1, 6, 1 /*SSO Support*/);
-	bit_toggle(&world_info->flags_1, 7, world->flags.downed_plant);
+	bit_toggle(world_info->flags_1, 0, world->flags.shadow_orb_smashed);
+	bit_toggle(world_info->flags_1, 1, world->flags.downed_boss_1);
+	bit_toggle(world_info->flags_1, 2, world->flags.downed_boss_2);
+	bit_toggle(world_info->flags_1, 3, world->flags.downed_boss_3);
+	bit_toggle(world_info->flags_1, 4, world->flags.hard_mode);
+	bit_toggle(world_info->flags_1, 5, world->flags.downed_clowns);
+	bit_toggle(world_info->flags_1, 6, 1 /*SSO Support*/);
+	bit_toggle(world_info->flags_1, 7, world->flags.downed_plant);
 	
-	bit_toggle(&world_info->flags_2, 0, world->flags.downed_mech_1);
-	bit_toggle(&world_info->flags_2, 1, world->flags.downed_mech_2);
-	bit_toggle(&world_info->flags_2, 2, world->flags.downed_mech_3);
-	bit_toggle(&world_info->flags_2, 3, world->flags.downed_mech_any);
-	bit_toggle(&world_info->flags_2, 4, world->cloud_bg_active > 1.);
-	bit_toggle(&world_info->flags_2, 5, world->flags.crimson);
-	bit_toggle(&world_info->flags_2, 6, 0 /* Pumpkin moon */);
-	bit_toggle(&world_info->flags_2, 7, 0 /* Snow moon */);
+	bit_toggle(world_info->flags_2, 0, world->flags.downed_mech_1);
+	bit_toggle(world_info->flags_2, 1, world->flags.downed_mech_2);
+	bit_toggle(world_info->flags_2, 2, world->flags.downed_mech_3);
+	bit_toggle(world_info->flags_2, 3, world->flags.downed_mech_any);
+	bit_toggle(world_info->flags_2, 4, (world->cloud_bg_active > 1.));
+	bit_toggle(world_info->flags_2, 5, world->flags.crimson);
+	bit_toggle(world_info->flags_2, 6, 0 /* Pumpkin moon */);
+	bit_toggle(world_info->flags_2, 7, 0 /* Snow moon */);
 
-	bit_toggle(&world_info->flags_3, 0, world->expert_mode);
-	bit_toggle(&world_info->flags_3, 1, world->fast_forward_time);
-	bit_toggle(&world_info->flags_3, 2, 0 /* Slime rain */);
-	bit_toggle(&world_info->flags_3, 3, world->flags.downed_slime_king);
-	bit_toggle(&world_info->flags_3, 4, world->flags.downed_queen_bee);
-	bit_toggle(&world_info->flags_3, 5, world->flags.downed_fishron);
-	bit_toggle(&world_info->flags_3, 6, world->flags.downed_martians);
-	bit_toggle(&world_info->flags_3, 7, world->flags.downed_ancient_cultist);
+	bit_toggle(world_info->flags_3, 0, world->expert_mode);
+	bit_toggle(world_info->flags_3, 1, world->fast_forward_time);
+	bit_toggle(world_info->flags_3, 2, 0 /* Slime rain */);
+	bit_toggle(world_info->flags_3, 3, world->flags.downed_slime_king);
+	bit_toggle(world_info->flags_3, 4, world->flags.downed_queen_bee);
+	bit_toggle(world_info->flags_3, 5, world->flags.downed_fishron);
+	bit_toggle(world_info->flags_3, 6, world->flags.downed_martians);
+	bit_toggle(world_info->flags_3, 7, world->flags.downed_ancient_cultist);
 
-	bit_toggle(&world_info->flags_4, 0, world->flags.downed_moonlord);
-	bit_toggle(&world_info->flags_4, 1, world->flags.downed_halloween_king);
-	bit_toggle(&world_info->flags_4, 2, world->flags.downed_halloween_tree);
-	bit_toggle(&world_info->flags_4, 3, world->flags.downed_christmas_ice_queen);
-	bit_toggle(&world_info->flags_4, 4, world->flags.downed_christmas_santank);
-	bit_toggle(&world_info->flags_4, 5, world->flags.downed_christmas_tree);
-	bit_toggle(&world_info->flags_4, 6, world->flags.downed_golem);
-	bit_toggle(&world_info->flags_4, 7, 0 /* Not used */);
+	bit_toggle(world_info->flags_4, 0, world->flags.downed_moonlord);
+	bit_toggle(world_info->flags_4, 1, world->flags.downed_halloween_king);
+	bit_toggle(world_info->flags_4, 2, world->flags.downed_halloween_tree);
+	bit_toggle(world_info->flags_4, 3, world->flags.downed_christmas_ice_queen);
+	bit_toggle(world_info->flags_4, 4, world->flags.downed_christmas_santank);
+	bit_toggle(world_info->flags_4, 5, world->flags.downed_christmas_tree);
+	bit_toggle(world_info->flags_4, 6, world->flags.downed_golem);
+	bit_toggle(world_info->flags_4, 7, 0 /* Not used */);
 
 	world_info->invasion_type = world->invasion_type;
 	world_info->lobby_id = 0;

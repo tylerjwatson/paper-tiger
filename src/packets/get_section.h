@@ -22,15 +22,12 @@
 #define _HAVE_GET_SECTION_H
 
 #define PACKET_TYPE_GET_SECTION 8
-
-/*
- * Base length + name length + 1
- */
 #define PACKET_LEN_GET_SECTION 8
 
 #include <uv.h>
 
 #include "../talloc/talloc.h"
+#include "../rect.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,12 +35,13 @@ extern "C" {
 
 struct player;
 struct packet;
-struct vector_2d;
 	
 struct get_section {
-	struct vector_2d section;
+	int32_t x;
+	int32_t y;
 };
 
+int get_section_handle(struct player *player, struct packet *packet);
 int get_section_read(struct packet *packet, const uv_buf_t *buf);
 
 #ifdef __cplusplus

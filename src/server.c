@@ -108,7 +108,7 @@ static void __alloc_buffer(uv_handle_t *handle, size_t size, uv_buf_t *out_buf)
 		size = player->incoming_packet->len - PACKET_HEADER_SIZE;
 	}
 	
-	*out_buf = uv_buf_init(talloc_size(player, size), size);
+	*out_buf = uv_buf_init(talloc_zero_size(player, size), size);
 }
 
 void __on_connection(uv_stream_t *handle, int status)

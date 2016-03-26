@@ -263,6 +263,9 @@ int world_new(TALLOC_CTX *parent, const char *world_path, struct world **out_wor
 int world_init(struct world *world);
 struct tile *world_tile_at(struct world *world, const uint32_t x, const uint32_t y);
 
+int world_compress_tile_section(struct world *world, unsigned start_x, unsigned start_y,
+								unsigned w, unsigned h, char *buffer, int *buf_len);
+
 #ifdef __cplusplus
 }
 #endif

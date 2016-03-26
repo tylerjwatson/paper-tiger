@@ -22,4 +22,18 @@
 
 #define _ERROR(x,...) fprintf(stderr, x,##__VA_ARGS__)
 
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define bit_toggle(src, n, val)	do {		\
+	src ^= (-(int)val ^ src) & (1 << n);		\
+} while (0)
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif //UPGRADED_GUACAMOLE_UTIL_H

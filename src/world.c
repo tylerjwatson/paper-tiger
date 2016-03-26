@@ -20,12 +20,13 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <zlib.h>
 
 #include "world.h"
 #include "util.h"
+#include "binary_writer.h"
 
 #define RELOGIC_MAGIC_NUMBER 27981915666277746
-
 
 static int __world_read_file_metadata(struct world *world)
 {
@@ -935,4 +936,39 @@ failed:
 struct tile *world_tile_at(struct world *world, const uint32_t x, const uint32_t y)
 {
 	return &world->tiles[x][y];
+}
+
+int world_compress_tile_section(struct world *world, unsigned start_x, unsigned start_y, unsigned w, unsigned h, char *buffer, int *buf_len)
+{
+	struct tile *tile;
+	int staging_len = 0, pos = 0, ret = -1;
+	uint8_t header_1, header_2, header_3;
+
+	char staging_buffer[13];
+	char tile_buffer[262144];
+
+	for (unsigned y = start_y; y < start_y + w; y++)
+	for (unsigned x = start_x; x < start_x + h; x++) {
+		tile = world_tile_at(world, x, y);
+		staging_len = tile_pack(tile, staging_buffer, &header_1, &header_2, &header_3);
+		pos += binary_writer_write_value(tile_buffer + pos, header_1);
+
+		if ((header_1 & 1) == 1) {
+			pos += binary_writer_write_value(tile_buffer + pos, header_2);
+
+			if ((header_2 & 1) == 1) {
+				pos += binary_writer_write_value(tile_buffer + pos, header_3);
+			}
+		}
+
+		memcpy(tile_buffer + pos, staging_buffer, staging_len);
+		pos += staging_len;
+	}
+
+	if (compress(buffer, buf_len, tile_buffer, pos) != Z_OK) {
+		_ERROR("%s: compression error writing tile section %d,%d.\n", __FUNCTION__, start_x, start_y);
+		ret = -1;
+	}
+
+	return ret;
 }

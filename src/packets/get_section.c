@@ -34,12 +34,20 @@
 
 #define ARRAY_SIZEOF(a) sizeof(a)/sizeof(a[0])
 
+int get_section_handle(struct player *player, struct packet *packet)
+{
+	struct get_section *get_section = (struct get_section *)packet->data;
+
+	return 0;
+}
+
 int get_section_read(struct packet *packet, const uv_buf_t *buf)
 {
 	TALLOC_CTX *temp_context;
-	int ret = -1, pos = 0, str_len;
+	int ret = -1, pos = 0;
 	struct get_section *get_section;
-	
+	uint8_t *u_buffer = (uint8_t *)buf->base;
+
 	temp_context = talloc_new(NULL);
 	if (temp_context == NULL) {
 		_ERROR("%s: out of memory allocating temp context for get section.\n", __FUNCTION__);
@@ -53,6 +61,10 @@ int get_section_read(struct packet *packet, const uv_buf_t *buf)
 		ret = -ENOMEM;
 		goto out;
 	}
+
+	get_section->x = *(int32_t *)(u_buffer + pos);
+	pos += sizeof(int32_t);
+	get_section->y = *(int32_t *)(u_buffer + pos);
 
 	packet->data = (void *)talloc_steal(packet, get_section);
 

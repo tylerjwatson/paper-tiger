@@ -50,6 +50,7 @@ enum {
 	S_TILE_HEADER_WIRE = 1 << 7,
 	S_TILE_HEADER_WIRE_2 = 1 << 8,
 	S_TILE_HEADER_WIRE_3 = 1 << 9,
+	S_TILE_HEADER_HALFBRICK = 1 << 10,
 	S_TILE_ACTUATOR = 1 << 11
 };
 
@@ -85,19 +86,20 @@ struct tile {
 };
 
 int tile_heap_new(TALLOC_CTX *context, const uint32_t size_x, const uint32_t size_y, struct tile ***out_tiles);
-bool tile_active(struct tile *tile);
+
+bool tile_active(const struct tile *tile);
 void tile_set_active(struct tile *tile, bool val);
 
-uint8_t tile_colour(struct tile *tile);
+uint8_t tile_colour(const struct tile *tile);
 void tile_set_colour(struct tile *tile, uint8_t colour);
 
-uint8_t tile_wall_colour(struct tile *tile);
+uint8_t tile_wall_colour(const struct tile *tile);
 void tile_set_wall_colour(struct tile *tile, uint8_t colour);
 
-bool tile_honey(struct tile *tile);
+bool tile_honey(const struct tile *tile);
 void tile_set_honey(struct tile *tile, bool honey);
 
-bool tile_lava(struct tile *tile);
+bool tile_lava(const struct tile *tile);
 void tile_set_lava(struct tile *tile, bool lava);
 
 void tile_set_wire(struct tile *tile, bool tile_val);
@@ -109,7 +111,9 @@ void tile_set_actuator(struct tile *tile, bool val);
 
 void tile_copy(const struct tile *src, struct tile *dest);
 
-int tile_pack(const struct tile *src, char *dest);
+int tile_pack(const struct tile *tile, char *dest, uint8_t *tile_flags_1, uint8_t *tile_flags_2, uint8_t *tile_flags_3);
+
+int tile_cmp(const struct tile *src, const struct tile *dest);
 
 #ifdef __cplusplus
 }
