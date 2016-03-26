@@ -67,7 +67,7 @@ int dataloader_load_tile_flags(struct game *game)
 		tile_frame_important[i] = flags;
 	}
 
-	game->tile_frame_important = talloc_steal(game, tile_frame_important);
+	game->tile_frame_important = (bool *)talloc_steal(game, tile_frame_important);
 
 	ret = 0;
 out:
