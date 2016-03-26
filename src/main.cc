@@ -92,17 +92,23 @@ int main(int argc, char **argv)
 	start = clock();
 
 	printf("%s: initializing game context... ", __FUNCTION__);
-	game_new(NULL, &game);
+	
+	if (game_new(NULL, &game) < 0) {
+		printf("failed.\n");
+		_ERROR("%s: game initialization failed.  The process cannot continue.\n", __FUNCTION__);
+		return 2;
+	}
+
 	printf("done.\n");
 
 	printf("%s: loading world from %s... ", __FUNCTION__, options_worldPath);
-	if (world_new(game, options_worldPath, &game->world) < 0
+	if (world_new(game, game, options_worldPath, &game->world) < 0
 		|| world_init(game->world) < 0) {
 		ret = -1;
 		printf("World init failed: %d\n", ret);
 		goto out;
 	}
-	
+
 	diff = clock() - start;
 	printf("done (%dms).\n", (int)(diff * 1000 / CLOCKS_PER_SEC));
 

@@ -110,6 +110,11 @@ struct game {
 	 * libuv timer which fires every @a ms_per_frame ms.  Serves as the game update loop.
 	 */
 	uv_timer_t *update_handle;
+	
+	/**
+	 * Array of tile frame important data, loaded from @a flags.dat.
+	 */
+	bool *tile_frame_important;
 };
 
 /**

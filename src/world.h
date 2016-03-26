@@ -33,6 +33,8 @@ extern "C" {
 #include "tile.h"
 #include "binary_reader.h"
 
+struct game;
+
 struct world_flags {
 	bool crimson;
 	bool downed_boss_1;
@@ -98,6 +100,7 @@ enum relogic_file_type {
  * all the tiles and everything the world needs to operate correctly.
  */
 struct world {
+	struct game *game;
 	/**
 	 * Internal unique world identifier.
 	 */
@@ -259,11 +262,14 @@ struct world {
 	int _is_loaded; 
 };
 
-int world_new(TALLOC_CTX *parent, const char *world_path, struct world **out_world);
+int world_new(TALLOC_CTX *parent_context, const struct game *game, const char *world_path,
+			  struct world **out_world);
+
 int world_init(struct world *world);
+
 struct tile *world_tile_at(struct world *world, const uint32_t x, const uint32_t y);
 
-int world_compress_tile_section(struct world *world, unsigned start_x, unsigned start_y,
+int world_compress_tile_section(struct world *world, unsigned start_x, unsigned start_y, 
 								unsigned w, unsigned h, char *buffer, int *buf_len);
 
 #ifdef __cplusplus

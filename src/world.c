@@ -22,6 +22,7 @@
 #include <string.h>
 #include <zlib.h>
 
+#include "game.h"
 #include "world.h"
 #include "util.h"
 #include "binary_writer.h"
@@ -900,7 +901,7 @@ out:
 	return ret;
 }
 
-int world_new(TALLOC_CTX *parent_context, const char *world_path,
+int world_new(TALLOC_CTX *parent_context, const struct game *game, const char *world_path,
 			  struct world **out_world)
 {
 	int ret = 0;
@@ -925,6 +926,8 @@ int world_new(TALLOC_CTX *parent_context, const char *world_path,
 		goto failed;
 	}
 
+	world->game = game;
+
 	*out_world = talloc_steal(parent_context, world);
 	ret = 0;
 
@@ -938,7 +941,8 @@ struct tile *world_tile_at(struct world *world, const uint32_t x, const uint32_t
 	return &world->tiles[x][y];
 }
 
-int world_compress_tile_section(struct world *world, unsigned start_x, unsigned start_y, unsigned w, unsigned h, char *buffer, int *buf_len)
+int world_compress_tile_section(struct world *world, unsigned start_x, unsigned start_y, 
+								unsigned w, unsigned h, char *buffer, int *buf_len)
 {
 	struct tile *tile;
 	int staging_len = 0, pos = 0, ret = -1;
@@ -950,7 +954,7 @@ int world_compress_tile_section(struct world *world, unsigned start_x, unsigned 
 	for (unsigned y = start_y; y < start_y + w; y++)
 	for (unsigned x = start_x; x < start_x + h; x++) {
 		tile = world_tile_at(world, x, y);
-		staging_len = tile_pack(tile, staging_buffer, &header_1, &header_2, &header_3);
+		staging_len = tile_pack(world->game, tile, staging_buffer, &header_1, &header_2, &header_3);
 		pos += binary_writer_write_value(tile_buffer + pos, header_1);
 
 		if ((header_1 & 1) == 1) {
@@ -965,7 +969,7 @@ int world_compress_tile_section(struct world *world, unsigned start_x, unsigned 
 		pos += staging_len;
 	}
 
-	if (compress(buffer, buf_len, tile_buffer, pos) != Z_OK) {
+	if (compress(buffer, (uLongf *)buf_len, tile_buffer, pos) != Z_OK) {
 		_ERROR("%s: compression error writing tile section %d,%d.\n", __FUNCTION__, start_x, start_y);
 		ret = -1;
 	}

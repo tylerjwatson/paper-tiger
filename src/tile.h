@@ -22,8 +22,9 @@
 #ifndef _HAVE_TILE_H
 #define _HAVE_TILE_H
 
-#include "talloc/talloc.h"
 #include <stdint.h>
+
+#include "talloc/talloc.h"
 #include "binary_reader.h"
 
 #define TILE_SECTION_WIDTH 100
@@ -31,6 +32,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+struct game;
 
 enum {
 	WORLD_FILE_TILE_HAS_FLAGS = 1,
@@ -68,10 +71,6 @@ enum {
 	WORLD_FILE_WALL_COLOUR = 1 << 4
 };
 
-struct tile_row {
-	int x;
-	struct tile *tiles;
-};
 
 struct tile {
 	uint16_t type;
@@ -84,6 +83,12 @@ struct tile {
 	int16_t frame_x;
 	int16_t frame_y;
 };
+
+struct tile_row {
+	int x;
+	struct tile *tiles;
+};
+
 
 int tile_heap_new(TALLOC_CTX *context, const uint32_t size_x, const uint32_t size_y, struct tile ***out_tiles);
 
@@ -111,7 +116,8 @@ void tile_set_actuator(struct tile *tile, bool val);
 
 void tile_copy(const struct tile *src, struct tile *dest);
 
-int tile_pack(const struct tile *tile, char *dest, uint8_t *tile_flags_1, uint8_t *tile_flags_2, uint8_t *tile_flags_3);
+int tile_pack(const struct game *game, const struct tile *tile, char *dest, uint8_t *tile_flags_1, 
+			  uint8_t *tile_flags_2, uint8_t *tile_flags_3);
 
 int tile_cmp(const struct tile *src, const struct tile *dest);
 

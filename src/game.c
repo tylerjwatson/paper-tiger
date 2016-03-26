@@ -23,6 +23,7 @@
 #include <uv.h>
 
 #include "game.h"
+#include "dataloader.h"
 #include "util.h"
 
 #ifdef _WIN32
@@ -101,7 +102,13 @@ int game_new(TALLOC_CTX *context, struct game **out_context)
 	uv_loop_init(gameContext->event_loop);
 	gameContext->player_slots = talloc_zero_array(gameContext, word_t, GAME_MAX_PLAYERS / sizeof(word_t));
 	talloc_set_destructor(gameContext, __game_destructor);
-
+	
+	if (dataloader_load_tile_flags(gameContext) < 0) {
+		_ERROR("%s: loading tile flags failed.\n", __FUNCTION__);
+		ret = -1;
+		goto out;
+	}
+	
 	*out_context = talloc_steal(context, gameContext);
 
 	ret = 0;

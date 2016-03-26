@@ -1,0 +1,64 @@
+[03/26/16 20:39:55] [Server API] Verbose: TerrariaApi - Server v1.22.0.0 started.
+[03/26/16 20:39:55] [Server API] Verbose: 	Command line: /home/tw/src/paper-tiger/bindata/TerrariaServer.exe
+[03/26/16 20:39:55] [Server API] Verbose: 	OS: Unix 4.4.5.300 (64bit: True)
+[03/26/16 20:39:55] [Server API] Verbose: 	Mono: True
+[03/26/16 20:41:38] [Server API] Verbose: TerrariaApi - Server v1.22.0.0 started.
+[03/26/16 20:41:38] [Server API] Verbose: 	Command line: /home/tw/src/paper-tiger/bindata/TerrariaServer.exe
+[03/26/16 20:41:38] [Server API] Verbose: 	OS: Unix 4.4.5.300 (64bit: True)
+[03/26/16 20:41:38] [Server API] Verbose: 	Mono: True
+[03/26/16 20:43:42] [Server API] Verbose: TerrariaApi - Server v1.22.0.0 started.
+[03/26/16 20:43:42] [Server API] Verbose: 	Command line: /home/tw/src/paper-tiger/bindata/TerrariaServer.exe
+[03/26/16 20:43:42] [Server API] Verbose: 	OS: Unix 4.4.5.300 (64bit: True)
+[03/26/16 20:43:42] [Server API] Verbose: 	Mono: True
+[03/26/16 20:44:33] [Server API] Verbose: TerrariaApi - Server v1.22.0.0 started.
+[03/26/16 20:44:33] [Server API] Verbose: 	Command line: /home/tw/src/paper-tiger/bindata/TerrariaServer.exe
+[03/26/16 20:44:33] [Server API] Verbose: 	OS: Unix 4.4.5.300 (64bit: True)
+[03/26/16 20:44:33] [Server API] Verbose: 	Mono: True
+[03/26/16 20:44:33] [Server API] Info: Plugin ProtoPlugin v1.0.0.0 (by Tyler W.) initiated.
+[03/26/16 20:44:42] [Server API] Warning: Plugin "ProtoPlugin" has had an unhandled exception thrown by one of its GamePostInitialize handlers: 
+System.IO.DirectoryNotFoundException: Could not find a part of the path "/home/tw/src/paper-tiger/bindata/data/tile/flags.dat".
+  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) <0x7fe67ab0ec10 + 0x001fb> in <filename unknown>:0 
+  at System.IO.FileStream..ctor (System.String path, FileMode mode) <0x7fe67ab0e7c0 + 0x00053> in <filename unknown>:0 
+  at (wrapper remoting-invoke-with-check) System.IO.FileStream:.ctor (string,System.IO.FileMode)
+  at protoplugin.ProtoPlugin.DumpTileFlags (System.String path) <0x403b0520 + 0x00157> in <filename unknown>:0 
+  at protoplugin.ProtoPlugin.<Initialize>m__0 (System.EventArgs args) <0x403b04f0 + 0x00017> in <filename unknown>:0 
+  at TerrariaApi.Server.HandlerCollection`1[ArgsType].Invoke (TerrariaApi.Server.ArgsType args) <0x402e23c0 + 0x00197> in <filename unknown>:0 
+[03/26/16 20:51:38] [Server API] Verbose: TerrariaApi - Server v1.22.0.0 started.
+[03/26/16 20:51:38] [Server API] Verbose: 	Command line: /home/tw/src/paper-tiger/bindata/TerrariaServer.exe
+[03/26/16 20:51:38] [Server API] Verbose: 	OS: Unix 4.4.5.300 (64bit: True)
+[03/26/16 20:51:38] [Server API] Verbose: 	Mono: True
+[03/26/16 20:51:38] [Server API] Info: Plugin ProtoPlugin v1.0.0.0 (by Tyler W.) initiated.
+[03/26/16 20:51:43] [Server API] Warning: Plugin "ProtoPlugin" has had an unhandled exception thrown by one of its GamePostInitialize handlers: 
+System.IO.DirectoryNotFoundException: Could not find a part of the path "/home/tw/src/paper-tiger/bindata/data/tile/flags.dat".
+  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) <0x7f799330ec10 + 0x001fb> in <filename unknown>:0 
+  at System.IO.FileStream..ctor (System.String path, FileMode mode) <0x7f799330e7c0 + 0x00053> in <filename unknown>:0 
+  at (wrapper remoting-invoke-with-check) System.IO.FileStream:.ctor (string,System.IO.FileMode)
+  at protoplugin.ProtoPlugin.DumpTileFlags (System.String path) <0x41057e60 + 0x00157> in <filename unknown>:0 
+  at protoplugin.ProtoPlugin.<Initialize>m__0 (System.EventArgs args) <0x41057d90 + 0x00017> in <filename unknown>:0 
+  at TerrariaApi.Server.HandlerCollection`1[ArgsType].Invoke (TerrariaApi.Server.ArgsType args) <0x40f8a3c0 + 0x00197> in <filename unknown>:0 
+[03/26/16 21:17:00] [Server API] Verbose: TerrariaApi - Server v1.22.0.0 started.
+[03/26/16 21:17:00] [Server API] Verbose: 	Command line: /home/tw/src/paper-tiger/bindata/TerrariaServer.exe
+[03/26/16 21:17:00] [Server API] Verbose: 	OS: Unix 4.4.5.300 (64bit: True)
+[03/26/16 21:17:00] [Server API] Verbose: 	Mono: True
+[03/26/16 21:17:00] [Server API] Info: Plugin ProtoPlugin v1.0.0.0 (by Tyler W.) initiated.
+[03/26/16 21:17:06] [Server API] Warning: Plugin "ProtoPlugin" has had an unhandled exception thrown by one of its GamePostInitialize handlers: 
+System.IO.DirectoryNotFoundException: Could not find a part of the path "/home/tw/src/paper-tiger/bindata/data/tile/flags.dat".
+  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) <0x7ff6b070ec10 + 0x001fb> in <filename unknown>:0 
+  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize) <0x7ff6b070e8d0 + 0x0004d> in <filename unknown>:0 
+  at (wrapper remoting-invoke-with-check) System.IO.FileStream:.ctor (string,System.IO.FileMode,System.IO.FileAccess,System.IO.FileShare,int)
+  at System.IO.File.Create (System.String path, Int32 bufferSize) <0x7ff6b070b890 + 0x0003e> in <filename unknown>:0 
+  at System.IO.File.Create (System.String path) <0x7ff6b070b870 + 0x00011> in <filename unknown>:0 
+  at System.IO.File.WriteAllBytes (System.String path, System.Byte[] bytes) <0x7ff6b070d060 + 0x00020> in <filename unknown>:0 
+  at protoplugin.ProtoPlugin.DumpTileFlags (System.String path) <0x417c3e20 + 0x001bf> in <filename unknown>:0 
+  at protoplugin.ProtoPlugin.<Initialize>m__0 (System.EventArgs args) <0x417c3df0 + 0x00017> in <filename unknown>:0 
+  at TerrariaApi.Server.HandlerCollection`1[ArgsType].Invoke (TerrariaApi.Server.ArgsType args) <0x416f63c0 + 0x00197> in <filename unknown>:0 
+[03/26/16 21:23:32] [Server API] Verbose: TerrariaApi - Server v1.22.0.0 started.
+[03/26/16 21:23:32] [Server API] Verbose: 	Command line: /home/tw/src/paper-tiger/bindata/TerrariaServer.exe
+[03/26/16 21:23:32] [Server API] Verbose: 	OS: Unix 4.4.5.300 (64bit: True)
+[03/26/16 21:23:32] [Server API] Verbose: 	Mono: True
+[03/26/16 21:23:32] [Server API] Info: Plugin ProtoPlugin v1.0.0.0 (by Tyler W.) initiated.
+[03/26/16 21:28:50] [Server API] Verbose: TerrariaApi - Server v1.22.0.0 started.
+[03/26/16 21:28:50] [Server API] Verbose: 	Command line: /home/tw/src/paper-tiger/bindata/TerrariaServer.exe
+[03/26/16 21:28:50] [Server API] Verbose: 	OS: Unix 4.4.5.300 (64bit: True)
+[03/26/16 21:28:50] [Server API] Verbose: 	Mono: True
+[03/26/16 21:28:50] [Server API] Info: Plugin ProtoPlugin v1.0.0.0 (by Tyler W.) initiated.

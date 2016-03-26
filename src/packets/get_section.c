@@ -22,6 +22,7 @@
 #include <stdbool.h> 
 
 #include "get_section.h"
+
 #include "../world.h"
 #include "../game.h"
 #include "../packet.h"
@@ -38,6 +39,11 @@ int get_section_handle(struct player *player, struct packet *packet)
 {
 	struct get_section *get_section = (struct get_section *)packet->data;
 
+	if (get_section->x == -1 && get_section->y == -1) {
+		//send spawn section
+		
+	}
+	
 	return 0;
 }
 

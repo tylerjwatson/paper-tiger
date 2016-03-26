@@ -23,6 +23,7 @@
 #include "tile.h"
 #include "world.h"
 #include "util.h"
+#include "game.h"
 #include "binary_writer.h"
 
 int tile_heap_new(TALLOC_CTX *context, const uint32_t size_x, const uint32_t size_y, struct tile ***out_tiles)
@@ -196,7 +197,8 @@ int tile_cmp(const struct tile *src, const struct tile *dest)
 	return memcmp(src, dest, sizeof(*src));
 }
 
-int tile_pack(const struct tile *tile, char *dest, uint8_t *tile_flags_1, uint8_t *tile_flags_2, uint8_t *tile_flags_3)
+int tile_pack(const struct game *game, const struct tile *tile, char *dest, uint8_t *tile_flags_1, 
+			  uint8_t *tile_flags_2, uint8_t *tile_flags_3)
 {
 	int pos = 0;
 	
@@ -214,11 +216,11 @@ int tile_pack(const struct tile *tile, char *dest, uint8_t *tile_flags_1, uint8_
 			*tile_flags_1 |= 32;
 		}
 		else {
-			char lsw = (char)(tile->type & 0xFF00) >> 8;
-			pos += binary_writer_write_value(dest + pos, lsw);
+			char msw = (char)(tile->type & 0xFF00) >> 8;
+			pos += binary_writer_write_value(dest + pos, msw);
 		}
 
-		if (false /*Main.tileFrameImportant[(int)tile.type]*/) {
+		if (game->tile_frame_important[tile->type]) {
 			pos += binary_writer_write_value(dest + pos, tile->frame_x);
 			pos += binary_writer_write_value(dest + pos, tile->frame_y);
 		}
@@ -267,12 +269,11 @@ int tile_pack(const struct tile *tile, char *dest, uint8_t *tile_flags_1, uint8_
 	bit_toggle(*tile_flags_3, 2, tile_actuator(tile));
 	bit_toggle(*tile_flags_3, 3, tile_inactive(tile));
 
-	if (*tile_flags_3 != 0)
-	{
+	if (*tile_flags_3 != 0) {
 		*tile_flags_2 |= 1;
 	}
-	if (*tile_flags_2 != 0)
-	{
+
+	if (*tile_flags_2 != 0) {
 		*tile_flags_1 |= 1;
 	}
 
