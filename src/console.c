@@ -96,9 +96,10 @@ static void __print_prompt(uv_stream_t *stream)
 {
 	uv_write_t *req = talloc(stream->data, uv_write_t);
 	static uv_buf_t buf = {
-		.base = "[\033[32mserver\e[0m@paper-tiger] > ",
-		.len = 32
+		.base = "[server@\033[32;1mpaper-tiger\033[0m] > ",
 	};
+
+	buf.len = strlen(buf.base);
 
 	if (req == NULL) {
 		_ERROR("%s: write request for console handle failed.\n", __FUNCTION__);
@@ -175,7 +176,7 @@ out:
 		talloc_free(buf->base);
 	}
 
-	__print_prompt(stream);
+	__print_prompt(game->console->console_write_handle);
 }
 
 static void __alloc_buffer(uv_handle_t *handle, size_t suggested_size, uv_buf_t *buf)
@@ -204,7 +205,7 @@ int console_new(TALLOC_CTX *context, struct game *game, struct console **out_con
 	int ret = -1;
 	TALLOC_CTX *temp_context;
 	struct console *console;
-	uv_tty_t *tty_handle;
+	uv_tty_t *tty_handle, *tty_write_handle;
 
 	if ((temp_context = talloc_new(NULL)) == NULL) {
 		_ERROR("%s: cannot allocate temporary context for console handle.\n", __FUNCTION__);
@@ -224,9 +225,17 @@ int console_new(TALLOC_CTX *context, struct game *game, struct console **out_con
 		goto out;
 	}
 
+	if ((tty_write_handle = talloc_zero(temp_context, uv_tty_t)) == NULL) {
+		_ERROR("%s: Cannot allocate console handle.\n", __FUNCTION__);
+		ret = -ENOMEM;
+		goto out;
+	}
+
 	talloc_set_destructor(console, __console_destructor);
 
 	console->console_handle = talloc_steal(console, tty_handle);
+	console->console_write_handle = talloc_steal(console, tty_write_handle);
+
 	console->game = game;
 
 	ret = 0;
@@ -239,14 +248,16 @@ out:
 
 int console_init(struct console *console)
 {
-	uv_tty_init(console->game->event_loop, console->console_handle, 0, true);
+	uv_tty_init(console->game->event_loop, console->console_handle, 0, 1);
+	uv_tty_init(console->game->event_loop, console->console_write_handle, 1, 0);
+
 	uv_tty_set_mode(console->console_handle, UV_TTY_MODE_NORMAL);
 
 	console->console_handle->data = console->game;
 
 	uv_read_start((uv_stream_t *)console->console_handle, __alloc_buffer, __on_read);
 
-	__print_prompt((uv_stream_t *)console->console_handle);
+	__print_prompt((uv_stream_t *)console->console_write_handle);
 
 	return 0;
 }

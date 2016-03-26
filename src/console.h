@@ -51,6 +51,8 @@ struct console {
 	 */
 	uv_tty_t *console_handle;
 
+	uv_tty_t *console_write_handle;
+
 	/**
 	 * Backpointer to the game which owns the instance of the console context.
 	 */

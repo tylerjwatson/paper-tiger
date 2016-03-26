@@ -18,6 +18,8 @@
  * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
+
 #include <stdbool.h>
 #include <string.h>
 #include <time.h>
@@ -26,6 +28,8 @@
 
 #ifndef _WIN32
 #include <unistd.h>
+#else
+#define PROTOBUF_USE_DLLS
 #endif
 
 #include "talloc/talloc.h"
@@ -157,6 +161,7 @@ int main(int argc, char **argv)
 	
 	if (game->console) {
 		uv_read_stop((uv_stream_t *)game->console->console_handle);
+		uv_read_stop((uv_stream_t *)game->console->console_write_handle);
 	}
 	
 	uv_read_stop((uv_stream_t *)game->server->tcp_handle);
