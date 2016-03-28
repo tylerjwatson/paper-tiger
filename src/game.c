@@ -25,6 +25,7 @@
 #include "game.h"
 #include "dataloader.h"
 #include "util.h"
+#include "colour.h"
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -147,4 +148,9 @@ out:
 	talloc_free(temp_context);
 
 	return ret;
+}
+
+int game_chat(const struct game *game, const struct colour *colour, const char *message)
+{
+	return -1;
 }
