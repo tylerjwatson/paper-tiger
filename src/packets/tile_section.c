@@ -119,7 +119,7 @@ int tile_section_write(TALLOC_CTX *context, const struct packet *packet, const s
 		return -ENOMEM;
 	}
 
-	if ((ret = compress(compressed_buffer, &compressed_len, tile_buffer, tile_len)) != Z_OK) {
+	if ((ret = compress(compressed_buffer, &compressed_len, tile_buffer, pos)) != Z_OK) {
 		_ERROR("%s: compression error compressing tile section: %d %s\n", __FUNCTION__, ret, zError(ret));
 		return -1;
 	}

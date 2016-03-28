@@ -75,9 +75,9 @@ int get_section_handle(struct player *player, struct packet *packet)
 	}
 
 	server_send_packet(player, section);
-	_sleep(5);
+	//_sleep(100);
 	server_send_packet(player, tile_frame);
-	_sleep(5);
+	//_sleep(100);
 	server_send_packet(player, connection_complete);
 	
 	return 0;
