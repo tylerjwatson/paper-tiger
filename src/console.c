@@ -89,7 +89,11 @@ static struct console_command_handler __command_handlers[] = {
 
 static void __on_write(uv_write_t *req, int status)
 {
-	// stub
+	if (status < 0) {
+		return;
+	}
+
+	talloc_free(req);
 }
 
 static void __print_prompt(uv_stream_t *stream)
@@ -176,7 +180,7 @@ out:
 		talloc_free(buf->base);
 	}
 
-	__print_prompt(game->console->console_write_handle);
+	__print_prompt((uv_stream_t *)game->console->console_write_handle);
 }
 
 static void __alloc_buffer(uv_handle_t *handle, size_t suggested_size, uv_buf_t *buf)
@@ -254,6 +258,7 @@ int console_init(struct console *console)
 	uv_tty_set_mode(console->console_handle, UV_TTY_MODE_NORMAL);
 
 	console->console_handle->data = console->game;
+	console->console_write_handle->data = console->game;
 
 	uv_read_start((uv_stream_t *)console->console_handle, __alloc_buffer, __on_read);
 
