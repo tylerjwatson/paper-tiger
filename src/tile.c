@@ -211,11 +211,13 @@ int tile_pack(const struct game *game, const struct tile *tile, uint8_t *dest,
 		*tile_flags_1 |= 2;
 		
 		if (tile->type > 255) {
+			int16_t type = (int16_t)tile->type;
 			*tile_flags_1 |= 32;
 			
-			pos += binary_writer_write_value(dest + pos, (int16_t)(tile->type));	
+			pos += binary_writer_write_value(dest + pos, type);
 		} else {
-			pos += binary_writer_write_value(dest + pos, (uint8_t)(tile->type));
+			uint8_t type = (uint8_t)tile->type;
+			pos += binary_writer_write_value(dest + pos, type);
 		}
 
 		if (game->tile_frame_important[tile->type]) {
