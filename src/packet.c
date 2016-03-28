@@ -36,11 +36,13 @@
 #include "packets/tile_section.h"
 #include "packets/section_tile_frame.h"
 #include "packets/connection_complete.h"
+#include "packets/inventory_slot.h"
 
 static struct packet_handler packet_handlers[] = {
 	{ .type = PACKET_TYPE_CONNECT_REQUEST, .read_func = connect_request_read, .handle_func = connect_request_handle, .write_func = NULL },
 	{ .type = PACKET_TYPE_CONTINUE_CONNECTING, .read_func = NULL, .handle_func = NULL, .write_func = continue_connecting_write },
 	{ .type = PACKET_TYPE_PLAYER_INFO, .read_func = player_info_read, .handle_func = player_info_handle, .write_func = NULL },
+	{ .type = PACKET_TYPE_INVENTORY_SLOT, .read_func = inventory_slot_read, .handle_func = inventory_slot_handle, .write_func = NULL },
 	{ .type = PACKET_TYPE_CONTINUE_CONNECTING2, .read_func = NULL, .handle_func = continue_connecting2_handle, .write_func = NULL },
 	{ .type = PACKET_TYPE_WORLD_INFO, .read_func = NULL, .handle_func = NULL, .write_func = world_info_write },
 	{ .type = PACKET_TYPE_GET_SECTION, .read_func = get_section_read, .handle_func = get_section_handle, .write_func = NULL },

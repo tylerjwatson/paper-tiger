@@ -75,6 +75,8 @@ add_executable(paper-tiger
 	src/packets/tile_section.c
 	src/packets/section_tile_frame.c
 	src/packets/section_tile_frame.h
+	src/packets/inventory_slot.c
+	src/packets/inventory_slot.h
 	src/packets/connection_complete.c
 	src/packets/connection_complete.h
 

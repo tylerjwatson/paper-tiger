@@ -18,47 +18,25 @@
  * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _HAVE_PLAYER_H
-#define _HAVE_PLAYER_H
+#ifndef _HAVE_ITEM_H
+#define _HAVE_ITEM_H
 
 #include <stdint.h>
-#include <uv.h>
-
-#include "talloc/talloc.h"
-#include "item.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-struct packet;
-struct game;
-	
-struct player {
-    uint32_t id;
-	char *name;
-	char *uuid;
-	char *remote_addr;
-	uint16_t remote_port;
-	struct game *game;
-    uv_tcp_t *handle;
-	
-	uint16_t life;
-	uint16_t life_max;
-	uint16_t mana;
-	uint16_t mana_max;
-
-	struct item_slot inventory[180];
-
-	struct packet *incoming_packet;
+struct item_slot {
+	uint8_t id;
+	uint8_t slot_id;
+	int16_t stack;
+	uint8_t prefix;
+	int16_t net_id;
 };
-
-int player_new(TALLOC_CTX *context, const struct game *game, int id, struct player **out_player);
-
-void player_close(struct player *player);
 
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* _HAVE_PLAYER_H */
+	
+#endif
