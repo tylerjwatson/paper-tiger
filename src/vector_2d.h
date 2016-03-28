@@ -18,8 +18,8 @@
 * along with upgraded-guacamole.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _HAVE_RECT_H
-#define _HAVE_RECT_H
+#ifndef _HAVE_VECTOR_2D_H
+#define _HAVE_VECTOR_2D_H
 
 #include <stdint.h>
 
@@ -27,27 +27,13 @@
 extern "C" {
 #endif
 
-struct rect {
+struct vector_2d {
 	int32_t x;
 	int32_t y;
-	int16_t w;
-	int16_t h;
 };
-
-static inline struct rect rect_new(int x, int y, int w, int h)
-{
-	struct rect r;
-
-	r.h = h;
-	r.w = w;
-	r.x = x;
-	r.y = y;
-
-	return r;
-}
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif //_HAVE_RECT_H
+#endif //_HAVE_VECTOR_2D_H

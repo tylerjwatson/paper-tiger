@@ -21,19 +21,25 @@
 #ifndef _HAVE_WORLD_H
 #define _HAVE_WORLD_H
 
+#define WORLD_SECTION_WIDTH 200
+#define WORLD_SECTION_HEIGHT 150
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "talloc/talloc.h"
 #include <stdbool.h>
 #include <errno.h>
 #include <stdint.h>
 
+#include "talloc/talloc.h"
+
+#include "vector_2d.h"
 #include "tile.h"
 #include "binary_reader.h"
 
 struct game;
+struct rect;
 
 struct world_flags {
 	bool crimson;
@@ -81,11 +87,6 @@ struct world_flags {
 	bool hard_mode;
 	bool raining;
 	bool fast_forward_time;
-};
-
-struct vector_2d {
-	int32_t x;
-	int32_t y;
 };
 
 enum relogic_file_type {
@@ -269,8 +270,10 @@ int world_init(struct world *world);
 
 struct tile *world_tile_at(struct world *world, const uint32_t x, const uint32_t y);
 
-int world_compress_tile_section(struct world *world, unsigned start_x, unsigned start_y, 
-								unsigned w, unsigned h, char *buffer, int *buf_len);
+struct vector_2d world_tile_section(int x, int y);
+
+int world_pack_tile_section(TALLOC_CTX *context, struct world *world, struct rect rect,
+							char *tile_buffer, int *out_buf_len);
 
 #ifdef __cplusplus
 }

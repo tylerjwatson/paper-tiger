@@ -21,14 +21,14 @@
 #ifndef _HAVE_BITMAP_H
 #define _HAVE_BITMAP_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include <limits.h>    /* for CHAR_BIT */
 #include <stdint.h>   /* for uint32_t */
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef uint32_t word_t;
 

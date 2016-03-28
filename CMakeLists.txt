@@ -71,6 +71,12 @@ add_executable(paper-tiger
 	src/packets/player_hp.c
 	src/packets/player_mana.h
 	src/packets/player_mana.c
+	src/packets/tile_section.h
+	src/packets/tile_section.c
+	src/packets/section_tile_frame.c
+	src/packets/section_tile_frame.h
+	src/packets/connection_complete.c
+	src/packets/connection_complete.h
 
 	src/rect.h
 

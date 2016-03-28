@@ -33,6 +33,7 @@ static int __handle_packet(struct player *player, struct packet *packet, const u
 
 	packet_handler = packet_handler_for_type(packet->type);
 	if (packet_handler == NULL) {
+		_ERROR("error: received unknown message type %d from slot %d.\n", packet->type, player->id);
 		return -1;
 	}
 
@@ -208,8 +209,6 @@ int server_send_packet(const struct player *player, const struct packet *packet)
 	bufs[0] = uv_buf_init(header_buf, PACKET_HEADER_SIZE);
 	bufs[1] = uv_buf_init(payload_buf, PACKET_PAYLOAD_SIZE);
 
-	packet_write_header(packet->type, packet->len, &bufs[0], &pos);
-
 	packet_handler = packet_handler_for_type(packet->type);
 	if (packet_handler == NULL) {
 		_ERROR("%s: could not find packet handler for type %d for slot %d.\n", __FUNCTION__, packet->type, player->id);
@@ -225,11 +224,12 @@ int server_send_packet(const struct player *player, const struct packet *packet)
 
 	write_request->data = (void *)player;
 
+	packet_write_header(packet->type, packet_len + PACKET_HEADER_SIZE, &bufs[0], &pos);
 	/*
 	 * The packet header's length must be updated with payload length
 	 * as they are in separate buffers.
 	 */
-	*(uint16_t *)bufs[0].base += packet_len;
+	// *(uint16_t *)bufs[0].base += packet_len;
 	bufs[1].len = packet_len;
 	
 	if (uv_write(talloc_steal(player->handle, write_request), (uv_stream_t *)player->handle, bufs, bufs[1].base != NULL ? 2 : 1, __on_write) < 0) {

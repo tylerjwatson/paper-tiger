@@ -116,7 +116,7 @@ void tile_set_actuator(struct tile *tile, bool val);
 
 void tile_copy(const struct tile *src, struct tile *dest);
 
-int tile_pack(const struct game *game, const struct tile *tile, char *dest, uint8_t *tile_flags_1, 
+int tile_pack(const struct game *game, const struct tile *tile, uint8_t *dest, uint8_t *tile_flags_1,
 			  uint8_t *tile_flags_2, uint8_t *tile_flags_3);
 
 int tile_cmp(const struct tile *src, const struct tile *dest);

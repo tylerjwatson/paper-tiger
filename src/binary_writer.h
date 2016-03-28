@@ -36,7 +36,10 @@ extern "C" {
 
 static inline int binary_writer_write_internal(char *dest, const void *src, int n)
 {
-	memcpy(dest, src, n);
+	if (dest != NULL) {
+		memcpy(dest, src, n);
+	}
+
 	return n;
 }
 	

@@ -22,6 +22,7 @@
 #include <string.h>
 #include <zlib.h>
 
+#include "rect.h"
 #include "game.h"
 #include "world.h"
 #include "util.h"
@@ -204,6 +205,9 @@ static int __world_load_tile(struct world *world, uint32_t x, uint32_t y, uint16
 	 * num5 = tile_wire_flags
 	 * num4 = tile_colour_flags
 	 */
+
+	//if (x == 4090 && y == 65)
+	//	DebugBreak();
 
 	if (binary_reader_read_byte(world->reader, &tile_flags_1) < 0) {
 		_ERROR("%s: binary reader error reading tile_flags_1", __FUNCTION__);
@@ -926,7 +930,7 @@ int world_new(TALLOC_CTX *parent_context, const struct game *game, const char *w
 		goto failed;
 	}
 
-	world->game = game;
+	world->game = (struct game *)game;
 
 	*out_world = talloc_steal(parent_context, world);
 	ret = 0;
@@ -936,24 +940,44 @@ failed:
 	return ret;
 }
 
+struct vector_2d world_tile_section(int x, int y)
+{
+	struct vector_2d vec = {
+		.x = x / WORLD_SECTION_WIDTH,
+		.y = y / WORLD_SECTION_HEIGHT
+	};
+
+	return vec;
+}
+
 struct tile *world_tile_at(struct world *world, const uint32_t x, const uint32_t y)
 {
 	return &world->tiles[x][y];
 }
 
-int world_compress_tile_section(struct world *world, unsigned start_x, unsigned start_y, 
-								unsigned w, unsigned h, char *buffer, int *buf_len)
+struct vector_2d world_max_tile_sections(const struct world *world)
+{
+	struct vector_2d vec;
+
+	vec.x = world->max_tiles_x / WORLD_SECTION_WIDTH;
+	vec.y = world->max_tiles_y / WORLD_SECTION_HEIGHT;
+
+	return vec;
+}
+
+int world_pack_tile_section(TALLOC_CTX *context, struct world *world, struct rect rect, 
+							char *tile_buffer, int *out_buf_len)
 {
 	struct tile *tile;
 	int staging_len = 0, pos = 0, ret = -1;
-	uint8_t header_1, header_2, header_3;
+	uint8_t header_1 = 0, header_2 = 0, header_3 = 0;
 
-	char staging_buffer[13];
-	char tile_buffer[262144];
+	uint8_t staging_buffer[13];
 
-	for (unsigned y = start_y; y < start_y + w; y++)
-	for (unsigned x = start_x; x < start_x + h; x++) {
+	for (unsigned y = rect.y; y < rect.y + rect.h; y++)
+	for (unsigned x = rect.x; x < rect.x + rect.w; x++) {
 		tile = world_tile_at(world, x, y);
+
 		staging_len = tile_pack(world->game, tile, staging_buffer, &header_1, &header_2, &header_3);
 		pos += binary_writer_write_value(tile_buffer + pos, header_1);
 
@@ -965,14 +989,21 @@ int world_compress_tile_section(struct world *world, unsigned start_x, unsigned 
 			}
 		}
 
-		memcpy(tile_buffer + pos, staging_buffer, staging_len);
+		if (tile_buffer != NULL) {
+			memcpy(tile_buffer + pos, staging_buffer, staging_len);
+		}
+
 		pos += staging_len;
 	}
 
-	if (compress(buffer, (uLongf *)buf_len, tile_buffer, pos) != Z_OK) {
-		_ERROR("%s: compression error writing tile section %d,%d.\n", __FUNCTION__, start_x, start_y);
-		ret = -1;
-	}
+	*out_buf_len = pos;
 
+	//if (tile_buffer != NULL) {
+	//	memcpy(tile_buffer, staging_buffer, pos);
+	//}
+
+	ret = 0;
+
+out:
 	return ret;
 }

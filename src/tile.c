@@ -38,14 +38,14 @@ int tile_heap_new(TALLOC_CTX *context, const uint32_t size_x, const uint32_t siz
 		goto out;
 	}
 
-	if ((tile_heap = talloc_array(temp_context, struct tile *, size_x)) == NULL) {
+	if ((tile_heap = talloc_zero_array(temp_context, struct tile *, size_x)) == NULL) {
 		_ERROR("%s: Could not allocate X tile heap of size %d\n", __FUNCTION__, size_x);
 		ret = -1;
 		goto out;
 	}
 
 	for (unsigned column = 0; column < size_x; column++) {
-		if ((tile_heap[column] = talloc_array(tile_heap, struct tile, size_y)) == NULL) {
+		if ((tile_heap[column] = talloc_zero_array(tile_heap, struct tile, size_y)) == NULL) {
 			_ERROR("%s: Could not allocate Y tile heap of size %d\n", __FUNCTION__, size_y);
 			ret = -1;
 			goto out;
@@ -197,8 +197,8 @@ int tile_cmp(const struct tile *src, const struct tile *dest)
 	return memcmp(src, dest, sizeof(*src));
 }
 
-int tile_pack(const struct game *game, const struct tile *tile, char *dest, uint8_t *tile_flags_1, 
-			  uint8_t *tile_flags_2, uint8_t *tile_flags_3)
+int tile_pack(const struct game *game, const struct tile *tile, uint8_t *dest,
+			  uint8_t *tile_flags_1, uint8_t *tile_flags_2, uint8_t *tile_flags_3)
 {
 	int pos = 0;
 	
@@ -209,15 +209,13 @@ int tile_pack(const struct game *game, const struct tile *tile, char *dest, uint
 
 	if (tile_active(tile) == true) {
 		*tile_flags_1 |= 2;
-
+		
 		if (tile->type > 255) {
-			char lsw = (char)(tile->type & 0xFF);
-			pos += binary_writer_write_value(dest + pos, lsw);
 			*tile_flags_1 |= 32;
-		}
-		else {
-			char msw = (char)(tile->type & 0xFF00) >> 8;
-			pos += binary_writer_write_value(dest + pos, msw);
+			
+			pos += binary_writer_write_value(dest + pos, (int16_t)(tile->type));	
+		} else {
+			pos += binary_writer_write_value(dest + pos, (uint8_t)(tile->type));
 		}
 
 		if (game->tile_frame_important[tile->type]) {
@@ -234,11 +232,11 @@ int tile_pack(const struct game *game, const struct tile *tile, char *dest, uint
 	if (tile->wall != 0) {
 		*tile_flags_1 |= 4;
 
-		pos += binary_writer_write_value(dest, tile->wall);
+		pos += binary_writer_write_value(dest + pos, tile->wall);
 
 		if ((wall_colour = tile_wall_colour(tile)) != 0) {
 			*tile_flags_3 |= 16;
-			pos += binary_writer_write_value(dest, wall_colour);
+			pos += binary_writer_write_value(dest + pos, wall_colour);
 		}
 	}
 
@@ -251,7 +249,7 @@ int tile_pack(const struct game *game, const struct tile *tile, char *dest, uint
 			*tile_flags_1 |= 8;
 		}
 
-		pos += binary_writer_write_value(dest, tile->liquid);
+		pos += binary_writer_write_value(dest + pos, tile->liquid);
 	}
 
 	bit_toggle(*tile_flags_2, 2, tile_wire(tile));

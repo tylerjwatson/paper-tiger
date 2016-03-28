@@ -22,7 +22,11 @@
 #include <stdbool.h> 
 
 #include "get_section.h"
+#include "tile_section.h"
+#include "section_tile_frame.h"
+#include "connection_complete.h"
 
+#include "../server.h"
 #include "../world.h"
 #include "../game.h"
 #include "../packet.h"
@@ -38,11 +42,43 @@
 int get_section_handle(struct player *player, struct packet *packet)
 {
 	struct get_section *get_section = (struct get_section *)packet->data;
+	struct packet *section, *tile_frame, *connection_complete;
+	struct rect rect, section_rect;
 
-	if (get_section->x == -1 && get_section->y == -1) {
-		//send spawn section
-		
+	/*
+	 * Cheat, and statically send the spawn point for now
+	 */
+
+	rect.x = (player->game->world->spawn_tile.x / WORLD_SECTION_WIDTH) * WORLD_SECTION_WIDTH;
+	rect.y = (player->game->world->spawn_tile.y / WORLD_SECTION_HEIGHT) * WORLD_SECTION_HEIGHT;
+	rect.w = WORLD_SECTION_WIDTH;
+	rect.h = WORLD_SECTION_HEIGHT;
+
+	section_rect.x = (rect.x / WORLD_SECTION_WIDTH) - 1;
+	section_rect.y = (rect.y / WORLD_SECTION_HEIGHT) - 1;
+	section_rect.h = section_rect.y + 2;
+	section_rect.w = section_rect.x + 2;
+
+	if (tile_section_new(player, player, rect, &section) < 0) {
+		_ERROR("%s: allocating tile section failed.\n", __FUNCTION__);
+		return -1;
 	}
+
+	if (section_tile_frame_new(player, player, section_rect, &tile_frame) < 0) {
+		_ERROR("%s: allocating tile frame section failed.\n", __FUNCTION__);
+		return -1;
+	}
+
+	if (connection_complete_new(player, player, &connection_complete) < 0) {
+		_ERROR("%s: allocating connection complete packet failed.\n", __FUNCTION__);
+		return -1;
+	}
+
+	server_send_packet(player, section);
+	_sleep(5);
+	server_send_packet(player, tile_frame);
+	_sleep(5);
+	server_send_packet(player, connection_complete);
 	
 	return 0;
 }
