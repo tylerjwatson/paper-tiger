@@ -171,7 +171,7 @@ static void __on_read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 		goto command_copy_free;
 	}
 
-	_ERROR("console: error: %s: unknown command.\n", command_copy);
+	_ERROR("%s: unknown command.\n", command_copy);
 
 command_copy_free:
 	free(command_copy_base);
