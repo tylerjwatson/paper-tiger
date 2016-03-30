@@ -18,12 +18,16 @@
 * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <string.h>
+#include <stdio.h>
+#include <stdarg.h>
 
 #include "player.h"
 #include "console.h"
 #include "game.h"
 #include "util.h"
 #include "param.h"
+
+#include "packets/disconnect.h"
 
 static int __handle_test(struct game *game, struct console_command *command)
 {
@@ -71,7 +75,8 @@ static int __handle_disconnect(struct game *game, struct console_command *comman
 		_ERROR("%s: out of memory sending packet.\n", __FUNCTION__);
 		return -2;
 	}
-	server_send_packet(player, (const struct packet *)disconnect);
+	server_send_packet(player, disconnect);
+	
 	talloc_free(disconnect);
 
 	player_close(player);
@@ -95,6 +100,25 @@ static void __on_write(uv_write_t *req, int status)
 
 	talloc_free(req);
 }
+
+void console_vsprintf(const struct console *console, const char *fmt, ...)
+{
+	uv_write_t *req = talloc(console, uv_write_t);
+	char *line_buf = talloc_size(req, 1024);
+	int len = 0;
+	
+	uv_buf_t buf = uv_buf_init(line_buf, 1024);
+	va_list args;
+	
+	va_start(args, fmt);
+	len = vsnprintf(buf.base, 1024, fmt, args);
+	va_end(args);
+	
+	buf.len = len;
+	
+	uv_write(req, (uv_stream_t *)console->console_write_handle, &buf, 1, __on_write);
+}
+
 
 static void __print_prompt(uv_stream_t *stream)
 {

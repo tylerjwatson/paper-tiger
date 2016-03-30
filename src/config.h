@@ -18,36 +18,22 @@
 * along with upgraded-guacamole.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _HAVE_RECT_H
-#define _HAVE_RECT_H
 
-#include <stdint.h>
+#ifndef _HAVE_CONFIG_H
+#define _HAVE_CONFIG_H
 
-#ifdef __cplusplus
-extern "C" {
-	#endif
-	
-	struct rect {
-		int32_t x;
-		int32_t y;
-		int16_t w;
-		int16_t h;
-	};
-	
-	static inline struct rect rect_new(int x, int y, int w, int h)
-	{
-		struct rect r;
-		
-		r.h = h;
-		r.w = w;
-		r.x = x;
-		r.y = y;
-		
-		return r;
-	}
-	
-	#ifdef __cplusplus
-}
+#define PRODUCT_NAME "paper-tiger"
+#define VERSION_MAJOR 0
+#define VERSION_MINOR 1
+
+#ifdef _WIN32
+#define PRODUCT_PLATFORM Windows
+#elif __APPLE__
+#define PRODUCT_PLATFORM Apple Mac
+#elif __linux__
+#define PRODUCT_PLATFORM Linux
+#else
+#define PRODUCT_PLATFORM Unknown
 #endif
 
 #endif //_HAVE_RECT_H

@@ -36,19 +36,21 @@
 extern "C" {
 #endif
 
-struct client_message {
+struct chat_message {
 	uint8_t id;
 	struct colour colour;
 	char *message;
 };
 
-int client_message_new(TALLOC_CTX *ctx, const struct player *player, const struct colour colour,
+int chat_message_new(TALLOC_CTX *ctx, const struct player *player, const struct colour colour,
 					   const char *message, struct packet **out_packet);
 
-int client_message_read(struct packet *packet, const uv_buf_t *buf);
+int chat_message_read(struct packet *packet, const uv_buf_t *buf);
 
-int client_message_handle(struct player *player, struct packet *packet);
-	
+int chat_message_handle(struct player *player, struct packet *packet);
+
+int chat_message_write(TALLOC_CTX *context, const struct packet *packet, const struct player *player, 
+					   uv_buf_t buffer);
 
 #ifdef __cplusplus
 }

@@ -125,6 +125,9 @@ int console_new(TALLOC_CTX *context, struct game *game, struct console **out_con
  */
 int console_init(struct console *console);
 
+
+void console_vsprintf(const struct console *console, const char *fmt, ...);
+
 /**
  * @}
  */

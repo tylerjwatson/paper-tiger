@@ -20,79 +20,86 @@
 
 #include <string.h>
 
-#include "client_uuid.h"
+#include "chat_message.h"
 #include "../game.h"
+#include "../console.h"
 #include "../binary_reader.h"
+#include "../binary_writer.h"
 #include "../player.h"
 #include "../util.h"
 #include "../packet.h"
+#include "../colour.h"
 
-int client_uuid_handle(struct player *player, struct packet *packet)
+int chat_message_handle(struct player *player, struct packet *packet)
 {
-	struct client_uuid *client_uuid = (struct client_uuid *)packet->data;
+	struct chat_message *chat_message = (struct chat_message *)packet->data;
 
-	/*
-	 * No need to copy here, just reparent the UUID field from the packet data
-	 * to the player structure since we aren't going to use it anywhere else.
-	 */
+	console_vsprintf(player->game->console, "<\033[33;1m%s\033[0m> %s\n", player->name, chat_message->message);
 	
-	player->uuid = talloc_steal(player, client_uuid->uuid);
-
 	return 0;
 }
 
-int client_uuid_new(TALLOC_CTX *ctx, const struct player *player, const char *uuid, struct packet **out_packet)
+int chat_message_new(TALLOC_CTX *ctx, const struct player *player, const struct colour colour,
+					 const char *message, struct packet **out_packet)
 {
 	int ret = -1;
 	TALLOC_CTX *temp_context;
 	struct packet *packet;
-	struct client_uuid *client_uuid;
+	struct chat_message *chat_message;
 	
 	temp_context = talloc_new(NULL);
 	if (temp_context == NULL) {
-		_ERROR("%s: out of memory allocating temp context for packet %d\n", __FUNCTION__, PACKET_TYPE_CLIENT_UUID);
+		_ERROR("%s: out of memory allocating temp context for packet %d\n", __FUNCTION__, PACKET_TYPE_CHAT_MESSAGE);
 		ret = -ENOMEM;
 		goto out;
 	}
 
 	packet = talloc(temp_context, struct packet);
 	if (packet == NULL) {
-		_ERROR("%s: out of memory allocating packet type %d\n", __FUNCTION__, PACKET_TYPE_CLIENT_UUID);
+		_ERROR("%s: out of memory allocating packet type %d\n", __FUNCTION__, PACKET_TYPE_CHAT_MESSAGE);
 		ret = -ENOMEM;
 		goto out;
 	}
 
-	client_uuid = talloc(temp_context, struct client_uuid);
-	if (client_uuid == NULL) {
-		_ERROR("%s: out of memory allocating client_uuid.\n", __FUNCTION__);
+	chat_message = talloc(temp_context, struct chat_message);
+	if (chat_message == NULL) {
+		_ERROR("%s: out of memory allocating chat_message.\n", __FUNCTION__);
 		ret = -ENOMEM;
 		goto out;
 	}
 	
-	packet->type = PACKET_TYPE_CLIENT_UUID;
-	packet->len = PACKET_HEADER_SIZE + PACKET_LEN_CLIENT_UUID;
+	packet->type = PACKET_TYPE_CHAT_MESSAGE;
+	packet->len = PACKET_HEADER_SIZE + strlen(message) + binary_writer_7bit_len(strlen(message));
 
-	client_uuid->uuid = talloc_strdup(client_uuid, uuid);
+	chat_message->id = player->id;
+	chat_message->colour = colour;
+	chat_message->message = talloc_strdup(chat_message, message);
+	if (chat_message->message == NULL) {
+		_ERROR("%s: out of memory copying chat message to packet.\n", __FUNCTION__);
+		ret = -ENOMEM;
+		goto out;
+	}
 	
-	packet->data = (void *)talloc_steal(packet, client_uuid);
+	packet->data = (void *)talloc_steal(packet, chat_message);
 
 	*out_packet = (struct packet *)talloc_steal(ctx, packet);
 
 	ret = 0;
+
 out:
 	talloc_free(temp_context);
 
 	return ret;
 }
 
-int client_uuid_read(struct packet *packet, const uv_buf_t *buf)
+int chat_message_read(struct packet *packet, const uv_buf_t *buf)
 {
-	int ret = -1, pos = 0, uuid_len = 0;
+	int ret = -1, pos = 0, message_len = 0;
 	TALLOC_CTX *temp_context;
-	struct client_uuid *client_uuid;
+	struct chat_message *chat_message;
 
-	char *uuid;
-	char *uuid_copy;
+	char *message;
+	char *message_copy;
 
 	temp_context = talloc_new(NULL);
 	if (temp_context == NULL) {
@@ -101,31 +108,47 @@ int client_uuid_read(struct packet *packet, const uv_buf_t *buf)
 		goto out;
 	}
 
-	client_uuid = talloc_zero(temp_context, struct client_uuid);
-	if (client_uuid == NULL) {
+	chat_message = talloc_zero(temp_context, struct chat_message);
+	if (chat_message == NULL) {
 		_ERROR("%s: out of memory allocating player info.\n", __FUNCTION__);
 		ret = -ENOMEM;
 		goto out;
 	}
 
-	binary_reader_read_string_buffer(buf->base, pos, &uuid_len, &uuid);
+	chat_message->id = buf->base[pos++];
+	chat_message->colour = *(struct colour *)(buf->base + pos);
+	pos += sizeof(struct colour);
 
-	uuid_copy = talloc_size(temp_context, uuid_len + 1);
-	if (uuid_copy == NULL) {
-		_ERROR("%s: out of memory allocating uuid.\n", __FUNCTION__);
+	binary_reader_read_string_buffer(buf->base, pos, &message_len, &message);
+
+	message_copy = talloc_size(temp_context, message_len + 1);
+	if (message_copy == NULL) {
+		_ERROR("%s: out of memory allocating chat message from packet.\n", __FUNCTION__);
 		ret = -ENOMEM;
 		goto out;
 	}
-	
-	memcpy(uuid_copy, uuid, uuid_len);
-	uuid_copy[uuid_len] = '\0';
 
-	client_uuid->uuid = talloc_steal(client_uuid, uuid_copy);
-	packet->data = (void *)talloc_steal(packet, client_uuid);
+	memcpy(message_copy, message, message_len);
+	message_copy[message_len] = '\0';
+
+	chat_message->message = talloc_steal(chat_message, message_copy);
+	packet->data = (void *)talloc_steal(packet, chat_message);
 
 	ret = 0;
 out:
 	talloc_free(temp_context);
 
 	return ret;
+}
+
+int chat_message_write(TALLOC_CTX *context, const struct packet *packet, const struct player *player, uv_buf_t buffer)
+{
+	struct chat_message *chat_message = (struct chat_message *)packet->data;
+	int pos = 0;
+
+	pos += binary_writer_write_value(buffer.base + pos, chat_message->id);
+	pos += binary_writer_write_value(buffer.base + pos, chat_message->colour);
+	pos += binary_writer_write_string(buffer.base + pos, chat_message->message);
+
+	return pos;
 }

@@ -58,6 +58,7 @@ extern "C" {
  * @{
  */
 
+struct colour;
 struct player;
 struct server;
 struct game;
@@ -168,6 +169,9 @@ int game_new(TALLOC_CTX *context, struct game **out_context);
  * according to the time it takes for the game update procedure to finish.
  */
 int game_update_loop_init(struct game *game);
+
+int game_send_message(const struct game *game, const struct player *player, const struct colour colour, 
+					  const char *fmt, ...);
 
 /**
  * @}

@@ -34,6 +34,11 @@ struct colour {
 	uint8_t b;
 };
 
+static const struct colour colour_black = {
+	.r = 0,
+	.g = 0,
+	.b = 0
+};
 
 #ifdef __cplusplus
 }

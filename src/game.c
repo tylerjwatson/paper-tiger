@@ -19,13 +19,17 @@
  */
 
 
+#include <stdarg.h>
 #include <time.h>
 #include <uv.h>
 
+#include "server.h"
 #include "game.h"
 #include "dataloader.h"
 #include "util.h"
 #include "colour.h"
+
+#include "packets/chat_message.h"
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -150,7 +154,26 @@ out:
 	return ret;
 }
 
-int game_chat(const struct game *game, const struct colour *colour, const char *message)
+int game_send_message(const struct game *game, const struct player *player, const struct colour colour, 
+					  const char *fmt, ...)
 {
+	struct packet *chat_packet;
+	
+	char msg[1024];
+	va_list args;
+
+	va_start(args, fmt);
+	vsnprintf(msg, 1024, fmt, args);
+	va_end(args);
+
+	if (chat_message_new(player, player, colour, msg, &chat_packet) < 0) {
+		_ERROR("%s: out of memory allocating chat packet.\n", __FUNCTION__);
+		return -ENOMEM;
+	}
+
+	((struct chat_message *)chat_packet->data)->id = 0xFF; //nameless broadcast
+	
+	server_send_packet(player, chat_packet);
+
 	return -1;
 }
