@@ -65,6 +65,7 @@ extern "C" {
  */
 
 struct player;
+struct game;
 
 /**
  * Describes a Terraria message.  Contains the packet header information and a pointer to
@@ -112,7 +113,7 @@ struct packet {
  * @returns
  * `0` if the encoding was successful, `< 0` otherwise.
  */
-typedef int (*packet_write_cb)(TALLOC_CTX *context, const struct packet *packet, const struct player *player, uv_buf_t buffer);
+typedef int (*packet_write_cb)(const struct game *game, const struct packet *packet, uv_buf_t buffer);
 
 /**
  * @brief Function to call to translate a packet from a network buffer to a fully-qualified `struct packet`.

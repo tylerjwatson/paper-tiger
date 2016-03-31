@@ -137,7 +137,11 @@ int server_start(struct server *server);
  * packet into the send queue, thus the caller of this function still owns the memory
  * pointed to by @a packet and is responsible for freeing it.
  */
-int server_send_packet(const struct player *player, const struct packet *packet);
+int server_send_packet(const struct server *server, const struct player *player,
+	const struct packet *packet);
+
+
+int server_broadcast_packet(const struct server *server, const struct packet *packet);
 
 #ifdef __cplusplus
 }

@@ -75,7 +75,8 @@ static int __handle_disconnect(struct game *game, struct console_command *comman
 		_ERROR("%s: out of memory sending packet.\n", __FUNCTION__);
 		return -2;
 	}
-	server_send_packet(player, disconnect);
+
+	server_send_packet(player->game->server, player, disconnect);
 	
 	talloc_free(disconnect);
 
