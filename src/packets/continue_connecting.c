@@ -21,15 +21,17 @@
 #include <string.h>
 
 #include "continue_connecting.h"
+#include "../game.h"
 #include "../player.h"
 #include "../packet.h"
 #include "../binary_reader.h"
 #include "../util.h"
 
-int continue_connecting_new(TALLOC_CTX *ctx, const struct player *player, struct packet **out_packet)
+int continue_connecting_new(TALLOC_CTX *ctx, uint8_t id, struct packet **out_packet)
 {
 	int ret = -1;
 	TALLOC_CTX *temp_context;
+	struct continue_connecting *continue_connecting;
 	struct packet *packet;
 
 	temp_context = talloc_new(NULL);
@@ -46,14 +48,19 @@ int continue_connecting_new(TALLOC_CTX *ctx, const struct player *player, struct
 		goto out;
 	}
 
-	/*
-	 * Packet has no payload.
-	 */
+	continue_connecting = talloc(temp_context, struct continue_connecting);
+	if (continue_connecting == NULL) {
+		_ERROR("%s: out of memory allocating continue connecting structure\n", __FUNCTION__);
+		ret = -ENOMEM;
+		goto out;
+	}
 
 	packet->type = PACKET_TYPE_CONTINUE_CONNECTING;
-	packet->len = PACKET_HEADER_SIZE;
-	packet->data = NULL;
+	packet->len = PACKET_HEADER_SIZE + 1;
 
+	continue_connecting->id = id;
+
+	packet->data = talloc_steal(packet, continue_connecting);
 	*out_packet = talloc_steal(ctx, packet);
 
 	ret = 0;
@@ -63,8 +70,10 @@ out:
 	return ret;
 }
 
-int continue_connecting_write(TALLOC_CTX *context, const struct packet *packet, const struct player *player, uv_buf_t buf)
+int continue_connecting_write(const struct game *game, const struct packet *packet, uv_buf_t buf)
 {
-	buf.base[0] = player->id;
-	return PACKET_LEN_CONTINUE_CONNECTING;
+	const struct continue_connecting *data = (const struct continue_connecting *)packet->data;
+	buf.base[0] = data->id;
+
+	return 1;
 }

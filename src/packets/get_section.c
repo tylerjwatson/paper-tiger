@@ -48,7 +48,6 @@ int get_section_handle(struct player *player, struct packet *packet)
 	struct get_section *get_section = (struct get_section *)packet->data;
 	struct packet *section, *tile_frame, *connection_complete, *welcome_msg;
 	struct rect rect, section_rect;
-	struct colour colour;
 	
 	/*
 	 * Cheat, and statically send the spawn point for now
@@ -86,13 +85,14 @@ int get_section_handle(struct player *player, struct packet *packet)
 
 	((struct chat_message *)welcome_msg->data)->id = 0xFF;
 	
-	server_send_packet(player, section);
+	server_send_packet(player->game->server, player, section);
 	//_sleep(100);
-	server_send_packet(player, tile_frame);
+	server_send_packet(player->game->server, player, tile_frame);
 	//_sleep(100);
-	server_send_packet(player, connection_complete);
+	server_send_packet(player->game->server, player, connection_complete);
 	
-	game_send_message(player->game, player, colour_black, "Welcome to %s v%d.%d.", PRODUCT_NAME, VERSION_MAJOR, VERSION_MINOR);
+	game_send_message(player->game, player, colour_black, "Welcome to %s v%d.%d.", 
+		PRODUCT_NAME, VERSION_MAJOR, VERSION_MINOR);
 	
 	return 0;
 }

@@ -57,7 +57,7 @@ int disconnect_new(TALLOC_CTX *ctx, const struct player *player, const char * re
 	}
 
 	packet->type = PACKET_TYPE_DISCONNECT;
-	packet->len = PACKET_HEADER_SIZE + strlen(reason) + 1;
+	packet->len = PACKET_HEADER_SIZE + (uint16_t)strlen(reason) + 1;
 	packet->data = NULL;
 
 	disconnect->reason = talloc_strdup(disconnect, reason);
@@ -107,8 +107,6 @@ int disconnect_read(struct packet *packet, const uv_buf_t *buf)
 	reason[str_len] = '\0';
 
 	disconnect->reason = talloc_steal(disconnect, reason);
-
-	disconnect->packet = packet;
 	packet->data = (void *)talloc_steal(packet, disconnect);
 
 	ret = 0;
@@ -127,7 +125,7 @@ error:
 	return -1;
 }
 
-int disconnect_write(TALLOC_CTX *context, const struct packet *packet, const struct player *player, uv_buf_t buf)
+int disconnect_write(const struct game *game, const struct packet *packet, uv_buf_t buf)
 {
 	struct disconnect *disconnect = (struct disconnect *)(packet->data);
 

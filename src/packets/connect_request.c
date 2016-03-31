@@ -85,12 +85,12 @@ int connect_request_handle(struct player *player, struct packet *packet)
 
 	if (strcmp(req->protocol_version, target_version) == 0) {
 		
-		if (continue_connecting_new((struct player *)player, player, &continue_connecting) < 0) {
+		if (continue_connecting_new((struct player *)player, player->id, &continue_connecting) < 0) {
 			_ERROR("%s: out of memory sending packet.\n", __FUNCTION__);
 			goto error;
 		}
 
-		server_send_packet(player, (const struct packet *)continue_connecting);
+		server_send_packet(player->game->server, player, (const struct packet *)continue_connecting);
 		talloc_free(continue_connecting);
 	}
 	else {

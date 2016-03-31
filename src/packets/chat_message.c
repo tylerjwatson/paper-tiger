@@ -28,6 +28,7 @@
 #include "../player.h"
 #include "../util.h"
 #include "../packet.h"
+#include "../server.h"
 #include "../colour.h"
 
 int chat_message_handle(struct player *player, struct packet *packet)
@@ -36,6 +37,10 @@ int chat_message_handle(struct player *player, struct packet *packet)
 
 	console_vsprintf(player->game->console, "<\033[33;1m%s\033[0m> %s\n", player->name, chat_message->message);
 	
+	chat_message->id = player->id;
+
+	server_broadcast_packet(player->game->server, packet);
+
 	return 0;
 }
 
@@ -141,7 +146,7 @@ out:
 	return ret;
 }
 
-int chat_message_write(TALLOC_CTX *context, const struct packet *packet, const struct player *player, uv_buf_t buffer)
+int chat_message_write(const struct game *game, const struct packet *packet, uv_buf_t buffer)
 {
 	struct chat_message *chat_message = (struct chat_message *)packet->data;
 	int pos = 0;

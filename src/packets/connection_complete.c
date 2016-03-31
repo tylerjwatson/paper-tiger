@@ -63,7 +63,7 @@ out:
 	return ret;
 }
 
-int connection_complete_write(TALLOC_CTX *context, const struct packet *packet, const struct player *player, uv_buf_t buf)
+int connection_complete_write(const struct game *game, const struct packet *packet, uv_buf_t buf)
 {
 	/*
 	 * This packet has no payload.

@@ -79,7 +79,7 @@ out:
 	return ret;
 }
 
-int tile_section_write(TALLOC_CTX *context, const struct packet *packet, const struct player *player, uv_buf_t buffer)
+int tile_section_write(const struct game *game, const struct packet *packet, uv_buf_t buffer)
 {
 	struct tile_section *tile_section = (struct tile_section *)packet->data;
 	char tile_buffer[262144], *compressed_buffer;
@@ -100,7 +100,7 @@ int tile_section_write(TALLOC_CTX *context, const struct packet *packet, const s
 	pos += binary_writer_write_value(tile_buffer + pos, tile_section->width);
 	pos += binary_writer_write_value(tile_buffer + pos, tile_section->height);
 
-	if (world_pack_tile_section(context, player->game->world, rect, tile_buffer + pos, &tile_len) < 0) {
+	if (world_pack_tile_section(packet, game->world, rect, tile_buffer + pos, &tile_len) < 0) {
 		_ERROR("%s: cannot pack tile section @ %d,%d.\n", __FUNCTION__, rect.x, rect.y);
 		return -1;
 	}
@@ -113,7 +113,7 @@ int tile_section_write(TALLOC_CTX *context, const struct packet *packet, const s
 	pos += binary_writer_write_value(tile_buffer + pos, tile_section->tile_entity_count);
 
 	compressed_len = compressBound(tile_len);
-	compressed_buffer = talloc_size(context, compressed_len);
+	compressed_buffer = talloc_size(packet, compressed_len);
 	if (compressed_buffer == NULL) {
 		_ERROR("%s: out of memory allocating compression buffer.\n", __FUNCTION__);
 		return -ENOMEM;

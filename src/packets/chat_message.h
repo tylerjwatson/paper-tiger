@@ -49,8 +49,7 @@ int chat_message_read(struct packet *packet, const uv_buf_t *buf);
 
 int chat_message_handle(struct player *player, struct packet *packet);
 
-int chat_message_write(TALLOC_CTX *context, const struct packet *packet, const struct player *player, 
-					   uv_buf_t buffer);
+int chat_message_write(const struct game *game, const struct packet *packet, uv_buf_t buffer);
 
 #ifdef __cplusplus
 }

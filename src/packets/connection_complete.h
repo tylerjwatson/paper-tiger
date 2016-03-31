@@ -37,7 +37,7 @@ struct packet;
 	
 int connection_complete_new(TALLOC_CTX *ctx, const struct player *player, struct packet **out_packet);
 
-int connection_complete_write(TALLOC_CTX *context, const struct packet *packet, const struct player *player, uv_buf_t buf);
+int connection_complete_write(const struct game *game, const struct packet *packet, uv_buf_t buf);
 
 #ifdef __cplusplus
 }

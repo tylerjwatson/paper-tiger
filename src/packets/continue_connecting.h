@@ -34,10 +34,15 @@ extern "C" {
 
 struct player;
 struct packet;
-	
-int continue_connecting_new(TALLOC_CTX *ctx, const struct player *player, struct packet **out_packet);
+struct game;
 
-int continue_connecting_write(TALLOC_CTX *context, const struct packet *packet, const struct player *player, uv_buf_t buf);
+struct continue_connecting {
+	uint8_t id;
+};
+	
+int continue_connecting_new(TALLOC_CTX *ctx, uint8_t id, struct packet **out_packet);
+
+int continue_connecting_write(const struct game *game, const struct packet *packet, uv_buf_t buf);
 
 #ifdef __cplusplus
 }

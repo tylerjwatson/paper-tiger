@@ -177,7 +177,7 @@ static void __fill_world_info(struct world *world, struct world_info *world_info
 	world_info->lobby_id = 0;
 }
 
-int world_info_write(TALLOC_CTX *context, const struct packet *packet, const struct player *player, uv_buf_t buf)
+int world_info_write(const struct game *game, const struct packet *packet, uv_buf_t buf)
 {
 	struct world_info *world_info = (struct world_info *)packet->data;
 	int name_len = strlen(world_info->world_name);

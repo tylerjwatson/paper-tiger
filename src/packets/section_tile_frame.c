@@ -77,8 +77,7 @@ out:
 	return ret;
 }
 
-int section_tile_frame_write(TALLOC_CTX *context, const struct packet *packet,
-							 const struct player *player, uv_buf_t buffer)
+int section_tile_frame_write(const struct game *game, const struct packet *packet, uv_buf_t buffer)
 {
 	struct section_tile_frame *section_tile_frame = (struct section_tile_frame *)packet->data;
 	int pos = 0;
