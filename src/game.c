@@ -18,13 +18,14 @@
  * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "game.h"
 
 #include <stdarg.h>
 #include <time.h>
 #include <uv.h>
 
 #include "server.h"
-#include "game.h"
+#include "bitmap.h"
 #include "dataloader.h"
 #include "util.h"
 #include "colour.h"
@@ -173,7 +174,20 @@ int game_send_message(const struct game *game, const struct player *player, cons
 
 	((struct chat_message *)chat_packet->data)->id = 0xFF; //nameless broadcast
 	
-	server_send_packet(player, chat_packet);
+	server_send_packet(game->server, player, chat_packet);
 
 	return -1;
+}
+
+int game_online_players(const struct game *game, uint8_t *out_ids)
+{
+	int count = 0;
+
+	for (uint8_t i = 0; i < GAME_MAX_PLAYERS; i++) {
+		if (bitmap_get(game->player_slots, i) == true) {
+			out_ids[count++] == i;
+		}
+	}
+
+	return count;
 }

@@ -61,7 +61,6 @@ extern "C" {
 struct colour;
 struct player;
 struct server;
-struct game;
 struct console;
 
 /**
@@ -172,6 +171,8 @@ int game_update_loop_init(struct game *game);
 
 int game_send_message(const struct game *game, const struct player *player, const struct colour colour, 
 					  const char *fmt, ...);
+
+int game_online_players(const struct game *game, uint8_t *out_ids);
 
 /**
  * @}
