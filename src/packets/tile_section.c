@@ -100,7 +100,7 @@ int tile_section_write(const struct game *game, const struct packet *packet, uv_
 	pos += binary_writer_write_value(tile_buffer + pos, tile_section->width);
 	pos += binary_writer_write_value(tile_buffer + pos, tile_section->height);
 
-	if (world_pack_tile_section(packet, game->world, rect, tile_buffer + pos, &tile_len) < 0) {
+	if (world_pack_tile_section((TALLOC_CTX *)packet, game->world, rect, tile_buffer + pos, &tile_len) < 0) {
 		_ERROR("%s: cannot pack tile section @ %d,%d.\n", __FUNCTION__, rect.x, rect.y);
 		return -1;
 	}

@@ -33,6 +33,8 @@ static int __player_destructor(struct player *player)
 	
 	bitmap_clear(player->game->player_slots, player->id);
 	player->game->players[player->id] = NULL;
+
+	return 0;
 }
 
 int player_new(TALLOC_CTX *context, const struct game *game, int id, struct player **out_player)

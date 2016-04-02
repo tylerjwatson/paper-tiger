@@ -62,7 +62,8 @@ static void __game_update(uv_timer_t *timer)
 }
 
 static int __game_destructor(struct game *context)
-{   
+{
+	return 0;
 }
 
 int game_find_next_slot(struct game *context)
@@ -167,7 +168,7 @@ int game_send_message(const struct game *game, const struct player *player, cons
 	vsnprintf(msg, 1024, fmt, args);
 	va_end(args);
 
-	if (chat_message_new(player, player, colour, msg, &chat_packet) < 0) {
+	if (chat_message_new((TALLOC_CTX *)player, player, colour, msg, &chat_packet) < 0) {
 		_ERROR("%s: out of memory allocating chat packet.\n", __FUNCTION__);
 		return -ENOMEM;
 	}

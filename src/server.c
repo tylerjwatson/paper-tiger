@@ -171,7 +171,7 @@ static void __on_write(uv_write_t *req, int status)
 	talloc_free(req);
 }
 
-static int server_packet_to_buffer(const struct game *game, const struct uv_write_t *req, const struct packet *packet, uv_buf_t *bufs)
+static int server_packet_to_buffer(const struct game *game, const uv_write_t *req, const struct packet *packet, uv_buf_t *bufs)
 {
 	struct packet_handler *packet_handler;
 	char *header_buf, *payload_buf;
@@ -237,7 +237,7 @@ int server_send_packet(const struct server *server, const struct player *player,
 		goto out;
 	}
 
-	server_packet_to_buffer(server->game, (const struct uv_write_t *)write_request, packet, bufs);
+	server_packet_to_buffer(server->game, (const uv_write_t *)write_request, packet, bufs);
 
 	write_request->data = (void *)player;
 	

@@ -974,11 +974,17 @@ int world_pack_tile_section(TALLOC_CTX *context, struct world *world, struct rec
 
 	uint8_t staging_buffer[13];
 
-	for (unsigned y = rect.y; y < rect.y + rect.h; y++)
-	for (unsigned x = rect.x; x < rect.x + rect.w; x++) {
+	for (int y = rect.y; y < rect.y + rect.h; y++)
+	for (int x = rect.x; x < rect.x + rect.w; x++) {
 		tile = world_tile_at(world, x, y);
 
 		staging_len = tile_pack(world->game, tile, staging_buffer, &header_1, &header_2, &header_3);
+		if (staging_len < 0) {
+			_ERROR("%s: error packing tile at %d,%d.\n", __FUNCTION__, x, y);
+			ret = -1;
+			goto out;
+		}
+
 		pos += binary_writer_write_value(tile_buffer + pos, header_1);
 
 		if ((header_1 & 1) == 1) {
@@ -997,10 +1003,6 @@ int world_pack_tile_section(TALLOC_CTX *context, struct world *world, struct rec
 	}
 
 	*out_buf_len = pos;
-
-	//if (tile_buffer != NULL) {
-	//	memcpy(tile_buffer, staging_buffer, pos);
-	//}
 
 	ret = 0;
 
