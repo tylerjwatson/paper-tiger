@@ -18,8 +18,7 @@
  * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _HAVE_PLAYER_H
-#define _HAVE_PLAYER_H
+#pragma once
 
 #include <stdint.h>
 #include <uv.h>
@@ -60,5 +59,3 @@ void player_close(struct player *player);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* _HAVE_PLAYER_H */

@@ -18,8 +18,7 @@
  * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _HAVE_ITEM_H
-#define _HAVE_ITEM_H
+#pragma once
 
 #include <stdint.h>
 
@@ -37,6 +36,4 @@ struct item_slot {
 
 #ifdef __cplusplus
 }
-#endif
-	
 #endif

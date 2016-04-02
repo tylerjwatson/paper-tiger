@@ -18,8 +18,7 @@
 * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _HAVE_CONTINUE_CONNECTING2_H
-#define _HAVE_CONTINUE_CONNECTING2_H
+#pragma once
 
 #define PACKET_TYPE_CONTINUE_CONNECTING2 6
 #define PACKET_LEN_CONTINUE_CONNECTING2 0
@@ -39,5 +38,3 @@ int continue_connecting2_handle(struct player *player, struct packet *packet);
 #ifdef __cplusplus
 }
 #endif
-
-#endif //_HAVE_CONTINUE_CONNECTING2_H

@@ -18,9 +18,7 @@
 * along with upgraded-guacamole.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-#ifndef _HAVE_CONFIG_H
-#define _HAVE_CONFIG_H
+#pragma once
 
 #define PRODUCT_NAME "paper-tiger"
 #define VERSION_MAJOR 0
@@ -36,4 +34,3 @@
 #define PRODUCT_PLATFORM Unknown
 #endif
 
-#endif //_HAVE_RECT_H

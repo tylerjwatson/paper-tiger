@@ -18,12 +18,12 @@
 * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _HAVE_CONSOLE_H
-#define _HAVE_CONSOLE_H
+#pragma once
 
 #include <uv.h>
 
 #include "game.h"
+#include "server.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -136,4 +136,3 @@ void console_vsprintf(const struct console *console, const char *fmt, ...);
 }
 #endif
 
-#endif

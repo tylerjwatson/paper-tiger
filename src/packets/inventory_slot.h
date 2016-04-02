@@ -18,15 +18,19 @@
  * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _HAVE_INVENTORY_SLOT_H
-#define _HAVE_INVENTORY_SLOT_H
+#pragma once
 
 #define PACKET_TYPE_INVENTORY_SLOT 5
 #define PACKET_LEN_INVENTORY_SLOT 7
 
 #include <uv.h>
-#include "../packet.h"
+
 #include "../item.h"
+#include "../talloc/talloc.h"
+
+struct player;
+struct packet;
+struct game;
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,5 +46,3 @@ int inventory_slot_handle(struct player *player, struct packet *packet);
 #ifdef __cplusplus
 }
 #endif
-
-#endif //_HAVE_INVENTORY_SLOT_H

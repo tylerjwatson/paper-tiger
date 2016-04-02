@@ -18,9 +18,7 @@
  * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _HAVE_GAME_H
-#define _HAVE_GAME_H
-
+#pragma once
 
 #include <errno.h>
 #include <stdbool.h>
@@ -181,5 +179,3 @@ int game_online_players(const struct game *game, uint8_t *out_ids);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* _HAVE_GAME_H */

@@ -18,8 +18,7 @@
  * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef HAVE_BINARY_WRITER_H
-#define HAVE_BINARY_WRITER_H
+#pragma once
 
 #include <string.h>
 #include <stdbool.h>
@@ -52,5 +51,3 @@ int binary_writer_write_string(char *dest, const char *src);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* HAVE_BINARY_WRITER_H */

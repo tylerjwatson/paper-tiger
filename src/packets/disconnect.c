@@ -22,6 +22,8 @@
 #include <string.h>
 
 #include "disconnect.h"
+
+#include "../packet.h"
 #include "../server.h"
 #include "../game.h"
 #include "../binary_reader.h"

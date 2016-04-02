@@ -18,8 +18,7 @@
 * along with upgraded-guacamole.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _HAVE_VECTOR_2D_H
-#define _HAVE_VECTOR_2D_H
+#pragma once
 
 #include <stdint.h>
 
@@ -35,5 +34,3 @@ struct vector_2d {
 #ifdef __cplusplus
 }
 #endif
-
-#endif //_HAVE_VECTOR_2D_H

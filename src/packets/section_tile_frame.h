@@ -18,8 +18,7 @@
 * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _HAVE_SECTION_TILE_FRAME_H
-#define _HAVE_SECTION_TILE_FRAME_H
+#pragma once
 
 #define PACKET_TYPE_SECTION_TILE_FRAME 11
 
@@ -32,6 +31,7 @@
 #include <stdint.h>
 
 #include "../talloc/talloc.h"
+#include "../rect.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,7 +39,7 @@ extern "C" {
 
 struct player;
 struct packet;
-struct rect;
+struct game;
 
 struct section_tile_frame {
 	int16_t x;
@@ -57,5 +57,3 @@ int section_tile_frame_write(const struct game *game, const struct packet *packe
 #ifdef __cplusplus
 }
 #endif
-
-#endif //_HAVE_SECTION_TILE_FRAME_H

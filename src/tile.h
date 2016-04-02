@@ -18,14 +18,12 @@
  * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#ifndef _HAVE_TILE_H
-#define _HAVE_TILE_H
+#pragma once
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "talloc/talloc.h"
-#include "binary_reader.h"
 
 #define TILE_SECTION_WIDTH 100
 
@@ -123,6 +121,4 @@ int tile_cmp(const struct tile *src, const struct tile *dest);
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

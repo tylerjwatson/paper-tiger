@@ -24,6 +24,7 @@
 #include <time.h>
 #include <uv.h>
 
+#include "packet.h"
 #include "server.h"
 #include "bitmap.h"
 #include "dataloader.h"
@@ -62,8 +63,7 @@ static void __game_update(uv_timer_t *timer)
 }
 
 static int __game_destructor(struct game *context)
-{
-	return 0;
+{   
 }
 
 int game_find_next_slot(struct game *context)
@@ -186,7 +186,7 @@ int game_online_players(const struct game *game, uint8_t *out_ids)
 
 	for (uint8_t i = 0; i < GAME_MAX_PLAYERS; i++) {
 		if (bitmap_get(game->player_slots, i) == true) {
-			out_ids[count++] = i;
+			out_ids[count++] == i;
 		}
 	}
 

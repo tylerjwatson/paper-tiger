@@ -17,23 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef UPGRADED_GUACAMOLE_UTIL_H
-#define UPGRADED_GUACAMOLE_UTIL_H
+
+#pragma once
 
 #define _ERROR(x,...) fprintf(stderr, x,##__VA_ARGS__)
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#define bit_toggle(src, n, val)	do {		\
+#define bit_toggle(src, n, val)	do {			\
 	src ^= (-(int)val ^ src) & (1 << n);		\
 } while (0)
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif //UPGRADED_GUACAMOLE_UTIL_H

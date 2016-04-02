@@ -18,8 +18,7 @@
  * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _HAVE_PACKET_H
-#define _HAVE_PACKET_H
+#pragma once
 
 #include <uv.h>
 #include <stdint.h>
@@ -193,5 +192,3 @@ int packet_new(TALLOC_CTX *ctx, struct player *player, const uv_buf_t *buf, stru
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* _HAVE_PACKET_H */

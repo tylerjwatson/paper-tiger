@@ -19,9 +19,10 @@
 */
 
 #include <string.h>
-#include <stdbool.h> 
+#include <stdbool.h>
 
 #include "world_info.h"
+
 #include "../world.h"
 #include "../game.h"
 #include "../packet.h"

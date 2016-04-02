@@ -37,11 +37,8 @@ int chat_message_handle(struct player *player, struct packet *packet)
 
 	console_vsprintf(player->game->console, "<\033[33;1m%s\033[0m> %s\n", player->name, chat_message->message);
 	
-	/*
-	 * The chat message can be re-broadcasted to everyone else, but
-	 * must have the ID of the originating player set in the message.
-	 */
 	chat_message->id = player->id;
+
 	server_broadcast_packet(player->game->server, packet);
 
 	return 0;
@@ -77,7 +74,7 @@ int chat_message_new(TALLOC_CTX *ctx, const struct player *player, const struct 
 	}
 	
 	packet->type = PACKET_TYPE_CHAT_MESSAGE;
-	packet->len = PACKET_HEADER_SIZE + (uint16_t)strlen(message) + binary_writer_7bit_len(strlen(message));
+	packet->len = PACKET_HEADER_SIZE + strlen(message) + binary_writer_7bit_len(strlen(message));
 
 	chat_message->id = player->id;
 	chat_message->colour = colour;

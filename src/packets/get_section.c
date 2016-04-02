@@ -33,7 +33,7 @@
 #include "../game.h"
 #include "../packet.h"
 #include "../player.h"
-
+#include "../colour.h"
 #include "../talloc/talloc.h"
 #include "../binary_reader.h"
 #include "../binary_writer.h"

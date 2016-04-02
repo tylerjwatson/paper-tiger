@@ -18,8 +18,7 @@
 * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _HAVE_CONTINUE_CONNECTING_H
-#define _HAVE_CONTINUE_CONNECTING_H
+#pragma once
 
 #define PACKET_TYPE_CONTINUE_CONNECTING 0x03
 
@@ -47,5 +46,3 @@ int continue_connecting_write(const struct game *game, const struct packet *pack
 #ifdef __cplusplus
 }
 #endif
-
-#endif //_HAVE_CONTINUE_CONNECTING_H

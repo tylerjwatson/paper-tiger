@@ -18,8 +18,7 @@
  * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _HAVE_WORLD_H
-#define _HAVE_WORLD_H
+#pragma once
 
 #define WORLD_SECTION_WIDTH 200
 #define WORLD_SECTION_HEIGHT 150
@@ -35,11 +34,11 @@ extern "C" {
 #include "talloc/talloc.h"
 
 #include "vector_2d.h"
-#include "tile.h"
-#include "binary_reader.h"
 
 struct game;
 struct rect;
+struct tile;
+struct binary_reader_context;
 
 struct world_flags {
 	bool crimson;
@@ -278,5 +277,3 @@ int world_pack_tile_section(TALLOC_CTX *context, struct world *world, struct rec
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* _HAVE_WORLD_H */

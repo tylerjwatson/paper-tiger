@@ -20,7 +20,9 @@
 
 #include <stdint.h>
 
+#include "player.h"
 #include "packet.h"
+#include "game.h"
 #include "util.h"
 
 #include "packets/world_info.h"

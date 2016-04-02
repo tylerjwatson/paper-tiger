@@ -18,8 +18,7 @@
  * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef HAVE_BINARY_READER_H
-#define HAVE_BINARY_READER_H
+#pragma once
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -73,5 +72,3 @@ int binary_reader_read_7bit_int(const char *buf, int *pos, int *out_value);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* HAVE_BINARY_READER_H */

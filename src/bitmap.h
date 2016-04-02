@@ -18,9 +18,7 @@
  * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _HAVE_BITMAP_H
-#define _HAVE_BITMAP_H
-
+#pragma once
 
 #include <limits.h>    /* for CHAR_BIT */
 #include <stdint.h>   /* for uint32_t */
@@ -59,4 +57,3 @@ static inline bool bitmap_get(word_t *words, int n)
 }
 #endif
 
-#endif /* _HAVE_BITMAP_H */

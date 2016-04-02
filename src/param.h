@@ -18,8 +18,7 @@
 * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef HAVE_PARAM_H
-#define HAVE_PARAM_H
+#pragma once
 
 #include "talloc/talloc.h"
 #include <errno.h>
@@ -40,6 +39,4 @@ void param_free(struct param *param);
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

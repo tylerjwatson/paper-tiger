@@ -19,14 +19,17 @@
 * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _HAVE_DISCONNECT_H
-#define _HAVE_DISCONNECT_H
+#pragma once
 
 #define PACKET_TYPE_DISCONNECT 0x02
 
 #include <uv.h>
-#include "../packet.h"
-#include "../player.h"
+
+#include "../talloc/talloc.h"
+
+struct packet;
+struct player;
+struct game;
 
 #ifdef __cplusplus
 extern "C" {
@@ -51,5 +54,3 @@ int disconnect_handle(struct player *player, struct packet *packet);
 #ifdef __cplusplus
 }
 #endif
-
-#endif //_HAVE_DISCONNECT_H

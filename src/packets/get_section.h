@@ -18,8 +18,7 @@
 * along with upgraded-guacamole.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _HAVE_GET_SECTION_H
-#define _HAVE_GET_SECTION_H
+#pragma once
 
 #define PACKET_TYPE_GET_SECTION 8
 #define PACKET_LEN_GET_SECTION 8
@@ -35,6 +34,7 @@ extern "C" {
 
 struct player;
 struct packet;
+struct game;
 	
 struct get_section {
 	int32_t x;
@@ -47,5 +47,3 @@ int get_section_read(struct packet *packet, const uv_buf_t *buf);
 #ifdef __cplusplus
 }
 #endif
-
-#endif //_HAVE_GET_SECTION_H

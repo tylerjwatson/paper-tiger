@@ -18,8 +18,7 @@
  * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DATALOADER_H
-#define DATALOADER_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,4 +32,3 @@ int dataloader_load_tile_flags(struct game *world);
 }
 #endif
 
-#endif // DATALOADER_H

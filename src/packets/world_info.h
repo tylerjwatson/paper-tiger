@@ -18,8 +18,7 @@
 * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _HAVE_WORLD_INFO_H
-#define _HAVE_WORLD_INFO_H
+#pragma once
 
 #define PACKET_TYPE_WORLD_INFO 7
 
@@ -29,7 +28,6 @@
 #define PACKET_LEN_WORLD_INFO 29
 
 #include <uv.h>
-
 #include "../talloc/talloc.h"
 
 #ifdef __cplusplus
@@ -38,7 +36,8 @@ extern "C" {
 
 struct player;
 struct packet;
-	
+struct game;
+
 struct world_info {
 	int32_t time;
 	uint8_t day_info;
@@ -85,5 +84,3 @@ int world_info_write(const struct game *game, const struct packet *packet, uv_bu
 #ifdef __cplusplus
 }
 #endif
-
-#endif //_HAVE_WORLD_INFO_H

@@ -18,8 +18,7 @@
 * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _HAVE_CONNECTION_COMPLETE_H
-#define _HAVE_CONNECTION_COMPLETE_H
+#pragma once
 
 #define PACKET_TYPE_CONNECTION_COMPLETE 49
 
@@ -34,6 +33,7 @@ extern "C" {
 
 struct player;
 struct packet;
+struct game;
 	
 int connection_complete_new(TALLOC_CTX *ctx, const struct player *player, struct packet **out_packet);
 
@@ -42,5 +42,3 @@ int connection_complete_write(const struct game *game, const struct packet *pack
 #ifdef __cplusplus
 }
 #endif
-
-#endif //_HAVE_CONTINUE_CONNECTING_H

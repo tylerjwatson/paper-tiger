@@ -18,8 +18,7 @@
 * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _HAVE_PLAYER_HP_H
-#define _HAVE_PLAYER_HP_H
+#pragma once
 
 #define PACKET_TYPE_PLAYER_HP 16
 #define PACKET_LEN_PLAYER_HP 5
@@ -27,7 +26,6 @@
 #include <uv.h>
 
 #include "../talloc/talloc.h"
-#include "../colour.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -55,4 +53,4 @@ int player_hp_handle(struct player *player, struct packet *packet);
 }
 #endif
 
-#endif //_HAVE_PLAYER_HP_H
+#pragma once

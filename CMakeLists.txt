@@ -41,16 +41,20 @@ SET(PROTOBUF_GENERATE_CPP_APPEND_PATH PROTOBUF)
 	
 add_library(talloc STATIC src/talloc/talloc.c)
 
-include_directories("/usr/local/include" "${PROJECT_SOURCE_DIR}" 
+include_directories("${PROJECT_SOURCE_DIR}" 
 					"${LIBUV_INCLUDE_DIRS}" 
 					"${ZLIB_INCLUDE_DIRS}"
 					"${PROTOBUF_INCLUDE_DIRS}"
 					"${CMAKE_CURRENT_BINARY_DIR}") 
 
 add_executable(paper-tiger
+	src/game.c
+	src/game.h
 	src/packet.c
 	src/packet.h
 
+	src/packets/world_info.c
+	src/packets/world_info.h
 	src/packets/client_uuid.h
 	src/packets/client_uuid.c
 	src/packets/continue_connecting2.h
@@ -61,8 +65,6 @@ add_executable(paper-tiger
 	src/packets/player_info.c
 	src/packets/connect_request.h
 	src/packets/connect_request.c
-	src/packets/world_info.c
-	src/packets/world_info.h
 	src/packets/disconnect.c
 	src/packets/disconnect.h
 	src/packets/get_section.c
@@ -93,8 +95,6 @@ add_executable(paper-tiger
 	src/param.h
 	src/console.c
 	src/console.h
-	src/game.c
-	src/game.h
 	src/getopt.c
 	src/getopt.h
 	src/main.cc

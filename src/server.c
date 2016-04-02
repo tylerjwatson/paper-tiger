@@ -18,13 +18,12 @@
  * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <uv.h>
+#include "server.h"
 
-//#include "talloc/talloc.h"
+#include <uv.h>
 
 #include "game.h"
 #include "util.h"
-#include "server.h"
 #include "player.h"
 #include "packet.h"
 

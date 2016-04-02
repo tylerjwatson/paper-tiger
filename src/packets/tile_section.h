@@ -18,8 +18,7 @@
 * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _HAVE_TILE_SECTION_H
-#define _HAVE_TILE_SECTION_H
+#pragma once
 
 #define PACKET_TYPE_TILE_SECTION 10
 
@@ -31,7 +30,8 @@
 #include <uv.h>
 
 #include "../talloc/talloc.h"
-#include "../colour.h"
+
+#include "../rect.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,7 +39,7 @@ extern "C" {
 
 struct player;
 struct packet;
-struct rect;
+struct game;
 	
 struct tile_section {
 	uint8_t compressed;
@@ -61,5 +61,3 @@ int tile_section_write(const struct game *game, const struct packet *packet, uv_
 #ifdef __cplusplus
 }
 #endif
-
-#endif //_HAVE_tile_section_H

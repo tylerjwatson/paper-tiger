@@ -18,14 +18,14 @@
 * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _HAVE_CONNECT_REQUEST_H
-#define _HAVE_CONNECT_REQUEST_H
+#pragma once
 
 #define PACKET_TYPE_CONNECT_REQUEST 0x01
 
 #include <uv.h>
-#include "../packet.h"
-#include "../player.h"
+
+struct packet;
+struct player;
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,5 +43,3 @@ int connect_request_handle(struct player *player, struct packet *packet);
 #ifdef __cplusplus
 }
 #endif
-
-#endif //_HAVE_CONNECT_REQUEST_H

@@ -18,8 +18,7 @@
 * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _HAVE_CLIENT_UUID_H
-#define _HAVE_CLIENT_UUID_H
+#pragma once
 
 #define PACKET_TYPE_CLIENT_UUID 68
 
@@ -29,8 +28,11 @@
 #define PACKET_LEN_CLIENT_UUID 37
 
 #include <uv.h>
-#include "../packet.h"
-#include "../colour.h"
+
+#include "../talloc/talloc.h"
+
+struct packet;
+struct player;
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,5 +52,3 @@ int client_uuid_handle(struct player *player, struct packet *packet);
 #ifdef __cplusplus
 }
 #endif
-
-#endif //_HAVE_player_info_H

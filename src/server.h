@@ -18,17 +18,18 @@
  * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _HAVE_SERVER_H
-#define _HAVE_SERVER_H
+#pragma once
 
 #include <uv.h>
 
 #include "talloc/talloc.h"
-#include "packet.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+struct packet;
+struct player;
 
 /**
 * @defgroup server Server subsystem
@@ -150,5 +151,3 @@ int server_broadcast_packet(const struct server *server, const struct packet *pa
 /**
  * @}
  */
-
-#endif

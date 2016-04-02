@@ -18,8 +18,7 @@
 * along with upgraded-guacamole.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef HAVE_colour_H
-#define HAVE_colour_H
+#pragma once
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -43,5 +42,3 @@ static const struct colour colour_black = {
 #ifdef __cplusplus
 }
 #endif
-
-#endif //HAVE_colour_H

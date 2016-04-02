@@ -18,8 +18,7 @@
 * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _HAVE_CHAT_MESSAGE_H
-#define _HAVE_CHAT_MESSAGE_H
+#pragma once
 
 #define PACKET_TYPE_CHAT_MESSAGE 25
 
@@ -29,13 +28,18 @@
 #define PACKET_LEN_CHAT_MESSAGE 3
 
 #include <uv.h>
-#include "../packet.h"
+
 #include "../colour.h"
+#include "../talloc/talloc.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+struct packet;
+struct player;
+struct game;
+  
 struct chat_message {
 	uint8_t id;
 	struct colour colour;
@@ -54,5 +58,3 @@ int chat_message_write(const struct game *game, const struct packet *packet, uv_
 #ifdef __cplusplus
 }
 #endif
-
-#endif //_HAVE_player_info_H

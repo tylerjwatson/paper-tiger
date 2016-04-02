@@ -18,8 +18,7 @@
 * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _HAVE_PLAYER_INFO_H
-#define _HAVE_PLAYER_INFO_H
+#pragma once
 
 #define PACKET_TYPE_PLAYER_INFO 0x04
 
@@ -73,5 +72,3 @@ int player_info_handle(struct player *player, struct packet *packet);
 #ifdef __cplusplus
 }
 #endif
-
-#endif //_HAVE_player_info_H
