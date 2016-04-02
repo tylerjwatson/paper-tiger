@@ -37,8 +37,11 @@ int chat_message_handle(struct player *player, struct packet *packet)
 
 	console_vsprintf(player->game->console, "<\033[33;1m%s\033[0m> %s\n", player->name, chat_message->message);
 	
+	/*
+	 * The chat message can be re-broadcasted to everyone else, but
+	 * must have the ID of the originating player set in the message.
+	 */
 	chat_message->id = player->id;
-
 	server_broadcast_packet(player->game->server, packet);
 
 	return 0;

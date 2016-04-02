@@ -185,7 +185,7 @@ int game_online_players(const struct game *game, uint8_t *out_ids)
 
 	for (uint8_t i = 0; i < GAME_MAX_PLAYERS; i++) {
 		if (bitmap_get(game->player_slots, i) == true) {
-			out_ids[count++] == i;
+			out_ids[count++] = i;
 		}
 	}
 

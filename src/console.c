@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+#include "server.h"
 #include "player.h"
 #include "console.h"
 #include "game.h"
