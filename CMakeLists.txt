@@ -53,6 +53,8 @@ add_executable(paper-tiger
 	src/packet.c
 	src/packet.h
 
+	src/packets/status.c
+	src/packets/status.h
 	src/packets/world_info.c
 	src/packets/world_info.h
 	src/packets/client_uuid.h
