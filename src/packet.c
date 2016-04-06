@@ -40,6 +40,7 @@
 #include "packets/connection_complete.h"
 #include "packets/inventory_slot.h"
 #include "packets/chat_message.h"
+#include "packets/status.h"
 
 static struct packet_handler packet_handlers[] = {
 	{ .type = PACKET_TYPE_CONNECT_REQUEST, .read_func = connect_request_read, .handle_func = connect_request_handle, .write_func = NULL },
@@ -49,6 +50,7 @@ static struct packet_handler packet_handlers[] = {
 	{ .type = PACKET_TYPE_CONTINUE_CONNECTING2, .read_func = NULL, .handle_func = continue_connecting2_handle, .write_func = NULL },
 	{ .type = PACKET_TYPE_WORLD_INFO, .read_func = NULL, .handle_func = NULL, .write_func = world_info_write },
 	{ .type = PACKET_TYPE_GET_SECTION, .read_func = get_section_read, .handle_func = get_section_handle, .write_func = NULL },
+	{ .type = PACKET_TYPE_STATUS, .read_func = NULL, .handle_func = NULL, .write_func = status_write },
 	{ .type = PACKET_TYPE_TILE_SECTION, .read_func = NULL, .handle_func = NULL, .write_func = tile_section_write },
 	{ .type = PACKET_TYPE_SECTION_TILE_FRAME, .read_func = NULL, .handle_func = NULL, .write_func = section_tile_frame_write },
 	{ .type = PACKET_TYPE_CHAT_MESSAGE, .read_func = chat_message_read, .handle_func = chat_message_handle, .write_func = chat_message_write }, 
