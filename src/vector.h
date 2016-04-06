@@ -22,7 +22,11 @@
 
 #include "talloc/talloc.h"
 
-#define VECTOR_INITIAL_CAPACITY 4
+#define VECTOR_INITIAL_CAPACITY 1
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct vector {
 	size_t size;
@@ -30,7 +34,7 @@ struct vector {
 	void **data;
 };
 
-int vector_new(TALLOC_CTX *context, size_t initial_size, struct vector **out_vector);
+int vector_new(TALLOC_CTX *context, struct vector **out_vector);
 
 int vector_steal_back(struct vector *vector, void *data);
 
@@ -41,3 +45,9 @@ void *vector_get(struct vector *vector, size_t index);
 void vector_steal(struct vector *vector, size_t index, void *data);
 
 void vector_set(struct vector *vector, size_t index, void *data);
+
+void vector_delete(struct vector *vector, void *ptr);
+
+#ifdef __cplusplus
+}
+#endif

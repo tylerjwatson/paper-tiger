@@ -18,16 +18,13 @@
 * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
-
 #include "vector.h"
 #include "util.h"
 
 //forward declaration;
 static int vector_realloc(struct vector *vector);
 
-
-int vector_new(TALLOC_CTX *context, size_t initial_size, struct vector **out_vector)
+int vector_new(TALLOC_CTX *context, struct vector **out_vector)
 {
 	int ret = -1;
 	TALLOC_CTX *temp_context;
@@ -47,14 +44,16 @@ int vector_new(TALLOC_CTX *context, size_t initial_size, struct vector **out_vec
 		goto out;
 	}
 
-	vec->capacity = VECTOR_INITIAL_CAPACITY;
+	vec->capacity = 1;
 	vec->size = 0;
 
 	vector_realloc(vec);
 
 	*out_vector = (struct vector *)talloc_steal(context, vec);
+
+	ret = 0;
 out:
-	talloc_free(context);
+	talloc_free(temp_context);
 
 	return ret;
 }
@@ -126,4 +125,9 @@ void vector_set(struct vector *vector, size_t index, void *data)
 	}
 
 	vector->data[index] = data;
+}
+
+void vector_delete(struct vector *vector, void *ptr)
+{
+
 }
