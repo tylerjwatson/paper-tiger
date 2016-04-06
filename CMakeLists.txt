@@ -111,7 +111,10 @@ add_executable(paper-tiger
 	src/world.h
 	src/dataloader.h
 	src/dataloader.cc
-	
+
+	src/vector.c
+	src/vector.h
+
 	${PROTO_SRCS}
 	${PROTO_HEADERS})
 
