@@ -23,9 +23,6 @@
 #define WORLD_SECTION_WIDTH 200
 #define WORLD_SECTION_HEIGHT 150
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include <stdbool.h>
 #include <errno.h>
@@ -34,6 +31,12 @@ extern "C" {
 #include "talloc/talloc.h"
 
 #include "vector_2d.h"
+#include "rect.h"
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct game;
 struct rect;
@@ -144,7 +147,10 @@ struct world {
 	/** 
 	 * The number of tiles i n the world's Y axis.
 	 */
-	uint32_t max_tiles_y;		
+	uint32_t max_tiles_y;	
+
+	uint16_t max_sections_x;
+	uint16_t max_sections_y;
 
 	/*
 	 * DateTime stamp of when the world file was created
@@ -273,6 +279,12 @@ struct vector_2d world_tile_section(int x, int y);
 
 int world_pack_tile_section(TALLOC_CTX *context, struct world *world, struct rect rect,
 							char *tile_buffer, int *out_buf_len);
+
+struct rect world_floor_tile_section(uint16_t tile_x, uint16_t tile_y);
+
+struct rect world_get_spawn_section(struct world *world);
+
+struct rect world_get_section(struct world *world, uint16_t tile_x, uint16_t tile_y);
 
 #ifdef __cplusplus
 }

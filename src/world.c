@@ -459,6 +459,9 @@ static int __world_read_header(struct world *world)
 		goto out;
 	}
 
+	world->max_sections_x = world->max_tiles_x / WORLD_SECTION_WIDTH;
+	world->max_sections_y = world->max_tiles_y / WORLD_SECTION_HEIGHT;
+
 	if (world->version < 112) {
 		world->expert_mode = false;
 	} else {
@@ -992,6 +995,9 @@ int world_pack_tile_section(TALLOC_CTX *context, struct world *world, struct rec
 		}
 
 		if (tile_buffer != NULL) {
+		/*	if (pos + staging_len > 262144) {
+				_ERROR("%s: overrunning intermediate buffer.\n", __FUNCTION__);
+			}*/
 			memcpy(tile_buffer + pos, staging_buffer, staging_len);
 		}
 
@@ -1008,4 +1014,35 @@ int world_pack_tile_section(TALLOC_CTX *context, struct world *world, struct rec
 
 out:
 	return ret;
+}
+
+struct rect world_floor_tile_section(uint16_t tile_x, uint16_t tile_y)
+{
+	struct rect top_rect;
+
+	top_rect.x = (tile_x / WORLD_SECTION_WIDTH) * WORLD_SECTION_WIDTH;
+	top_rect.y = (tile_y / WORLD_SECTION_HEIGHT) * WORLD_SECTION_HEIGHT;
+	top_rect.w = WORLD_SECTION_WIDTH;
+	top_rect.h = WORLD_SECTION_HEIGHT;
+
+	return top_rect;
+}
+
+struct rect world_get_spawn_section(struct world *world)
+{
+	return world_get_section(world, world->spawn_tile.x, world->spawn_tile.y);
+}
+
+struct rect world_get_section(struct world *world, uint16_t tile_x, uint16_t tile_y)
+{
+	struct rect top_rect, section_rect;
+
+	top_rect = world_floor_tile_section(tile_x, tile_y);
+	
+	section_rect.x = (top_rect.x / WORLD_SECTION_WIDTH);
+	section_rect.y = (top_rect.y / WORLD_SECTION_HEIGHT);
+	section_rect.h = section_rect.y + 1;
+	section_rect.w = section_rect.x + 1;
+
+	return section_rect;
 }

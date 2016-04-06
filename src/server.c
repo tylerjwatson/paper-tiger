@@ -207,6 +207,12 @@ static int server_packet_to_buffer(const struct game *game, const uv_write_t *re
 		goto out;
 	}
 
+	if (packet_len >= 65535) {
+		_ERROR("%s: packet overran max length.\n", __FUNCTION__);
+		ret = -1;
+		goto out;
+	}
+
 	bufs[1].len = packet_len;
 
 	packet_write_header(packet->type, packet_len + PACKET_HEADER_SIZE, &bufs[0], &pos);

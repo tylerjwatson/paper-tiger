@@ -82,13 +82,19 @@ out:
 int tile_section_write(const struct game *game, const struct packet *packet, uv_buf_t buffer)
 {
 	struct tile_section *tile_section = (struct tile_section *)packet->data;
-	char tile_buffer[262144], *compressed_buffer;
+	char *tile_buffer, *compressed_buffer;
 	int ret = -1, pos = 0, tile_len = 0;
 	uLongf compressed_len = 0;
 
 	struct rect rect = rect_new(tile_section->x_start, tile_section->y_start, 
 		tile_section->width, tile_section->height);
 	
+	tile_buffer = talloc_size(packet, 1 * 1024 * 1024);
+	if (tile_buffer == NULL) {
+		_ERROR("%s: out of memory allocating tile buffer @ %d,%d.\n", __FUNCTION__, rect.x, rect.y);
+		return -ENOMEM;
+	}
+
 	binary_writer_write_value(buffer.base, tile_section->compressed);
 	
 	/*
@@ -137,6 +143,8 @@ int tile_section_write(const struct game *game, const struct packet *packet, uv_
 	*/
 
 	memcpy(buffer.base + 1, compressed_buffer + 2, compressed_len - 2);
+
+	talloc_free(tile_buffer);
 
 	return compressed_len + 1;
 }

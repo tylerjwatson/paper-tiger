@@ -24,6 +24,7 @@
 #include "get_section.h"
 #include "tile_section.h"
 #include "section_tile_frame.h"
+#include "status.h"
 #include "connection_complete.h"
 #include "chat_message.h"
 
@@ -54,15 +55,8 @@ int get_section_handle(struct player *player, struct packet *packet)
 	 * Cheat, and statically send the spawn point for now
 	 */
 
-	rect.x = (player->game->world->spawn_tile.x / WORLD_SECTION_WIDTH) * WORLD_SECTION_WIDTH;
-	rect.y = (player->game->world->spawn_tile.y / WORLD_SECTION_HEIGHT) * WORLD_SECTION_HEIGHT;
-	rect.w = WORLD_SECTION_WIDTH;
-	rect.h = WORLD_SECTION_HEIGHT;
-
-	section_rect.x = (rect.x / WORLD_SECTION_WIDTH) - 1;
-	section_rect.y = (rect.y / WORLD_SECTION_HEIGHT) - 1;
-	section_rect.h = section_rect.y + 2;
-	section_rect.w = section_rect.x + 2;
+	rect = world_floor_tile_section(player->game->world->spawn_tile.x, player->game->world->spawn_tile.y);
+	section_rect = world_get_section(player->game->world, rect.x, rect.y);
 
 	if (tile_section_new(player, player, rect, &section) < 0) {
 		_ERROR("%s: allocating tile section failed.\n", __FUNCTION__);
@@ -78,7 +72,7 @@ int get_section_handle(struct player *player, struct packet *packet)
 		_ERROR("%s: allocating connection complete packet failed.\n", __FUNCTION__);
 		return -1;
 	}
-	
+
 	server_send_packet(player->game->server, player, section);
 	server_send_packet(player->game->server, player, tile_frame);
 	server_send_packet(player->game->server, player, connection_complete);

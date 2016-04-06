@@ -32,6 +32,7 @@ int tile_heap_new(TALLOC_CTX *context, const uint32_t size_x, const uint32_t siz
 	int ret;
 	struct tile **tile_heap;
 
+
 	if ((temp_context = talloc_new(NULL)) == NULL) {
 		_ERROR("%s: Could not allocate talloc context for tile heap.", __FUNCTION__);
 		ret = -1;
