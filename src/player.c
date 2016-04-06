@@ -19,6 +19,7 @@
  */
 
 #include "player.h"
+#include "hook.h"
 #include "game.h"
 #include "util.h"
 
@@ -29,10 +30,12 @@ static void __player_handle_close(uv_handle_t *handle)
 
 static int __player_destructor(struct player *player)
 {
-	_ERROR("%s (%s) has disconnected.\n", player->name, player->remote_addr);
+	hook_on_player_leave(player->game->hooks, player->game, player);
 	
 	bitmap_clear(player->game->player_slots, player->id);
 	player->game->players[player->id] = NULL;
+
+	return 0;
 }
 
 int player_new(TALLOC_CTX *context, const struct game *game, int id, struct player **out_player)

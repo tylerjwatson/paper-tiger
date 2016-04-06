@@ -60,6 +60,7 @@ struct colour;
 struct player;
 struct server;
 struct console;
+struct hook_context;
 
 /**
  * Describes a game context.  Contains all references and information that a game needs
@@ -113,6 +114,12 @@ struct game {
 	 * Array of tile frame important data, loaded from @a flags.dat.
 	 */
 	bool *tile_frame_important;
+
+	/**
+	 * Hook subsystem, that provides hooking callbacks for parts of the system that
+	 * wish to listen for pre-programmed events.
+	 */
+	struct hook_context *hooks;
 };
 
 /**

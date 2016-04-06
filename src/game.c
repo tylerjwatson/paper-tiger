@@ -24,11 +24,14 @@
 #include <time.h>
 #include <uv.h>
 
+#include "player.h"
+#include "hook.h"
 #include "packet.h"
 #include "server.h"
 #include "bitmap.h"
 #include "dataloader.h"
 #include "util.h"
+#include "config.h"
 #include "colour.h"
 
 #include "packets/chat_message.h"
@@ -83,40 +86,86 @@ int game_start_event_loop(struct game *context)
 	return uv_run(context->event_loop, UV_RUN_DEFAULT);
 }
 
+static int game_on_player_leave(const struct game *game, const struct player *player)
+{
+	game_send_message(game, player, colour_black, "%s v%d.%d.",
+		PRODUCT_NAME, VERSION_MAJOR, VERSION_MINOR);
+
+	console_vsprintf(game->console,
+		"\033[31;1m* %s has left.\033[0m\n",
+		player->name);
+
+	return 0;
+}
+
+static int game_on_player_join(const struct game *game, const struct player *player)
+{
+	game_send_message(game, player, colour_black, "%s v%d.%d.",
+		PRODUCT_NAME, VERSION_MAJOR, VERSION_MINOR);
+
+	console_vsprintf(game->console, 
+		"\033[32;1m* %s has joined.  Slot=%d IP=%s\033[0m\n", 
+		player->name,
+		player->id,
+		player->remote_addr);
+
+	return 0;
+}
+
+static int game_init(struct game *game)
+{
+	int ret = -1;
+
+	hook_player_join_register(game->hooks, game_on_player_join);
+	hook_player_leave_register(game->hooks, game_on_player_leave);
+
+	ret = 0;
+
+	return ret;
+}
+
 int game_new(TALLOC_CTX *context, struct game **out_context)
 {
 	int ret = -1;
-	struct game *gameContext = NULL;
+	struct game *game = NULL;
 	TALLOC_CTX *tempContext;
 
 	if ((tempContext = talloc_new(NULL)) == NULL) {
 		return -ENOMEM;
 	}
 
-	gameContext = talloc_zero(tempContext, struct game);
+	game = talloc_zero(tempContext, struct game);
 
 	/*
 	 * Init game stuff here
 	 */
-	gameContext->ms_per_frame = 1000. / FRAMES_PER_SEC;
+	game->ms_per_frame = 1000. / FRAMES_PER_SEC;
 
-	if ((gameContext->event_loop = talloc_zero(gameContext, uv_loop_t)) == NULL) {
+	if ((game->event_loop = talloc_zero(game, uv_loop_t)) == NULL) {
 		_ERROR("%s: Could not allocate a game event loop.\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 	
-	uv_loop_init(gameContext->event_loop);
-	gameContext->player_slots = talloc_zero_array(gameContext, word_t, GAME_MAX_PLAYERS / sizeof(word_t));
-	talloc_set_destructor(gameContext, __game_destructor);
+	uv_loop_init(game->event_loop);
+	game->player_slots = talloc_zero_array(game, word_t, GAME_MAX_PLAYERS / sizeof(word_t));
+	talloc_set_destructor(game, __game_destructor);
 	
-	if (dataloader_load_tile_flags(gameContext) < 0) {
+	if (dataloader_load_tile_flags(game) < 0) {
 		_ERROR("%s: loading tile flags failed.\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
-	
-	*out_context = talloc_steal(context, gameContext);
+
+	if (hook_context_new(game, game, &game->hooks) < 0) {
+		_ERROR("%s: initializing hook subsystem failed.\n", __FUNCTION__);
+		ret = -1;
+		goto out;
+	}
+
+	game_init(game);
+
+	*out_context = talloc_steal(context, game);
 
 	ret = 0;
 out:

@@ -43,7 +43,7 @@ int dataloader_load_tile_flags(struct game *game)
 		std::fstream input_file(file_path, std::ios::in | std::ios::binary);
 
 		if (tile_flags.ParseFromIstream(&input_file) == false) {
-			_ERROR("%s: cannot parse data from %s.\n", __FUNCTION__, file_path);
+			_ERROR("%s: cannot parse data from %s: %s.\n", __FUNCTION__, file_path, strerror(errno));
 			return -1;
 		}
 	}

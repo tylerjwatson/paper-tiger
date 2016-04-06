@@ -25,6 +25,8 @@
 #include "../packet.h"
 #include "../binary_reader.h"
 #include "../util.h"
+#include "../game.h"
+#include "../hook.h"
 
 int connection_complete_new(TALLOC_CTX *ctx, const struct player *player, struct packet **out_packet)
 {

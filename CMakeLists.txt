@@ -114,6 +114,8 @@ add_executable(paper-tiger
 
 	src/vector.c
 	src/vector.h
+	src/hook.c
+	src/hook.h
 
 	${PROTO_SRCS}
 	${PROTO_HEADERS})

@@ -31,6 +31,7 @@
 #include "../server.h"
 #include "../world.h"
 #include "../game.h"
+#include "../hook.h"
 #include "../packet.h"
 #include "../player.h"
 #include "../colour.h"
@@ -46,7 +47,7 @@
 int get_section_handle(struct player *player, struct packet *packet)
 {
 	struct get_section *get_section = (struct get_section *)packet->data;
-	struct packet *section, *tile_frame, *connection_complete, *welcome_msg;
+	struct packet *section, *tile_frame, *connection_complete;
 	struct rect rect, section_rect;
 	
 	/*
@@ -78,21 +79,11 @@ int get_section_handle(struct player *player, struct packet *packet)
 		return -1;
 	}
 	
-	if (chat_message_new(player, player, colour_black, "testicles", &welcome_msg) < 0) {
-		_ERROR("%s: allocating connection complete packet failed.\n", __FUNCTION__);
-		return -1;
-	}
-
-	((struct chat_message *)welcome_msg->data)->id = 0xFF;
-	
 	server_send_packet(player->game->server, player, section);
-	//_sleep(100);
 	server_send_packet(player->game->server, player, tile_frame);
-	//_sleep(100);
 	server_send_packet(player->game->server, player, connection_complete);
 	
-	game_send_message(player->game, player, colour_black, "Welcome to %s v%d.%d.", 
-		PRODUCT_NAME, VERSION_MAJOR, VERSION_MINOR);
+	hook_on_player_join(player->game->hooks, player->game, player);
 	
 	return 0;
 }
