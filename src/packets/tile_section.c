@@ -88,8 +88,14 @@ int tile_section_write(const struct game *game, const struct packet *packet, uv_
 
 	struct rect rect = rect_new(tile_section->x_start, tile_section->y_start, 
 		tile_section->width, tile_section->height);
+
+	/*
+	 * Header section is 19 bytes * tile section rectangle of zlib compressed data.
+	 * Each tile can be a maximum of 13 bytes.  It is not expected that each tile
+	 * in the section will take up the entire 13 bytes.
+	 */
 	
-	tile_buffer = talloc_size(packet, 1 * 1024 * 1024);
+	tile_buffer = talloc_size(packet, (13 * tile_section->width * tile_section->height) + 19);
 	if (tile_buffer == NULL) {
 		_ERROR("%s: out of memory allocating tile buffer @ %d,%d.\n", __FUNCTION__, rect.x, rect.y);
 		return -ENOMEM;
@@ -98,7 +104,7 @@ int tile_section_write(const struct game *game, const struct packet *packet, uv_
 	binary_writer_write_value(buffer.base, tile_section->compressed);
 	
 	/*
-	 * All data after the compressed is compressed.
+	 * All data after the compressed flag (first byte) is compressed.
 	 */
 
 	pos += binary_writer_write_value(tile_buffer + pos, tile_section->x_start);
@@ -142,9 +148,13 @@ int tile_section_write(const struct game *game, const struct packet *packet, uv_
 	workaround of skipping past the first 2 bytes to get to the deflate data will definitely work.
 	*/
 
-	memcpy(buffer.base + 1, compressed_buffer + 2, compressed_len - 2);
+	compressed_len -= 6;
+	
+	memcpy(buffer.base + 1, compressed_buffer + 2, compressed_len);
+	
+	
 
 	talloc_free(tile_buffer);
 
-	return compressed_len + 1;
+	return compressed_len - 2 - 4 + 1;
 }
