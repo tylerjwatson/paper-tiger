@@ -971,7 +971,7 @@ struct vector_2d world_max_tile_sections(const struct world *world)
 }
 
 int world_pack_tile_section(TALLOC_CTX *context, struct world *world, struct rect rect, 
-							char *tile_buffer, int *out_buf_len)
+							uint8_t *tile_buffer, int *out_buf_len)
 {
 	struct tile *tile;
 	int staging_len = 0, pos = 0, ret = -1;
@@ -983,6 +983,8 @@ int world_pack_tile_section(TALLOC_CTX *context, struct world *world, struct rec
 	for (unsigned x = rect.x; x < rect.x + rect.w; x++) {
 		tile = world_tile_at(world, x, y);
 
+		header_1 = header_2 = header_3 = 0;
+		
 		staging_len = tile_pack(world->game, tile, staging_buffer, &header_1, &header_2, &header_3);
 		pos += binary_writer_write_value(tile_buffer + pos, header_1);
 
@@ -995,9 +997,6 @@ int world_pack_tile_section(TALLOC_CTX *context, struct world *world, struct rec
 		}
 
 		if (tile_buffer != NULL) {
-		/*	if (pos + staging_len > 262144) {
-				_ERROR("%s: overrunning intermediate buffer.\n", __FUNCTION__);
-			}*/
 			memcpy(tile_buffer + pos, staging_buffer, staging_len);
 		}
 
@@ -1005,10 +1004,6 @@ int world_pack_tile_section(TALLOC_CTX *context, struct world *world, struct rec
 	}
 
 	*out_buf_len = pos;
-
-	//if (tile_buffer != NULL) {
-	//	memcpy(tile_buffer, staging_buffer, pos);
-	//}
 
 	ret = 0;
 

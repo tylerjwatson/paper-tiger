@@ -82,7 +82,7 @@ out:
 int tile_section_write(const struct game *game, const struct packet *packet, uv_buf_t buffer)
 {
 	struct tile_section *tile_section = (struct tile_section *)packet->data;
-	char *tile_buffer, *compressed_buffer;
+	uint8_t *tile_buffer, *compressed_buffer;
 	int ret = -1, pos = 0, tile_len = 0;
 	uLongf compressed_len = 0;
 
@@ -124,7 +124,7 @@ int tile_section_write(const struct game *game, const struct packet *packet, uv_
 
 	pos += binary_writer_write_value(tile_buffer + pos, tile_section->tile_entity_count);
 
-	compressed_len = compressBound(tile_len);
+	compressed_len = compressBound(pos);
 	compressed_buffer = talloc_size(packet, compressed_len);
 	if (compressed_buffer == NULL) {
 		_ERROR("%s: out of memory allocating compression buffer.\n", __FUNCTION__);
@@ -148,13 +148,9 @@ int tile_section_write(const struct game *game, const struct packet *packet, uv_
 	workaround of skipping past the first 2 bytes to get to the deflate data will definitely work.
 	*/
 
-	compressed_len -= 6;
-	
 	memcpy(buffer.base + 1, compressed_buffer + 2, compressed_len);
 	
-	
-
 	talloc_free(tile_buffer);
 
-	return compressed_len - 2 - 4 + 1;
+	return compressed_len;
 }

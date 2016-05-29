@@ -278,7 +278,7 @@ struct tile *world_tile_at(struct world *world, const uint32_t x, const uint32_t
 struct vector_2d world_tile_section(int x, int y);
 
 int world_pack_tile_section(TALLOC_CTX *context, struct world *world, struct rect rect,
-							char *tile_buffer, int *out_buf_len);
+							uint8_t *tile_buffer, int *out_buf_len);
 
 struct rect world_floor_tile_section(uint16_t tile_x, uint16_t tile_y);
 

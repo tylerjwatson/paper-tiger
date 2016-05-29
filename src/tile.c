@@ -67,7 +67,11 @@ bool tile_active(const struct tile *tile)
 
 void tile_set_active(struct tile *tile, bool val)
 {
-	bit_toggle(tile->s_tile_header, 5, val);
+	if (val) {
+		BIT_SET(tile->s_tile_header, 5);
+	} else {
+		BIT_CLEAR(tile->s_tile_header, 5);
+	}	
 }
 
 uint8_t tile_colour(const struct tile *tile)
@@ -127,22 +131,38 @@ bool tile_half_brick(const struct tile *tile)
 
 void tile_set_half_brick(struct tile *tile, bool val)
 {
-	bit_toggle(tile->s_tile_header, 10, val);
+	if (val) {
+		BIT_SET(tile->s_tile_header, 10);
+	} else {
+		BIT_CLEAR(tile->s_tile_header, 10);
+	}	
 }
 
 void tile_set_wire(struct tile *tile, bool val)
 {
-	bit_toggle(tile->s_tile_header, 7, val);
+	if (val) {
+		BIT_SET(tile->s_tile_header, 7);
+	} else {
+		BIT_CLEAR(tile->s_tile_header,7);
+	}	
 }
 
 void tile_set_wire_2(struct tile *tile, bool val)
 {
-	bit_toggle(tile->s_tile_header, 8, val);
+	if (val) {
+		BIT_SET(tile->s_tile_header, 8);
+	} else {
+		BIT_CLEAR(tile->s_tile_header, 8);
+	}	
 }
 
 void tile_set_wire_3(struct tile *tile, bool val)
 {
-	bit_toggle(tile->s_tile_header, 9, val);
+	if (val) {
+		BIT_SET(tile->s_tile_header, 9);
+	} else {
+		BIT_CLEAR(tile->s_tile_header, 9);
+	}	
 }
 
 bool tile_actuator(const struct tile *tile)
@@ -152,7 +172,11 @@ bool tile_actuator(const struct tile *tile)
 
 void tile_set_actuator(struct tile *tile, bool val)
 {
-	bit_toggle(tile->s_tile_header, 11, val);
+	if (val) {
+		BIT_SET(tile->s_tile_header, 11);
+	} else {
+		BIT_CLEAR(tile->s_tile_header, 11);
+	}	
 }
 
 bool tile_inactive(const struct tile *tile)
@@ -162,7 +186,11 @@ bool tile_inactive(const struct tile *tile)
 
 void tile_set_inactive(struct tile *tile, bool val)
 {
-	bit_toggle(tile->s_tile_header, 6, val);
+	if (val) {
+		BIT_SET(tile->s_tile_header, 6);
+	} else {
+		BIT_CLEAR(tile->s_tile_header, 6);
+	}	
 }
 
 uint8_t tile_slope(const struct tile *tile)
@@ -209,17 +237,17 @@ int tile_pack(const struct game *game, const struct tile *tile, uint8_t *dest,
 	*tile_flags_1 = *tile_flags_2 = *tile_flags_3 = 0;
 
 	if (tile_active(tile) == true) {
-		*tile_flags_1 |= 2;
-		
+		uint8_t lsb = (uint8_t)tile->type;
+		*tile_flags_1 |= 2;	
+
+		pos += binary_writer_write_value(dest + pos, lsb);
+
 		if (tile->type > 255) {
-			int16_t type = (int16_t)tile->type;
+			uint8_t msb = (uint8_t)(tile->type >> 8);
 			*tile_flags_1 |= 32;
 			
-			pos += binary_writer_write_value(dest + pos, type);
-		} else {
-			uint8_t type = (uint8_t)tile->type;
-			pos += binary_writer_write_value(dest + pos, type);
-		}
+			pos += binary_writer_write_value(dest + pos, msb);
+		} 
 
 		if (game->tile_frame_important[tile->type]) {
 			pos += binary_writer_write_value(dest + pos, tile->frame_x);
@@ -255,9 +283,17 @@ int tile_pack(const struct game *game, const struct tile *tile, uint8_t *dest,
 		pos += binary_writer_write_value(dest + pos, tile->liquid);
 	}
 
-	bit_toggle(*tile_flags_2, 2, tile_wire(tile));
-	bit_toggle(*tile_flags_2, 3, tile_wire2(tile));
-	bit_toggle(*tile_flags_2, 4, tile_wire3(tile));
+	if (tile_wire(tile)) {
+		*tile_flags_2 |= 2;
+	}
+
+	if (tile_wire2(tile)) {
+		*tile_flags_2 |= 4;
+	}
+
+	if (tile_wire3(tile)) {
+		*tile_flags_2 |= 8;
+	}
 
 	if (tile_half_brick(tile)) {
 		slope = 16;
@@ -267,8 +303,13 @@ int tile_pack(const struct game *game, const struct tile *tile, uint8_t *dest,
 
 	*tile_flags_2 |= slope;
 
-	bit_toggle(*tile_flags_3, 2, tile_actuator(tile));
-	bit_toggle(*tile_flags_3, 3, tile_inactive(tile));
+	if (tile_actuator(tile)) {
+		*tile_flags_3 |= 2;
+	}
+
+	if (tile_inactive(tile)) {
+		*tile_flags_3 |= 4;
+	}
 
 	if (*tile_flags_3 != 0) {
 		*tile_flags_2 |= 1;

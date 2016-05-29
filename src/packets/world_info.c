@@ -93,9 +93,15 @@ static int __fill_world_info_buffer(struct world_info *world_info, char *buffer)
 static void __fill_world_info(struct world *world, struct world_info *world_info)
 {
 	world_info->time = (int)world->temp_time;
-	bit_toggle(world_info->day_info, 0, world->temp_day_time);
-	bit_toggle(world_info->day_info, 1, world->temp_blood_moon);
-	bit_toggle(world_info->day_info, 2, world->temp_eclipse);
+	if (world->temp_day_time) {
+		BIT_SET(world_info->day_info, 0);
+	}
+	if (world->temp_blood_moon) {
+		BIT_SET(world_info->day_info, 1);
+	}
+	if (world->temp_eclipse) {
+		BIT_SET(world_info->day_info, 2);
+	}
 	world_info->moon_phase = world->temp_moon_phase;
 	world_info->max_tile_x = world->max_tiles_x;
 	world_info->max_tile_y = world->max_tiles_y;
@@ -138,41 +144,105 @@ static void __fill_world_info(struct world *world, struct world_info *world_info
 
 	world_info->max_raining = world->max_rain;
 
-	bit_toggle(world_info->flags_1, 0, world->flags.shadow_orb_smashed);
-	bit_toggle(world_info->flags_1, 1, world->flags.downed_boss_1);
-	bit_toggle(world_info->flags_1, 2, world->flags.downed_boss_2);
-	bit_toggle(world_info->flags_1, 3, world->flags.downed_boss_3);
-	bit_toggle(world_info->flags_1, 4, world->flags.hard_mode);
-	bit_toggle(world_info->flags_1, 5, world->flags.downed_clowns);
-	bit_toggle(world_info->flags_1, 6, 1 /*SSO Support*/);
-	bit_toggle(world_info->flags_1, 7, world->flags.downed_plant);
+	if (world->flags.shadow_orb_smashed) {
+		BIT_SET(world_info->flags_1, 0);
+	}
+	if (world->flags.downed_boss_1) {
+		BIT_SET(world_info->flags_1, 1);
+	}
+	if (world->flags.downed_boss_2) {
+		BIT_SET(world_info->flags_1, 2);
+	}
+	if (world->flags.downed_boss_3) {
+		BIT_SET(world_info->flags_1, 3);
+	}
+	if (world->flags.hard_mode) {
+		BIT_SET(world_info->flags_1, 4);
+	}
+	if (world->flags.downed_clowns) {
+		BIT_SET(world_info->flags_1, 5);
+	}
+	if (1 /*SSO Support*/) {
+		BIT_SET(world_info->flags_1, 6);
+	}
+	if (world->flags.downed_plant) {
+		BIT_SET(world_info->flags_1, 7);
+	}
 	
-	bit_toggle(world_info->flags_2, 0, world->flags.downed_mech_1);
-	bit_toggle(world_info->flags_2, 1, world->flags.downed_mech_2);
-	bit_toggle(world_info->flags_2, 2, world->flags.downed_mech_3);
-	bit_toggle(world_info->flags_2, 3, world->flags.downed_mech_any);
-	bit_toggle(world_info->flags_2, 4, (world->cloud_bg_active > 1.));
-	bit_toggle(world_info->flags_2, 5, world->flags.crimson);
-	bit_toggle(world_info->flags_2, 6, 0 /* Pumpkin moon */);
-	bit_toggle(world_info->flags_2, 7, 0 /* Snow moon */);
+	if (world->flags.downed_mech_1) {
+		BIT_SET(world_info->flags_2, 0);
+	}
+	if (world->flags.downed_mech_2) {
+		BIT_SET(world_info->flags_2, 1);
+	}
+	if (world->flags.downed_mech_3) {
+		BIT_SET(world_info->flags_2, 2);
+	}
+	if (world->flags.downed_mech_any) {
+		BIT_SET(world_info->flags_2, 3);
+	}
+	if ((world->cloud_bg_active > 1.)) {
+		BIT_SET(world_info->flags_2, 4);
+	}
+	if (world->flags.crimson) {
+		BIT_SET(world_info->flags_2, 5);
+	}
+	if (0 /* Pumpkin moon */) {
+		BIT_SET(world_info->flags_2, 6);
+	}
+	if (0 /* Snow moon */) {
+		BIT_SET(world_info->flags_2, 7);
+	}
 
-	bit_toggle(world_info->flags_3, 0, world->expert_mode);
-	bit_toggle(world_info->flags_3, 1, world->fast_forward_time);
-	bit_toggle(world_info->flags_3, 2, 0 /* Slime rain */);
-	bit_toggle(world_info->flags_3, 3, world->flags.downed_slime_king);
-	bit_toggle(world_info->flags_3, 4, world->flags.downed_queen_bee);
-	bit_toggle(world_info->flags_3, 5, world->flags.downed_fishron);
-	bit_toggle(world_info->flags_3, 6, world->flags.downed_martians);
-	bit_toggle(world_info->flags_3, 7, world->flags.downed_ancient_cultist);
+	if (world->expert_mode) {
+		BIT_SET(world_info->flags_3, 0);
+	}
+	if (world->fast_forward_time) {
+		BIT_SET(world_info->flags_3, 1);
+	}
+	if (0 /* Slime rain */) {
+		BIT_SET(world_info->flags_3, 2);
+	}
+	if (world->flags.downed_slime_king) {
+		BIT_SET(world_info->flags_3, 3);
+	}
+	if (world->flags.downed_queen_bee) {
+		BIT_SET(world_info->flags_3, 4);
+	}
+	if (world->flags.downed_fishron) {
+		BIT_SET(world_info->flags_3, 5);
+	}
+	if (world->flags.downed_martians) {
+		BIT_SET(world_info->flags_3, 6);
+	}
+	if (world->flags.downed_ancient_cultist) {
+		BIT_SET(world_info->flags_3, 7);
+	}
 
-	bit_toggle(world_info->flags_4, 0, world->flags.downed_moonlord);
-	bit_toggle(world_info->flags_4, 1, world->flags.downed_halloween_king);
-	bit_toggle(world_info->flags_4, 2, world->flags.downed_halloween_tree);
-	bit_toggle(world_info->flags_4, 3, world->flags.downed_christmas_ice_queen);
-	bit_toggle(world_info->flags_4, 4, world->flags.downed_christmas_santank);
-	bit_toggle(world_info->flags_4, 5, world->flags.downed_christmas_tree);
-	bit_toggle(world_info->flags_4, 6, world->flags.downed_golem);
-	bit_toggle(world_info->flags_4, 7, 0 /* Not used */);
+	if (world->flags.downed_moonlord) {
+		BIT_SET(world_info->flags_4, 0);
+	}
+	if (world->flags.downed_halloween_king) {
+		BIT_SET(world_info->flags_4, 1);
+	}
+	if (world->flags.downed_halloween_tree) {
+		BIT_SET(world_info->flags_4, 2);
+	}
+	if (world->flags.downed_christmas_ice_queen) {
+		BIT_SET(world_info->flags_4, 3);
+	}
+	if (world->flags.downed_christmas_santank) {
+		BIT_SET(world_info->flags_4, 4);
+	}
+	if (world->flags.downed_christmas_tree) {
+		BIT_SET(world_info->flags_4, 5);
+	}
+	if (world->flags.downed_golem) {
+		BIT_SET(world_info->flags_4, 6);
+	}
+	if (0 /* Not used */) {
+		BIT_SET(world_info->flags_4, 7);
+	}
 
 	world_info->invasion_type = world->invasion_type;
 	world_info->lobby_id = 0;

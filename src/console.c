@@ -26,6 +26,8 @@
 #include "game.h"
 #include "util.h"
 #include "param.h"
+#include "world.h"
+#include "tile.h"
 
 #include "packets/disconnect.h"
 

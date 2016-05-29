@@ -33,7 +33,7 @@ extern "C" {
 #define binary_writer_write_value(dest, src)		\
 	binary_writer_write_internal(dest, &src, sizeof(src));
 
-static inline int binary_writer_write_internal(char *dest, const void *src, int n)
+static inline int binary_writer_write_internal(void  *dest, const void *src, int n)
 {
 	if (dest != NULL) {
 		memcpy(dest, src, n);
