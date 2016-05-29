@@ -45,7 +45,8 @@ include_directories("${PROJECT_SOURCE_DIR}"
 					"${LIBUV_INCLUDE_DIRS}" 
 					"${ZLIB_INCLUDE_DIRS}"
 					"${PROTOBUF_INCLUDE_DIRS}"
-					"${CMAKE_CURRENT_BINARY_DIR}") 
+					"${CMAKE_CURRENT_BINARY_DIR}")
+				
 
 add_executable(paper-tiger
 	src/game.c
@@ -124,6 +125,10 @@ SET_SOURCE_FILES_PROPERTIES(${PROTO_SRCS} ${PROTO_HEADERS} PROPERTIES GENERATED 
 	
 set_property(TARGET paper-tiger PROPERTY C_STANDARD 11)
 
-target_link_libraries(paper-tiger talloc "${LIBUV_LIBRARIES}" "${ZLIB_LIBRARIES}" "${PROTOBUF_LIBRARY}")
+target_link_libraries(paper-tiger 
+	talloc 
+	"${LIBUV_LIBRARIES}"
+	"${ZLIB_LIBRARIES}"
+	"${PROTOBUF_LIBRARY}")
 
 install(TARGETS paper-tiger RUNTIME DESTINATION bin)
