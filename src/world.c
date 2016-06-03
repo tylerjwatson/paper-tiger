@@ -461,6 +461,7 @@ static int __world_read_header(struct world *world)
 
 	world->max_sections_x = world->max_tiles_x / WORLD_SECTION_WIDTH;
 	world->max_sections_y = world->max_tiles_y / WORLD_SECTION_HEIGHT;
+	world->max_sections = world->max_sections_x * world->max_sections_y;
 
 	if (world->version < 112) {
 		world->expert_mode = false;
@@ -936,6 +937,7 @@ int world_new(TALLOC_CTX *parent_context, const struct game *game, const char *w
 	}
 
 	world->game = (struct game *)game;
+
 
 	*out_world = talloc_steal(parent_context, world);
 	ret = 0;

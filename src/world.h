@@ -32,7 +32,7 @@
 
 #include "vector_2d.h"
 #include "rect.h"
-
+#include "bitmap.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -149,8 +149,15 @@ struct world {
 	 */
 	uint32_t max_tiles_y;	
 
+	/**
+	 * Contains the maximum number of sections in the world.
+	 */
+	uint32_t max_sections;
+
 	uint16_t max_sections_x;
 	uint16_t max_sections_y;
+
+	word_t *section_dirty;
 
 	/*
 	 * DateTime stamp of when the world file was created

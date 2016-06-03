@@ -172,6 +172,7 @@ int main(int argc, char **argv)
 
 	uv_loop_close(game->event_loop);
 out:
+	
 	talloc_free(game);
 
 	talloc_report_full(NULL, stdout);
