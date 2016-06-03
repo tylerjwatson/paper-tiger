@@ -20,6 +20,19 @@ endif()
 include(FindZLIB)
 include(FindProtobuf)
 
+if(NOT PROTOBUF_FOUND)
+	message(FATAL_ERROR "libprotobuf not found and is required.")
+endif()
+
+
+find_library(PROTO_LIB_DEBUG
+	NAMES libprotobufd
+)
+
+find_library(PROTO_LIB_RELEASE
+	NAMES libprotobuf
+)
+
 if(NOT ZLIB_FOUND)
 	message(FATAL_ERROR "zlib not found and is required.")
 endif()
@@ -28,9 +41,6 @@ if(NOT LIBUV_FOUND)
 	message(FATAL_ERROR "LibUV not found and is required.")
 endif()
 
-if(NOT PROTOBUF_FOUND)
-	message(FATAL_ERROR "libprotobuf not found and is required.")
-endif()
 
 file(GLOB PROTO_DEF "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/*.proto")
 
@@ -125,10 +135,12 @@ SET_SOURCE_FILES_PROPERTIES(${PROTO_SRCS} ${PROTO_HEADERS} PROPERTIES GENERATED 
 	
 set_property(TARGET paper-tiger PROPERTY C_STANDARD 11)
 
+set(PROTO_LIB optimized ${PROTO_LIB_RELEASE} debug ${PROTO_LIB_DEBUG})
+
 target_link_libraries(paper-tiger 
 	talloc 
 	"${LIBUV_LIBRARIES}"
 	"${ZLIB_LIBRARIES}"
-	"${PROTOBUF_LIBRARY}")
+	${PROTO_LIB})
 
 install(TARGETS paper-tiger RUNTIME DESTINATION bin)

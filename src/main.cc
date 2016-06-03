@@ -29,7 +29,7 @@
 #ifndef _WIN32
 #include <unistd.h>
 #else
-#define PROTOBUF_USE_DLLS
+//#define PROTOBUF_USE_DLLS
 #endif
 
 #include "talloc/talloc.h"
