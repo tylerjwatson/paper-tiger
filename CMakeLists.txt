@@ -55,8 +55,8 @@ include_directories("${PROJECT_SOURCE_DIR}"
 					"${LIBUV_INCLUDE_DIRS}" 
 					"${ZLIB_INCLUDE_DIRS}"
 					"${PROTOBUF_INCLUDE_DIRS}"
-					"${CMAKE_CURRENT_BINARY_DIR}")
-				
+					"${CMAKE_CURRENT_BINARY_DIR}")				
+
 
 add_executable(paper-tiger
 	src/game.c
@@ -118,6 +118,8 @@ add_executable(paper-tiger
 	src/tile.c
 	src/tile.h
 	src/util.h
+	src/world_section.c
+	src/world_section.h
 	src/world.c
 	src/world.h
 	src/dataloader.h
@@ -132,6 +134,8 @@ add_executable(paper-tiger
 	${PROTO_HEADERS})
 
 SET_SOURCE_FILES_PROPERTIES(${PROTO_SRCS} ${PROTO_HEADERS} PROPERTIES GENERATED TRUE)
+
+source_group("packets" FILES continue_connecting.c)
 	
 set_property(TARGET paper-tiger PROPERTY C_STANDARD 11)
 

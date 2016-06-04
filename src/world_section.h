@@ -24,5 +24,8 @@
 	x * world->max_sections_x + y
 
 struct rect;
+struct vector_2d;
 
-struct rect world_section_to_tile_rect(const struct world *world);
+int world_section_to_coords(const struct world *world, unsigned section, struct vector_2d *out_coords);
+
+int world_section_to_tile_rect(const struct world *world, unsigned section, struct rect *out_rect);

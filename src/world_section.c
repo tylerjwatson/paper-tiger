@@ -18,16 +18,21 @@
  * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <string.h>
+
+#include "world_section.h"
+
 #include "rect.h"
 #include "vector_2d.h"
-#include "world_section.h"
 #include "world.h"
 #include "util.h"
+#include "bitmap.h"
 
 int world_section_init(struct world *world)
 {
 	int ret = -1;
 	TALLOC_CTX *temp_context;
+	word_t *dirty_table;
 
 	temp_context = talloc_new(NULL);
 	if (temp_context == NULL) {
@@ -36,6 +41,15 @@ int world_section_init(struct world *world)
 		goto out;
 	}
 
+	world->section_dirty_size = sizeof(word_t) / world->max_sections;
+	dirty_table = talloc_zero_size(temp_context, world->section_dirty_size);
+	if (dirty_table == NULL) {
+		_ERROR("%s: out of memory allocating section dirty bitmap\n", __FUNCTION__);
+		goto out;
+	}
+
+
+	
 out:
 	talloc_free(temp_context);
 

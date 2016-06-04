@@ -157,6 +157,7 @@ struct world {
 	uint16_t max_sections_x;
 	uint16_t max_sections_y;
 
+	int section_dirty_size;
 	word_t *section_dirty;
 
 	/*
