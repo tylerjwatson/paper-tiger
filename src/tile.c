@@ -226,6 +226,34 @@ int tile_cmp(const struct tile *src, const struct tile *dest)
 	return memcmp(src, dest, sizeof(*src));
 }
 
+int tile_pack_completely(const struct world *world, const struct tile *tile, uint8_t *buffer)
+{
+	uint8_t tile_data[13];
+	uint8_t tile_headers[3];
+	int tile_len = 0, buffer_pos = 0;
+
+	memset(tile_data, 0, sizeof(tile_data));
+	memset(tile_headers, 0, sizeof(tile_headers));
+
+	if ((tile_len = tile_pack(world->game, tile, tile_data, &tile_headers[0], &tile_headers[1], &tile_headers[2])) < 0) {
+		_ERROR("%s: error packing tile to buffer.\n", __FUNCTION__);
+		return -1;
+	}
+
+	buffer_pos += binary_writer_write_value(buffer + buffer_pos, tile_headers[0]);
+	if ((tile_headers[0] & 1) == 1) {
+		buffer_pos += binary_writer_write_value(buffer + buffer_pos, tile_headers[1]);
+		
+		if ((tile_headers[1] & 1) == 1) {
+			buffer_pos += binary_writer_write_value(buffer + buffer_pos, tile_headers[2]);
+		}
+	}
+
+	memcpy(buffer + buffer_pos, tile_data, tile_len);
+
+	return buffer_pos + tile_len;
+}
+
 int tile_pack(const struct game *game, const struct tile *tile, uint8_t *dest,
 			  uint8_t *tile_flags_1, uint8_t *tile_flags_2, uint8_t *tile_flags_3)
 {

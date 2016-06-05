@@ -27,6 +27,7 @@
 #include <stdbool.h>
 #include <errno.h>
 #include <stdint.h>
+#include <uv.h>
 
 #include "talloc/talloc.h"
 
@@ -273,7 +274,9 @@ struct world {
 	/**
 	 * Indicates if world_init has completed
 	 */
-	int _is_loaded; 
+	int _is_loaded;
+
+	uv_idle_t section_compress_worker;
 };
 
 int world_new(TALLOC_CTX *parent_context, const struct game *game, const char *world_path,

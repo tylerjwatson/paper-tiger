@@ -25,6 +25,7 @@
 #include "rect.h"
 #include "game.h"
 #include "world.h"
+#include "world_section.h"
 #include "util.h"
 #include "tile.h"
 #include "binary_reader.h"
@@ -906,6 +907,9 @@ int world_init(struct world *world)
 	if ((ret = __world_read_tile(world)) < 0) {
 		_ERROR("Reading world headers failed: %d\n", ret);
 	}
+
+	world_section_init(world);
+	world_section_compressor_start(world);
 
 out:
 	return ret;

@@ -19,14 +19,115 @@
  */
 
 #include <string.h>
+#include <zlib.h>
 
 #include "world_section.h"
 
+#include "tile.h"
+#include "game.h"
 #include "rect.h"
 #include "vector_2d.h"
 #include "world.h"
 #include "util.h"
 #include "bitmap.h"
+
+static int __zstream_init(z_stream *stream)
+{
+	stream->zalloc = stream->zfree = stream->opaque = Z_NULL;
+
+	return deflateInit(stream, Z_DEFAULT_COMPRESSION);
+}
+
+int world_section_compress(const struct world *world, unsigned section, uint8_t *buffer)
+{
+	struct rect tile_rect;
+	struct tile *tile;
+	z_stream compression_stream;
+	int ret = -1, tile_pos = 0, buffer_pos = 0, have;
+
+	uint8_t in[13 * WORLD_SECTION_WIDTH];
+	uint8_t out[Z_CHUNK];
+
+	world_section_to_tile_rect(world, section, &tile_rect);
+
+	if (__zstream_init(&compression_stream) != Z_OK) {
+		_ERROR("%s: cannot initialize zlib for compression routines.\n", __FUNCTION__);
+		return -1;
+	}
+
+	for (unsigned tile_y = tile_rect.y; tile_y < tile_rect.y + WORLD_SECTION_HEIGHT; tile_y++) {
+		tile_pos = 0;
+
+		for (unsigned tile_x = tile_rect.x; tile_x < tile_rect.x + WORLD_SECTION_WIDTH; tile_x++) {
+			tile = world_tile_at(world, tile_x, tile_y);
+			int tile_len = tile_pack_completely(world, tile, in + tile_pos);
+
+			if (tile_len < 0) {
+				_ERROR("%s: error packing tile.\n", __FUNCTION__);
+				ret = -1;
+				goto out;
+			}
+
+			tile_pos += tile_len;
+		}
+
+		compression_stream.avail_in = tile_pos;
+		compression_stream.next_in = in;
+
+		do {
+			compression_stream.avail_out = Z_CHUNK;
+			compression_stream.next_out = out;
+
+			ret = deflate(&compression_stream, Z_NO_FLUSH);
+			have = Z_CHUNK - compression_stream.avail_out;
+
+			memcpy(buffer + buffer_pos, out, have);
+			buffer_pos += have;
+		} while (compression_stream.avail_out == 0);
+	}
+
+	ret = deflate(&compression_stream, Z_FINISH);
+	have = Z_CHUNK - compression_stream.avail_out;
+	memcpy(buffer + buffer_pos, out, have);
+	buffer_pos += have;
+
+	ret = buffer_pos;
+out:
+	deflateEnd(&compression_stream);
+	
+	return ret;
+}
+
+static void __compress_section(uv_handle_t *handle)
+{
+	struct world *world = (struct world *)handle->data;
+
+	uint8_t buffer[Z_CHUNK];
+
+	for (unsigned section = 0; section < world->max_sections; section++) {
+		
+
+		if (bitmap_get(world->section_dirty, section)) {
+			world_section_compress(world, section, buffer);
+			//todo: compress section into world->section_data
+
+			bitmap_clear(world->section_dirty, section);
+			
+			/*
+			 * The compressor worker only compresses one section at a time per
+			 * iteration of the compressor loop.
+			 */
+			return;
+		}
+	}
+}
+
+int world_section_compressor_start(struct world *world)
+{
+	uv_idle_start(&world->section_compress_worker, __compress_section);
+
+	return 0;
+}
 
 int world_section_init(struct world *world)
 {
@@ -48,8 +149,16 @@ int world_section_init(struct world *world)
 		goto out;
 	}
 
-
+	world->section_dirty = talloc_steal(world, dirty_table);
 	
+	if (uv_idle_init(world->game->event_loop, &world->section_compress_worker) < 0) {
+		_ERROR("%s: initializing section compress worker failed.\n", __FUNCTION__);
+		goto out;
+	}
+
+	world->section_compress_worker.data = world;
+
+	ret = 0;
 out:
 	talloc_free(temp_context);
 

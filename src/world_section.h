@@ -20,11 +20,24 @@
 
 #pragma once
 
+#include <stdint.h>
+
+#define Z_CHUNK 65535
 #define WORLD_SECTION_TO_OFFSET(world,x,y)				\
 	x * world->max_sections_x + y
 
 struct rect;
 struct vector_2d;
+
+struct world_section_data {
+	unsigned section;
+	unsigned section_len;
+	uint8_t section_data[Z_CHUNK];
+};
+
+int world_section_init(struct world *world);
+
+int world_section_compressor_start(struct world *world);
 
 int world_section_to_coords(const struct world *world, unsigned section, struct vector_2d *out_coords);
 
