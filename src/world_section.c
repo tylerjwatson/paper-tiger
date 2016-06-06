@@ -101,25 +101,45 @@ out:
 static void __compress_section(uv_idle_t *handle)
 {
 	struct world *world = (struct world *)handle->data;
-
+	struct world_section_data *section_data;
+	
 	uint8_t buffer[Z_CHUNK];
-
+	int section_len;
+	
 	for (unsigned section = 0; section < world->max_sections; section++) {
-		
-		printf("compressing section %d\n", section);
-		world_section_compress(world, section, buffer);
-		if (bitmap_get(world->section_dirty, section)) {
-			
-			//todo: compress section into world->section_data
-
-			bitmap_clear(world->section_dirty, section);
-			
-			/*
-			 * The compressor worker only compresses one section at a time per
-			 * iteration of the compressor loop.
-			 */
-			return;
+		if (bitmap_get(world->section_dirty, section) == false) {
+			continue;
 		}
+		/*
+		 * Note:
+		 *
+		 * A staging buffer is used here for the call to world_section_compress
+		 * instead of world->section_data directly because the compression may
+		 * fail.  In such a case, we don't want good section tile data exchanged
+		 * with a half-munted turd from a failed compression round.
+		 *
+		 * If a section fails to zcompress then it remains dirty and will be tackled
+		 * again next round.
+		 */
+		 
+		printf("compressing section %d\n", section);
+		section_len = world_section_compress(world, section, buffer);
+		if (section_len < 0) {
+			_ERROR("%s: zcompressor error compressing section %d.\n", __FUNCTION__, section);
+			continue;
+		}
+		
+		section_data = &world->section_data[section];
+		memcpy(section_data->data, buffer, section_len);
+		section_data->len = section_len;
+		
+		bitmap_clear(world->section_dirty, section);
+		
+		/*
+		 * The compressor worker only compresses one section at a time per
+		 * iteration of the compressor loop.
+		 */
+		return;
 	}
 }
 
@@ -127,6 +147,73 @@ int world_section_compressor_start(struct world *world)
 {
 	uv_idle_start(&world->section_compress_worker, __compress_section);
 
+	return 0;
+}
+
+static int world_section_init_section_data(struct world *world)
+{
+	int ret = -1;
+	TALLOC_CTX *temp_context;
+	struct world_section_data *section_data;
+	
+	temp_context = talloc_new(NULL);
+	if (temp_context == NULL) {
+		_ERROR("%s: out of memory allocating temp context for section data.\n", __FUNCTION__);
+		ret = -ENOMEM;
+		goto out;
+	}
+	
+	section_data = talloc_zero_array(temp_context, struct world_section_data, world->max_sections);
+	if (section_data == NULL) {
+		_ERROR("%s: out of memory allocating section data array.\n", __FUNCTION__);
+		ret = -ENOMEM;
+		goto out;
+	}
+	
+	for(unsigned i = 0; i < world->max_sections; i++) {
+		section_data[i].section = i;
+	}
+	
+	world->section_data = talloc_steal(world, section_data);
+	
+	ret = 0;
+out:
+	talloc_free(temp_context);
+	return ret;
+}
+
+static int world_section_compress_all(struct world *world)
+{
+	struct world_section_data *section_data;
+	
+	uint8_t buffer[Z_CHUNK];
+	int section_len;
+	
+	for (unsigned section = 0; section < world->max_sections; section++) {
+		/*
+		 * Note:
+		 *
+		 * A staging buffer is used here for the call to world_section_compress
+		 * instead of world->section_data directly because the compression may
+		 * fail.  In such a case, we don't want good section tile data exchanged
+		 * with a half-munted turd from a failed compression round.
+		 *
+		 * If a section fails to zcompress then it remains dirty and will be tackled
+		 * again next round.
+		 */
+		
+		printf("compressing section %d\n", section);
+		section_len = world_section_compress(world, section, buffer);
+		if (section_len < 0) {
+			_ERROR("%s: zcompressor error compressing section %d.\n", __FUNCTION__, section);
+			return -1;
+		}
+		
+		section_data = &world->section_data[section];
+		memcpy(section_data->data, buffer, section_len);
+		section_data->len = section_len;
+	}
+	
 	return 0;
 }
 
@@ -159,6 +246,16 @@ int world_section_init(struct world *world)
 
 	world->section_compress_worker.data = world;
 
+	if (world_section_init_section_data(world) < 0) {
+		_ERROR("%s: init section data failed.\n", __FUNCTION__);
+		goto out;
+	}
+	
+	if (world_section_compress_all(world) < 0) {
+		_ERROR("%s: compressing section data failed.\n", __FUNCTION__);
+		goto out;
+	}
+	
 	ret = 0;
 out:
 	talloc_free(temp_context);

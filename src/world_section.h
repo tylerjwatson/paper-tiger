@@ -32,8 +32,8 @@ struct world;
 
 struct world_section_data {
 	unsigned section;
-	unsigned section_len;
-	uint8_t section_data[Z_CHUNK];
+	unsigned len;
+	uint8_t data[Z_CHUNK];
 };
 
 int world_section_init(struct world *world);

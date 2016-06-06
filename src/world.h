@@ -161,6 +161,7 @@ struct world {
 	int section_dirty_size;
 	word_t *section_dirty;
 
+	struct world_section_data *section_data;
 	/*
 	 * DateTime stamp of when the world file was created
 	 */
