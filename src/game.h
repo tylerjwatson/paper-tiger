@@ -29,7 +29,7 @@
 
 #define GAME_MAX_PLAYERS 255
 //#define GAME_PROTOCOL_VERSION 156 << this is for 1.3.0
-#define GAME_PROTOCOL_VERSION 168 // this is for 1.3.1
+#define GAME_PROTOCOL_VERSION 169 // this is for 1.3.1
 
 #ifdef __cplusplus
 extern "C" {

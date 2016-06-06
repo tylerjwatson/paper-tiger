@@ -32,6 +32,7 @@ extern "C" {
 #endif
 
 struct game;
+struct world;
 
 enum {
 	WORLD_FILE_TILE_HAS_FLAGS = 1,

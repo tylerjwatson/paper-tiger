@@ -76,7 +76,7 @@ int vector_steal_back(struct vector *vector, void *data)
 {
 	if (vector->size == vector->capacity) {
 		if (vector_realloc(vector) < 0) {
-			_ERROR("%s: out of memory reallocating vector array to %d items.\n", __FUNCTION__, vector->capacity);
+			_ERROR("%s: out of memory reallocating vector array to %zu items.\n", __FUNCTION__, vector->capacity);
 			return -1;
 		}
 	}
@@ -90,7 +90,7 @@ int vector_push_back(struct vector *vector, void *data)
 {
 	if (vector->size >= vector->capacity) {
 		if (vector_realloc(vector) < 0) {
-			_ERROR("%s: out of memory reallocating vector array to %d items.\n", __FUNCTION__, vector->capacity);
+			_ERROR("%s: out of memory reallocating vector array to %zu items.\n", __FUNCTION__, vector->capacity);
 			return -1;
 		}
 	}

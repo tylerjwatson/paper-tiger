@@ -976,7 +976,7 @@ struct vector_2d world_max_tile_sections(const struct world *world)
 	return vec;
 }
 
-int world_pack_tile_section(TALLOC_CTX *context, struct world *world, struct rect rect, 
+int world_pack_tile_section(TALLOC_CTX *context, struct world *world, struct rect rect,
 							uint8_t *tile_buffer, int *out_buf_len)
 {
 	struct tile *tile;
@@ -1013,7 +1013,6 @@ int world_pack_tile_section(TALLOC_CTX *context, struct world *world, struct rec
 
 	ret = 0;
 
-out:
 	return ret;
 }
 

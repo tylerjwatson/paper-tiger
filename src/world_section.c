@@ -23,11 +23,11 @@
 
 #include "world_section.h"
 
+#include "world.h"
 #include "tile.h"
 #include "game.h"
 #include "rect.h"
 #include "vector_2d.h"
-#include "world.h"
 #include "util.h"
 #include "bitmap.h"
 
@@ -59,8 +59,8 @@ int world_section_compress(const struct world *world, unsigned section, uint8_t 
 		tile_pos = 0;
 
 		for (unsigned tile_x = tile_rect.x; tile_x < tile_rect.x + WORLD_SECTION_WIDTH; tile_x++) {
-			tile = world_tile_at(world, tile_x, tile_y);
-			int tile_len = tile_pack_completely(world, tile, in + tile_pos);
+			tile = world_tile_at((struct world *)world, tile_x, tile_y);
+			int tile_len = tile_pack_completely(world, tile, &in[tile_pos]);
 
 			if (tile_len < 0) {
 				_ERROR("%s: error packing tile.\n", __FUNCTION__);
@@ -81,7 +81,7 @@ int world_section_compress(const struct world *world, unsigned section, uint8_t 
 			ret = deflate(&compression_stream, Z_NO_FLUSH);
 			have = Z_CHUNK - compression_stream.avail_out;
 
-			memcpy(buffer + buffer_pos, out, have);
+			memcpy(&buffer[buffer_pos], out, have);
 			buffer_pos += have;
 		} while (compression_stream.avail_out == 0);
 	}
@@ -98,7 +98,7 @@ out:
 	return ret;
 }
 
-static void __compress_section(uv_handle_t *handle)
+static void __compress_section(uv_idle_t *handle)
 {
 	struct world *world = (struct world *)handle->data;
 
@@ -106,9 +106,10 @@ static void __compress_section(uv_handle_t *handle)
 
 	for (unsigned section = 0; section < world->max_sections; section++) {
 		
-
+		printf("compressing section %d\n", section);
+		world_section_compress(world, section, buffer);
 		if (bitmap_get(world->section_dirty, section)) {
-			world_section_compress(world, section, buffer);
+			
 			//todo: compress section into world->section_data
 
 			bitmap_clear(world->section_dirty, section);
@@ -142,7 +143,7 @@ int world_section_init(struct world *world)
 		goto out;
 	}
 
-	world->section_dirty_size = sizeof(word_t) / world->max_sections;
+	world->section_dirty_size = world->max_sections / sizeof(word_t);
 	dirty_table = talloc_zero_size(temp_context, world->section_dirty_size);
 	if (dirty_table == NULL) {
 		_ERROR("%s: out of memory allocating section dirty bitmap\n", __FUNCTION__);
@@ -169,8 +170,8 @@ int world_section_to_coords(const struct world *world, unsigned section, struct 
 {
 	struct vector_2d coords;
 
-	coords.x = section / world->max_sections_x;
-	coords.y = section % world->max_sections_x;
+	coords.x = section / world->max_sections_y;
+	coords.y = section % world->max_sections_y;
 
 	*out_coords = coords;
 

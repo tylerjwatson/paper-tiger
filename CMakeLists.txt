@@ -24,14 +24,15 @@ if(NOT PROTOBUF_FOUND)
 	message(FATAL_ERROR "libprotobuf not found and is required.")
 endif()
 
+if(WIN32)
+	find_library(PROTO_LIB_DEBUG
+		NAMES libprotobufd
+	)
 
-find_library(PROTO_LIB_DEBUG
-	NAMES libprotobufd
-)
-
-find_library(PROTO_LIB_RELEASE
-	NAMES libprotobuf
-)
+	find_library(PROTO_LIB_RELEASE
+		NAMES libprotobuf
+	)
+endif(WIN32)
 
 if(NOT ZLIB_FOUND)
 	message(FATAL_ERROR "zlib not found and is required.")
@@ -139,7 +140,11 @@ source_group("packets" FILES continue_connecting.c)
 	
 set_property(TARGET paper-tiger PROPERTY C_STANDARD 11)
 
-set(PROTO_LIB optimized ${PROTO_LIB_RELEASE} debug ${PROTO_LIB_DEBUG})
+IF(WIN32)
+	set(PROTO_LIB optimized ${PROTO_LIB_RELEASE} debug ${PROTO_LIB_DEBUG})
+ELSE(WIN32)
+	set(PROTO_LIB ${PROTOBUF_LIBRARY})
+ENDIF(WIN32)
 
 target_link_libraries(paper-tiger 
 	talloc 

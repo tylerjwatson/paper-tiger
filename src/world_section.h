@@ -28,6 +28,7 @@
 
 struct rect;
 struct vector_2d;
+struct world;
 
 struct world_section_data {
 	unsigned section;
