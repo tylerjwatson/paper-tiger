@@ -31,7 +31,7 @@
 #include <stdint.h>
 
 #include "../talloc/talloc.h"
-#include "../rect.h"
+#include "../vector_2d.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -48,7 +48,7 @@ struct section_tile_frame {
 	int16_t dy;
 };
 
-int section_tile_frame_new(TALLOC_CTX *ctx, const struct player *player, struct rect rect, 
+int section_tile_frame_new(TALLOC_CTX *ctx, const struct player *player, struct vector_2d coords,
 							struct packet **out_packet);
 
 

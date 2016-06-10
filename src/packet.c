@@ -51,7 +51,7 @@ static struct packet_handler packet_handlers[] = {
 	{ .type = PACKET_TYPE_WORLD_INFO, .read_func = NULL, .handle_func = NULL, .write_func = world_info_write },
 	{ .type = PACKET_TYPE_GET_SECTION, .read_func = get_section_read, .handle_func = get_section_handle, .write_func = NULL },
 	{ .type = PACKET_TYPE_STATUS, .read_func = NULL, .handle_func = NULL, .write_func = status_write },
-	{ .type = PACKET_TYPE_TILE_SECTION, .read_func = NULL, .handle_func = NULL, .write_func = tile_section_write },
+	{ .type = PACKET_TYPE_TILE_SECTION, .read_func = NULL, .handle_func = NULL, .write_func = tile_section_write_v2 },
 	{ .type = PACKET_TYPE_SECTION_TILE_FRAME, .read_func = NULL, .handle_func = NULL, .write_func = section_tile_frame_write },
 	{ .type = PACKET_TYPE_CHAT_MESSAGE, .read_func = chat_message_read, .handle_func = chat_message_handle, .write_func = chat_message_write }, 
 	{ .type = PACKET_TYPE_PLAYER_HP, .read_func = player_hp_read, .handle_func = player_hp_handle, .write_func = NULL },

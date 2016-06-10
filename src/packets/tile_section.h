@@ -53,11 +53,13 @@ struct tile_section {
 	int16_t tile_entity_count;
 };
 
-int tile_section_new(TALLOC_CTX *ctx, const struct player *player, struct rect section, 
+int tile_section_new(TALLOC_CTX *ctx, const struct player *player, unsigned section,
 					 struct packet **out_packet);
 
 int tile_section_write(const struct game *game, const struct packet *packet, uv_buf_t buffer);
 
+int tile_section_write_v2(const struct game *game, const struct packet *packet, uv_buf_t buffer);
+	
 #ifdef __cplusplus
 }
 #endif

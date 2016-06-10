@@ -25,19 +25,21 @@
 
 #include "../game.h"
 #include "../world.h"
+#include "../world_section.h"
 #include "../packet.h"
 #include "../player.h"
 #include "../binary_writer.h"
 #include "../util.h"
 #include "../rect.h"
 
-int tile_section_new(TALLOC_CTX *ctx, const struct player *player, struct rect section, struct packet **out_packet)
+int tile_section_new(TALLOC_CTX *ctx, const struct player *player, unsigned section, struct packet **out_packet)
 {
 	int ret = -1;
 	TALLOC_CTX *temp_context;
 	struct packet *packet;
 	struct tile_section *tile_section;
-
+	struct vector_2d section_coords;
+	
 	temp_context = talloc_new(NULL);
 	if (temp_context == NULL) {
 		_ERROR("%s: out of memory allocating temp context for packet %d\n", __FUNCTION__, PACKET_TYPE_TILE_SECTION);
@@ -59,13 +61,15 @@ int tile_section_new(TALLOC_CTX *ctx, const struct player *player, struct rect s
 		goto out;
 	}
 
+	world_section_to_coords(player->game->world, section, &section_coords);
+	
 	packet->type = PACKET_TYPE_TILE_SECTION;
 	
 	tile_section->compressed = true;
-	tile_section->x_start = section.x;
-	tile_section->y_start = section.y;
-	tile_section->height = section.h;
-	tile_section->width = section.w;
+	tile_section->x_start = section_coords.x * WORLD_SECTION_WIDTH;
+	tile_section->y_start = section_coords.y * WORLD_SECTION_HEIGHT;
+	tile_section->height = WORLD_SECTION_HEIGHT;
+	tile_section->width = WORLD_SECTION_WIDTH;
 
 
 	packet->len = PACKET_HEADER_SIZE + sizeof(struct tile_section);
@@ -77,6 +81,29 @@ out:
 	talloc_free(temp_context);
 
 	return ret;
+}
+
+int tile_section_write_v2(const struct game *game, const struct packet *packet, uv_buf_t buffer)
+{
+	struct tile_section *tile_section = (struct tile_section *)packet->data;
+	int pos = 0;
+	unsigned section_num;
+	
+	section_num = world_section_num_for_tile_coords(game->world, tile_section->x_start,
+													tile_section->y_start);
+	
+	pos += binary_writer_write_value(buffer.base, tile_section->compressed);
+	
+	/*
+	 * Skipping 2 bytes of GZip header here
+	 */
+	memcpy(&buffer.base[pos], &game->world->section_data[section_num].data[2],
+		   game->world->section_data[section_num].len - 2);
+	
+	pos += game->world->section_data[section_num].len;
+	pos -= 2;
+	
+	return pos;
 }
 
 int tile_section_write(const struct game *game, const struct packet *packet, uv_buf_t buffer)

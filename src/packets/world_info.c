@@ -251,7 +251,6 @@ static void __fill_world_info(struct world *world, struct world_info *world_info
 int world_info_write(const struct game *game, const struct packet *packet, uv_buf_t buf)
 {
 	struct world_info *world_info = (struct world_info *)packet->data;
-	int name_len = strlen(world_info->world_name);
 	int packet_len = __fill_world_info_buffer(world_info, buf.base);
 
 	return packet_len;

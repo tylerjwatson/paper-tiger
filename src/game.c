@@ -25,6 +25,7 @@
 #include <uv.h>
 
 #include "player.h"
+#include "console.h"
 #include "hook.h"
 #include "packet.h"
 #include "server.h"
@@ -33,6 +34,7 @@
 #include "util.h"
 #include "config.h"
 #include "world.h"
+#include "world_section.h"
 #include "colour.h"
 
 #include "packets/tile_section.h"
@@ -54,25 +56,17 @@
 
 static int game_send_world(const struct game *game, const struct player *player);
 
-static inline void __sleep(double msec)
-{
-#if _WIN32
-	Sleep((DWORD)msec);
-#else
-	usleep((useconds_t)(msec * 1000));
-#endif
-	
-}
-
 static void __game_update(uv_timer_t *timer)
 {
 	struct game *game = (struct game *)timer->data;
  
+	(void)game; //unused
 	//TODO: Update the game shit.
 }
 
 static int __game_destructor(struct game *context)
-{   
+{
+	return 0;
 }
 
 int game_find_next_slot(struct game *context)
@@ -256,7 +250,7 @@ static int game_send_world(const struct game *game, const struct player *player)
 	struct packet *status, *tile_section, *section_frame;
 	TALLOC_CTX *temp_context;
 	
-	struct rect tile, section;
+	struct vector_2d section_coords;
 
 	num_packets = game->world->max_sections_x * game->world->max_sections_y * 2;
 
@@ -275,33 +269,24 @@ static int game_send_world(const struct game *game, const struct player *player)
 	
 	server_send_packet(game->server, player, status);
 
-	for (uint8_t y = 0; y < game->world->max_sections_y; y++)
-	for (uint8_t x = 0; x < game->world->max_sections_x; x++) {
-		section.x = x;
-		section.y = y;
-		section.w = x + 1;
-		section.h = y + 1;
-
-		tile.x = x * WORLD_SECTION_WIDTH;
-		tile.y = y * WORLD_SECTION_HEIGHT;
-		tile.w = WORLD_SECTION_WIDTH;
-		tile.h = WORLD_SECTION_HEIGHT;
-
-		if (tile_section_new(temp_context, player, tile, &tile_section) < 0) {
+	for(unsigned section = 0; section < game->world->max_sections; section++) {
+		world_section_to_coords(game->world, section, &section_coords);
+		
+		if (tile_section_new(temp_context, player, section, &tile_section) < 0) {
 			_ERROR("%s: out of memory allocating status packet for world sending.\n", __FUNCTION__);
 			ret = -ENOMEM;
 			goto out;
 		}
-
-		if (section_tile_frame_new(temp_context, player, section, &section_frame) < 0) {
+		
+		if (section_tile_frame_new(temp_context, player, section_coords, &section_frame) < 0) {
 			_ERROR("%s: out of memory allocating status packet for world sending.\n", __FUNCTION__);
 			ret = -ENOMEM;
 			goto out;
 		}
-
+		
 		server_send_packet(game->server, player, tile_section);
 		server_send_packet(game->server, player, section_frame);
-
+		
 		talloc_free(tile_section);
 		talloc_free(section_frame);
 	}

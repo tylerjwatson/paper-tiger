@@ -226,7 +226,7 @@ int server_send_packet(const struct server *server, const struct player *player,
 	TALLOC_CTX *temp_context;
 	uv_write_t *write_request;
 	uv_buf_t bufs[2];
-	int pos = 0, ret = -1;
+	int ret = -1;
 
 	temp_context = talloc_new(NULL);
 	if (temp_context == NULL) {
@@ -321,7 +321,7 @@ int server_broadcast_packet(const struct server *server, const struct packet *pa
 	uint8_t online_slots[GAME_MAX_PLAYERS];
 	int online_len;
 
-	int pos = 0, ret = -1;
+	int ret = -1;
 
 	temp_context = talloc_new(NULL);
 	if (temp_context == NULL) {

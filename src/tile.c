@@ -249,7 +249,7 @@ int tile_pack_completely(const struct world *world, const struct tile *tile, uin
 		}
 	}
 
-	memcpy(buffer + buffer_pos, tile_data, tile_len);
+	memcpy(&buffer[buffer_pos], tile_data, tile_len);
 
 	return buffer_pos + tile_len;
 }

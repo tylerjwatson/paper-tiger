@@ -909,7 +909,7 @@ int world_init(struct world *world)
 	}
 
 	world_section_init(world);
-	world_section_compressor_start(world);
+	//world_section_compressor_start(world);
 
 out:
 	return ret;
@@ -951,29 +951,9 @@ failed:
 	return ret;
 }
 
-struct vector_2d world_tile_section(int x, int y)
-{
-	struct vector_2d vec = {
-		.x = x / WORLD_SECTION_WIDTH,
-		.y = y / WORLD_SECTION_HEIGHT
-	};
-
-	return vec;
-}
-
 struct tile *world_tile_at(struct world *world, const uint32_t x, const uint32_t y)
 {
 	return &world->tiles[x][y];
-}
-
-struct vector_2d world_max_tile_sections(const struct world *world)
-{
-	struct vector_2d vec;
-
-	vec.x = world->max_tiles_x / WORLD_SECTION_WIDTH;
-	vec.y = world->max_tiles_y / WORLD_SECTION_HEIGHT;
-
-	return vec;
 }
 
 int world_pack_tile_section(TALLOC_CTX *context, struct world *world, struct rect rect,
@@ -1014,35 +994,4 @@ int world_pack_tile_section(TALLOC_CTX *context, struct world *world, struct rec
 	ret = 0;
 
 	return ret;
-}
-
-struct rect world_floor_tile_section(uint16_t tile_x, uint16_t tile_y)
-{
-	struct rect top_rect;
-
-	top_rect.x = (tile_x / WORLD_SECTION_WIDTH) * WORLD_SECTION_WIDTH;
-	top_rect.y = (tile_y / WORLD_SECTION_HEIGHT) * WORLD_SECTION_HEIGHT;
-	top_rect.w = WORLD_SECTION_WIDTH;
-	top_rect.h = WORLD_SECTION_HEIGHT;
-
-	return top_rect;
-}
-
-struct rect world_get_spawn_section(struct world *world)
-{
-	return world_get_section(world, world->spawn_tile.x, world->spawn_tile.y);
-}
-
-struct rect world_get_section(struct world *world, uint16_t tile_x, uint16_t tile_y)
-{
-	struct rect top_rect, section_rect;
-
-	top_rect = world_floor_tile_section(tile_x, tile_y);
-	
-	section_rect.x = (top_rect.x / WORLD_SECTION_WIDTH);
-	section_rect.y = (top_rect.y / WORLD_SECTION_HEIGHT);
-	section_rect.h = section_rect.y + 1;
-	section_rect.w = section_rect.x + 1;
-
-	return section_rect;
 }

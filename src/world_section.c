@@ -20,6 +20,7 @@
 
 #include <string.h>
 #include <zlib.h>
+#include <assert.h>
 
 #include "world_section.h"
 
@@ -30,10 +31,13 @@
 #include "vector_2d.h"
 #include "util.h"
 #include "bitmap.h"
+#include "binary_writer.h"
 
 static int __zstream_init(z_stream *stream)
 {
-	stream->zalloc = stream->zfree = stream->opaque = Z_NULL;
+	stream->zalloc = Z_NULL;
+	stream->zfree = Z_NULL;
+	stream->opaque = Z_NULL;
 
 	return deflateInit(stream, Z_DEFAULT_COMPRESSION);
 }
@@ -43,24 +47,32 @@ int world_section_compress(const struct world *world, unsigned section, uint8_t 
 	struct rect tile_rect;
 	struct tile *tile;
 	z_stream compression_stream;
-	int ret = -1, tile_pos = 0, buffer_pos = 0, have;
+	int ret = -1, in_pos = 0, buffer_pos = 0, have;
 
 	uint8_t in[13 * WORLD_SECTION_WIDTH];
 	uint8_t out[Z_CHUNK];
 
 	world_section_to_tile_rect(world, section, &tile_rect);
 
+	/*
+	 * The section header rectangle must be written to the input first
+	 * before the tile stream.
+	 */
+	
+	in_pos += binary_writer_write_value(in + in_pos, tile_rect.x);
+	in_pos += binary_writer_write_value(in + in_pos, tile_rect.y);
+	in_pos += binary_writer_write_value(in + in_pos, tile_rect.w);
+	in_pos += binary_writer_write_value(in + in_pos, tile_rect.h);
+	
 	if (__zstream_init(&compression_stream) != Z_OK) {
 		_ERROR("%s: cannot initialize zlib for compression routines.\n", __FUNCTION__);
 		return -1;
 	}
 
 	for (unsigned tile_y = tile_rect.y; tile_y < tile_rect.y + WORLD_SECTION_HEIGHT; tile_y++) {
-		tile_pos = 0;
-
 		for (unsigned tile_x = tile_rect.x; tile_x < tile_rect.x + WORLD_SECTION_WIDTH; tile_x++) {
 			tile = world_tile_at((struct world *)world, tile_x, tile_y);
-			int tile_len = tile_pack_completely(world, tile, &in[tile_pos]);
+			int tile_len = tile_pack_completely(world, tile, &in[in_pos]);
 
 			if (tile_len < 0) {
 				_ERROR("%s: error packing tile.\n", __FUNCTION__);
@@ -68,10 +80,10 @@ int world_section_compress(const struct world *world, unsigned section, uint8_t 
 				goto out;
 			}
 
-			tile_pos += tile_len;
+			in_pos += tile_len;
 		}
 
-		compression_stream.avail_in = tile_pos;
+		compression_stream.avail_in = in_pos;
 		compression_stream.next_in = in;
 
 		do {
@@ -84,13 +96,27 @@ int world_section_compress(const struct world *world, unsigned section, uint8_t 
 			memcpy(&buffer[buffer_pos], out, have);
 			buffer_pos += have;
 		} while (compression_stream.avail_out == 0);
+		in_pos = 0;
 	}
-
-	ret = deflate(&compression_stream, Z_FINISH);
-	have = Z_CHUNK - compression_stream.avail_out;
-	memcpy(buffer + buffer_pos, out, have);
-	buffer_pos += have;
-
+	
+	/*
+	 * Tile entity count, chest count and sign count
+	 */
+	compression_stream.avail_in = 6;
+	memset(in, 0, 6);
+	compression_stream.next_in = in;
+	
+	do {
+		compression_stream.avail_out = Z_CHUNK;
+		compression_stream.next_out = out;
+		
+		ret = deflate(&compression_stream, Z_FINISH);
+		have = Z_CHUNK - compression_stream.avail_out;
+		
+		memcpy(&buffer[buffer_pos], out, have);
+		buffer_pos += have;
+	} while (compression_stream.avail_out == 0);
+	
 	ret = buffer_pos;
 out:
 	deflateEnd(&compression_stream);
@@ -98,7 +124,7 @@ out:
 	return ret;
 }
 
-static void __compress_section(uv_idle_t *handle)
+static void __compress_section(uv_timer_t *handle)
 {
 	struct world *world = (struct world *)handle->data;
 	struct world_section_data *section_data;
@@ -122,7 +148,7 @@ static void __compress_section(uv_idle_t *handle)
 		 * again next round.
 		 */
 		 
-		printf("compressing section %d\n", section);
+		//printf("compressing section %d\n", section);
 		section_len = world_section_compress(world, section, buffer);
 		if (section_len < 0) {
 			_ERROR("%s: zcompressor error compressing section %d.\n", __FUNCTION__, section);
@@ -145,7 +171,8 @@ static void __compress_section(uv_idle_t *handle)
 
 int world_section_compressor_start(struct world *world)
 {
-	uv_idle_start(&world->section_compress_worker, __compress_section);
+	uv_timer_start(&world->section_compress_worker, __compress_section, 0, 100);
+	//uv_idle_start(&world->section_compress_worker, __compress_section);
 
 	return 0;
 }
@@ -202,7 +229,6 @@ static int world_section_compress_all(struct world *world)
 		 * again next round.
 		 */
 		
-		printf("compressing section %d\n", section);
 		section_len = world_section_compress(world, section, buffer);
 		if (section_len < 0) {
 			_ERROR("%s: zcompressor error compressing section %d.\n", __FUNCTION__, section);
@@ -210,6 +236,7 @@ static int world_section_compress_all(struct world *world)
 		}
 		
 		section_data = &world->section_data[section];
+		
 		memcpy(section_data->data, buffer, section_len);
 		section_data->len = section_len;
 	}
@@ -239,7 +266,7 @@ int world_section_init(struct world *world)
 
 	world->section_dirty = talloc_steal(world, dirty_table);
 	
-	if (uv_idle_init(world->game->event_loop, &world->section_compress_worker) < 0) {
+	if (uv_timer_init(world->game->event_loop, &world->section_compress_worker) < 0) {
 		_ERROR("%s: initializing section compress worker failed.\n", __FUNCTION__);
 		goto out;
 	}
@@ -288,8 +315,41 @@ int world_section_to_tile_rect(const struct world *world, unsigned section, stru
 
 	r.x = section_coords.x * WORLD_SECTION_WIDTH;
 	r.y = section_coords.y * WORLD_SECTION_HEIGHT;
+	r.w = WORLD_SECTION_WIDTH;
+	r.h	= WORLD_SECTION_HEIGHT;
 
 	*out_rect = r;
 
 	return 0;
+}
+
+struct rect world_section_for_tile_coords(const struct world *world, uint16_t tile_x, uint16_t tile_y)
+{
+	struct rect top_rect;
+	
+	top_rect.x = (tile_x / WORLD_SECTION_WIDTH) * WORLD_SECTION_WIDTH;
+	top_rect.y = (tile_y / WORLD_SECTION_HEIGHT) * WORLD_SECTION_HEIGHT;
+	top_rect.w = WORLD_SECTION_WIDTH;
+	top_rect.h = WORLD_SECTION_HEIGHT;
+	
+	return top_rect;
+}
+
+static unsigned int world_section_coords_to_num(const struct world *world, unsigned x, unsigned y)
+{
+	return world->max_sections_y * x + y;
+}
+
+unsigned int world_section_num_for_tile_coords(const struct world *world, uint16_t tile_x, uint16_t tile_y)
+{
+	struct rect tile_coords;
+	unsigned sec;
+	
+	tile_coords = world_section_for_tile_coords(world, tile_x, tile_y);
+	tile_coords.x /= WORLD_SECTION_WIDTH;
+	tile_coords.y /= WORLD_SECTION_HEIGHT;
+	
+	sec = world_section_coords_to_num(world, tile_coords.x, tile_coords.y);
+	
+	return sec;
 }

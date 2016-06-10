@@ -30,7 +30,7 @@
 #include "../util.h"
 #include "../rect.h"
 
-int section_tile_frame_new(TALLOC_CTX *ctx, const struct player *player, struct rect rect, struct packet **out_packet)
+int section_tile_frame_new(TALLOC_CTX *ctx, const struct player *player, struct vector_2d coords, struct packet **out_packet)
 {
 	int ret = -1;
 	TALLOC_CTX *temp_context;
@@ -60,10 +60,10 @@ int section_tile_frame_new(TALLOC_CTX *ctx, const struct player *player, struct 
 
 	packet->type = PACKET_TYPE_SECTION_TILE_FRAME;
 	
-	section_tile_frame->x = rect.x;
-	section_tile_frame->y = rect.y;
-	section_tile_frame->dx = rect.w;
-	section_tile_frame->dy = rect.h;
+	section_tile_frame->x = coords.x;
+	section_tile_frame->y = coords.y;
+	section_tile_frame->dx = coords.x + 1;
+	section_tile_frame->dy = coords.y + 1;
 
 
 	packet->len = PACKET_HEADER_SIZE + PACKET_LEN_SECTION_TILE_FRAME;

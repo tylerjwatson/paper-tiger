@@ -277,7 +277,7 @@ struct world {
 	 */
 	int _is_loaded;
 
-	uv_idle_t section_compress_worker;
+	uv_timer_t section_compress_worker;
 };
 
 int world_new(TALLOC_CTX *parent_context, const struct game *game, const char *world_path,
@@ -287,16 +287,8 @@ int world_init(struct world *world);
 
 struct tile *world_tile_at(struct world *world, const uint32_t x, const uint32_t y);
 
-struct vector_2d world_tile_section(int x, int y);
-
 int world_pack_tile_section(TALLOC_CTX *context, struct world *world, struct rect rect,
 							uint8_t *tile_buffer, int *out_buf_len);
-
-struct rect world_floor_tile_section(uint16_t tile_x, uint16_t tile_y);
-
-struct rect world_get_spawn_section(struct world *world);
-
-struct rect world_get_section(struct world *world, uint16_t tile_x, uint16_t tile_y);
 
 #ifdef __cplusplus
 }

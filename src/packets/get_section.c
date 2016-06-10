@@ -31,6 +31,7 @@
 #include "../colour.h"
 #include "../server.h"
 #include "../world.h"
+#include "../world_section.h"
 #include "../game.h"
 #include "../hook.h"
 #include "../packet.h"
@@ -49,21 +50,24 @@ int get_section_handle(struct player *player, struct packet *packet)
 {
 	struct get_section *get_section = (struct get_section *)packet->data;
 	struct packet *section, *tile_frame, *connection_complete;
-	struct rect rect, section_rect;
+	struct vector_2d section_coords;
+	int section_num;
+	
+	(void)get_section;
 	
 	/*
 	 * Cheat, and statically send the spawn point for now
 	 */
 
-	rect = world_floor_tile_section(player->game->world->spawn_tile.x, player->game->world->spawn_tile.y);
-	section_rect = world_get_section(player->game->world, rect.x, rect.y);
-
-	if (tile_section_new(player, player, rect, &section) < 0) {
+	section_num = world_section_num_for_tile_coords(player->game->world, player->game->world->spawn_tile.x, player->game->world->spawn_tile.y);
+	world_section_to_coords(player->game->world, section_num, &section_coords);
+	
+	if (tile_section_new(player, player, section_num, &section) < 0) {
 		_ERROR("%s: allocating tile section failed.\n", __FUNCTION__);
 		return -1;
 	}
 
-	if (section_tile_frame_new(player, player, section_rect, &tile_frame) < 0) {
+	if (section_tile_frame_new(player, player, section_coords, &tile_frame) < 0) {
 		_ERROR("%s: allocating tile frame section failed.\n", __FUNCTION__);
 		return -1;
 	}

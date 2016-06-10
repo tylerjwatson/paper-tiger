@@ -122,9 +122,9 @@ int disconnect_handle(struct player *player, struct packet *packet)
 {
 	struct disconnect *disconnect = (struct disconnect *)packet->data;
 
+	(void)disconnect;
+	
 	return 0;
-error:
-	return -1;
 }
 
 int disconnect_write(const struct game *game, const struct packet *packet, uv_buf_t buf)

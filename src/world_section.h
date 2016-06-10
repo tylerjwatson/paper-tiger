@@ -24,7 +24,7 @@
 
 #define Z_CHUNK 65535
 #define WORLD_SECTION_TO_OFFSET(world,x,y)				\
-	x * world->max_sections_x + y
+	y * world->max_sections_y + x
 
 struct rect;
 struct vector_2d;
@@ -43,3 +43,7 @@ int world_section_compressor_start(struct world *world);
 int world_section_to_coords(const struct world *world, unsigned section, struct vector_2d *out_coords);
 
 int world_section_to_tile_rect(const struct world *world, unsigned section, struct rect *out_rect);
+
+struct rect world_section_for_tile_coords(const struct world *world, uint16_t tile_x, uint16_t tile_y);
+
+unsigned int world_section_num_for_tile_coords(const struct world *world, uint16_t tile_x, uint16_t tile_y);
