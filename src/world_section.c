@@ -172,7 +172,6 @@ static void __compress_section(uv_timer_t *handle)
 int world_section_compressor_start(struct world *world)
 {
 	uv_timer_start(&world->section_compress_worker, __compress_section, 0, 100);
-	//uv_idle_start(&world->section_compress_worker, __compress_section);
 
 	return 0;
 }
@@ -290,16 +289,14 @@ out:
 	return ret;
 }
 
-int world_section_to_coords(const struct world *world, unsigned section, struct vector_2d *out_coords)
+struct vector_2d world_section_num_to_coords(const struct world *world, unsigned section)
 {
 	struct vector_2d coords;
 
 	coords.x = section / world->max_sections_y;
 	coords.y = section % world->max_sections_y;
 
-	*out_coords = coords;
-
-	return 0;
+	return coords;
 }
 
 int world_section_to_tile_rect(const struct world *world, unsigned section, struct rect *out_rect)
@@ -311,7 +308,7 @@ int world_section_to_tile_rect(const struct world *world, unsigned section, stru
 		return -1;
 	}
 
-	world_section_to_coords(world, section, &section_coords);
+	section_coords = world_section_num_to_coords(world, section);
 
 	r.x = section_coords.x * WORLD_SECTION_WIDTH;
 	r.y = section_coords.y * WORLD_SECTION_HEIGHT;
@@ -352,4 +349,15 @@ unsigned int world_section_num_for_tile_coords(const struct world *world, uint16
 	sec = world_section_coords_to_num(world, tile_coords.x, tile_coords.y);
 	
 	return sec;
+}
+
+int world_section_cube(const struct world *world, unsigned section, struct vector_2d *section_list)
+{
+	return -1;
+}
+
+int world_section_send_list(const struct world *world, const struct player *player,
+							int section_len, unsigned *in_sections)
+{
+	return -1;
 }

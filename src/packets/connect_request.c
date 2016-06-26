@@ -30,7 +30,7 @@
 
 #include "continue_connecting.h"
 
-int connect_request_read(struct packet *packet, const uv_buf_t *buf)
+int connect_request_read(struct packet *packet)
 {
 	TALLOC_CTX *temp_context;
 	int ret = -1, pos = 0, str_len;
@@ -51,7 +51,7 @@ int connect_request_read(struct packet *packet, const uv_buf_t *buf)
 		goto out;
 	}
 
-	binary_reader_read_7bit_int(buf->base, &pos, &str_len);
+	binary_reader_read_7bit_int(packet->data_buffer, &pos, &str_len);
 
 	protocol_version = talloc_size(temp_context, str_len + 1);
 	if (protocol_version == NULL) {
@@ -60,7 +60,7 @@ int connect_request_read(struct packet *packet, const uv_buf_t *buf)
 		goto out;
 	}
 
-	memcpy(protocol_version, buf->base + pos, str_len);
+	memcpy(protocol_version, packet->data_buffer + pos, str_len);
 
 	protocol_version[str_len] = '\0';
 

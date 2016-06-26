@@ -70,10 +70,11 @@ out:
 	return ret;
 }
 
-int continue_connecting_write(const struct game *game, const struct packet *packet, uv_buf_t buf)
+int continue_connecting_write(const struct game *game, struct packet *packet)
 {
 	const struct continue_connecting *data = (const struct continue_connecting *)packet->data;
-	buf.base[0] = data->id;
+	
+	packet->data_buffer[0] = data->id;
 
 	return 1;
 }

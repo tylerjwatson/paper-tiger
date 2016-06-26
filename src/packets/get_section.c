@@ -49,8 +49,7 @@
 int get_section_handle(struct player *player, struct packet *packet)
 {
 	struct get_section *get_section = (struct get_section *)packet->data;
-	struct packet *section, *tile_frame, *connection_complete;
-	struct vector_2d section_coords;
+	struct packet *connection_complete;
 	int section_num;
 	
 	(void)get_section;
@@ -60,25 +59,14 @@ int get_section_handle(struct player *player, struct packet *packet)
 	 */
 
 	section_num = world_section_num_for_tile_coords(player->game->world, player->game->world->spawn_tile.x, player->game->world->spawn_tile.y);
-	world_section_to_coords(player->game->world, section_num, &section_coords);
+
+	game_send_world(player->game, player);
 	
-	if (tile_section_new(player, player, section_num, &section) < 0) {
-		_ERROR("%s: allocating tile section failed.\n", __FUNCTION__);
-		return -1;
-	}
-
-	if (section_tile_frame_new(player, player, section_coords, &tile_frame) < 0) {
-		_ERROR("%s: allocating tile frame section failed.\n", __FUNCTION__);
-		return -1;
-	}
-
 	if (connection_complete_new(player, player, &connection_complete) < 0) {
 		_ERROR("%s: allocating connection complete packet failed.\n", __FUNCTION__);
 		return -1;
 	}
-
-	server_send_packet(player->game->server, player, section);
-	server_send_packet(player->game->server, player, tile_frame);
+	
 	server_send_packet(player->game->server, player, connection_complete);
 	
 	hook_on_player_join(player->game->hooks, player->game, player);
@@ -86,12 +74,12 @@ int get_section_handle(struct player *player, struct packet *packet)
 	return 0;
 }
 
-int get_section_read(struct packet *packet, const uv_buf_t *buf)
+int get_section_read(struct packet *packet)
 {
 	TALLOC_CTX *temp_context;
 	int ret = -1, pos = 0;
 	struct get_section *get_section;
-	uint8_t *u_buffer = (uint8_t *)buf->base;
+	uint8_t *u_buffer = (uint8_t *)packet->data_buffer;
 
 	temp_context = talloc_new(NULL);
 	if (temp_context == NULL) {

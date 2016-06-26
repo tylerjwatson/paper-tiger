@@ -40,7 +40,7 @@ int world_section_init(struct world *world);
 
 int world_section_compressor_start(struct world *world);
 
-int world_section_to_coords(const struct world *world, unsigned section, struct vector_2d *out_coords);
+struct vector_2d world_section_num_to_coords(const struct world *world, unsigned section);
 
 int world_section_to_tile_rect(const struct world *world, unsigned section, struct rect *out_rect);
 

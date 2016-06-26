@@ -19,6 +19,7 @@
 */
 #include <string.h>
 #include <stdio.h>
+#include <time.h>
 #include <stdarg.h>
 
 #include "player.h"
@@ -30,6 +31,35 @@
 #include "tile.h"
 
 #include "packets/disconnect.h"
+
+static int __handle_memdump(struct game *game, struct console_command *command)
+{
+	FILE *fp;
+	char file_path[48];
+	time_t timer;
+	struct tm *time_info;
+	size_t len;
+	
+	time(&timer);
+	time_info = localtime(&timer);
+	
+	len = strftime(file_path, sizeof(file_path), "memrpt-%y%m%d-%H.%M.%s.txt", time_info);
+	file_path[len] = '\0';
+	
+	fp = fopen(file_path, "w+");
+	if (fp == NULL) {
+		_ERROR("%s: fopen for path %s failed.\n", __FUNCTION__, file_path);
+		return -1;
+	}
+	
+	talloc_report_full(game, fp);
+	
+	fclose(fp);
+	
+	_ERROR("%s: wrote %s.\n", __FUNCTION__, file_path);
+
+	return 0;
+}
 
 static int __handle_test(struct game *game, struct console_command *command)
 {
@@ -92,6 +122,7 @@ static struct console_command_handler __command_handlers[] = {
 	{ .command_name = "quit", .handler = __handle_quit },
 	{ .command_name = "disconnect", .handler = __handle_disconnect },
 	{ .command_name = "dc", .handler = __handle_disconnect },
+	{ .command_name = "memrpt", .handler = __handle_memdump },
 	{ 0, 0 }
 };
 

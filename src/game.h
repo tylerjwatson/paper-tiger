@@ -175,10 +175,14 @@ int game_new(TALLOC_CTX *context, struct game **out_context);
  */
 int game_update_loop_init(struct game *game);
 
+int game_send_world(const struct game *game, const struct player *player);
+	
 int game_send_message(const struct game *game, const struct player *player, const struct colour colour, 
 					  const char *fmt, ...);
 
 int game_online_players(const struct game *game, uint8_t *out_ids);
+	
+int game_sync_players(const struct game *game, const struct player *new_player);
 
 /**
  * @}

@@ -38,6 +38,7 @@ extern "C" {
 
 struct player;
 struct packet;
+struct game;
 	
 struct player_info {
 	uint8_t id;
@@ -56,18 +57,19 @@ struct player_info {
 	struct colour under_shirt_colour;
 	struct colour pants_colour;
 	struct colour shoe_colour;
+	
+	struct player *player;
 
 	uint8_t difficulty;
 };
 
 int player_info_new(TALLOC_CTX *ctx, const struct player *player, struct packet **out_packet);
 
-int player_info_write(TALLOC_CTX *context, struct packet *packet, uv_buf_t *buf);
+int player_info_write(const struct game *game, struct packet *packet);
 
-int player_info_read(struct packet *packet, const uv_buf_t *buf);
+int player_info_read(struct packet *packet);
 
 int player_info_handle(struct player *player, struct packet *packet);
-	
 
 #ifdef __cplusplus
 }

@@ -74,7 +74,7 @@ out:
 	return ret;
 }
 
-int disconnect_read(struct packet *packet, const uv_buf_t *buf)
+int disconnect_read(struct packet *packet)
 {
 	TALLOC_CTX *temp_context;
 	int ret = -1, pos = 0, str_len;
@@ -95,7 +95,7 @@ int disconnect_read(struct packet *packet, const uv_buf_t *buf)
 		goto out;
 	}
 
-	binary_reader_read_7bit_int(buf->base, &pos, &str_len);
+	binary_reader_read_7bit_int(packet->data_buffer, &pos, &str_len);
 
 	reason = talloc_size(temp_context, str_len + 1);
 	if (reason == NULL) {
@@ -104,7 +104,7 @@ int disconnect_read(struct packet *packet, const uv_buf_t *buf)
 		goto out;
 	}
 
-	memcpy(reason, buf->base + pos, str_len);
+	memcpy(reason, packet->data_buffer + pos, str_len);
 
 	reason[str_len] = '\0';
 
@@ -127,11 +127,11 @@ int disconnect_handle(struct player *player, struct packet *packet)
 	return 0;
 }
 
-int disconnect_write(const struct game *game, const struct packet *packet, uv_buf_t buf)
+int disconnect_write(const struct game *game, struct packet *packet)
 {
 	struct disconnect *disconnect = (struct disconnect *)(packet->data);
 
-	int packet_len = binary_writer_write_string(buf.base, disconnect->reason);
+	int packet_len = binary_writer_write_string(packet->data_buffer, disconnect->reason);
 
 	return packet_len;
 }

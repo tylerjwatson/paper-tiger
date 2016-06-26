@@ -45,7 +45,7 @@
 static struct packet_handler packet_handlers[] = {
 	{ .type = PACKET_TYPE_CONNECT_REQUEST, .read_func = connect_request_read, .handle_func = connect_request_handle, .write_func = NULL },
 	{ .type = PACKET_TYPE_CONTINUE_CONNECTING, .read_func = NULL, .handle_func = NULL, .write_func = continue_connecting_write },
-	{ .type = PACKET_TYPE_PLAYER_INFO, .read_func = player_info_read, .handle_func = player_info_handle, .write_func = NULL },
+	{ .type = PACKET_TYPE_PLAYER_INFO, .read_func = player_info_read, .handle_func = player_info_handle, .write_func = player_info_write },
 	{ .type = PACKET_TYPE_INVENTORY_SLOT, .read_func = inventory_slot_read, .handle_func = inventory_slot_handle, .write_func = NULL },
 	{ .type = PACKET_TYPE_CONTINUE_CONNECTING2, .read_func = NULL, .handle_func = continue_connecting2_handle, .write_func = NULL },
 	{ .type = PACKET_TYPE_WORLD_INFO, .read_func = NULL, .handle_func = NULL, .write_func = world_info_write },
@@ -87,53 +87,89 @@ int packet_read_header(const uv_buf_t *buf, uint8_t *out_type, uint16_t *out_len
 	return 0;
 }
 
-int packet_new(TALLOC_CTX *context, struct player *player, const uv_buf_t *buf, struct packet **out_packet)
+int packet_deserialize(const struct packet *packet)
 {
-	int ret = -1;
-	TALLOC_CTX *temp_context;
-	struct packet *packet;
-
-	uint8_t type;
-	uint16_t len;
-
-	temp_context = talloc_new(NULL);
-	if (temp_context == NULL) {
-		_ERROR("%s: out of memory allocating temp context for packet.\n", __FUNCTION__);
-		ret = -1;
-		goto out;
+	struct packet_handler *handler;
+	packet_read_cb cb;
+	
+	handler = packet_handler_for_type(packet->type);
+	if (handler == NULL) {
+		_ERROR("%s: packet deserialize failed: no handler for type %d.\n", __FUNCTION__, packet->type);
+		return -1;
 	}
-
-	packet = talloc_zero(temp_context, struct packet);
-	if (packet == NULL) {
-		_ERROR("%s: out of memory allocating temp context for packet.\n", __FUNCTION__);
-		ret = -1;
-		goto out;
+	
+	cb = handler->read_func;
+	if (cb == NULL) {
+		_ERROR("%s: packet deserialize failed: no read handler for type %d.\n", __FUNCTION__,
+			   packet->type);
+		return -1;
 	}
-
-	if (packet_read_header(buf, &type, &len) < 0) {
-		_ERROR("%s: failed to read header from socket.\n", __FUNCTION__);
-		ret = -1;
-		goto out;
+	
+	if (cb((struct packet *)packet) < 0) {
+		_ERROR("%s: packet deserialize failed: error in read function for type %d.\n", __FUNCTION__,
+			   packet->type);
+		return -1;
 	}
-
-	packet->type = type;
-	packet->len = len;
-	//packet->player = player;
-
-	//TODO: Packet sanity checks.
-
-	*out_packet = talloc_steal(context, packet);
-	ret = 0;
-
-out:
-	talloc_free(temp_context);
-
-	return ret;
+	
+	return 0;
 }
 
-void packet_write_header(uint8_t type, uint16_t len, uv_buf_t *buf, int *pos)
+int packet_serialize(const struct game *game, struct packet *packet)
 {
-	*(uint16_t *)buf->base = len;
-	*pos += sizeof(uint16_t);
-	buf->base[*pos] = type;
+	struct packet_handler *handler;
+	packet_write_cb cb;
+	int len = 0;
+	
+	handler = packet_handler_for_type(packet->type);
+	if (handler == NULL) {
+		_ERROR("%s: serialize packet for type %d failed, no write function.\n",
+			   __FUNCTION__, packet->type);
+		return -1;
+	}
+	
+	cb = handler->write_func;
+	if (cb == NULL) {
+		_ERROR("%s: serialize packet for type %d failed, no write function.\n",
+			   __FUNCTION__, packet->type);
+		return -1;
+	}
+	
+	len = cb(game, packet);
+	if (len < 0) {
+		_ERROR("%s: serialize packet for type %d failed, write callback failed.\n",
+			   __FUNCTION__, packet->type);
+		return -1;
+	}
+	
+	packet->len = len + PACKET_HEADER_SIZE;
+	
+	return 0;
+}
+
+int packet_init(struct packet *packet)
+{
+	memset(packet, 0, sizeof(*packet));
+	
+	return 0;
+}
+
+int packet_recipient_all_online(const struct game *game, const struct packet *packet, int8_t ignore_id)
+{
+	int online_len = 0;
+	uint8_t online_players[256];
+	uint8_t id;
+	
+	online_len = game_online_players(game, online_players);
+	
+	for (int i = 0; i < online_len; i++) {
+		id = online_players[i];
+		
+		bitmap_set((word_t *)packet->recipients, id);
+	}
+	
+	if (ignore_id >= 0) {
+		bitmap_clear((word_t *)packet->recipients, ignore_id);
+	}
+	
+	return 0;
 }

@@ -44,7 +44,7 @@ struct client_uuid {
 
 int client_uuid_new(TALLOC_CTX *ctx, const struct player *player, const char *uuid, struct packet **out_packet);
 
-int client_uuid_read(struct packet *packet, const uv_buf_t *buf);
+int client_uuid_read(struct packet *packet);
 
 int client_uuid_handle(struct player *player, struct packet *packet);
 	

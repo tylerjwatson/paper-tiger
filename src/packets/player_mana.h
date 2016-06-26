@@ -45,7 +45,7 @@ int player_mana_new(TALLOC_CTX *ctx, const struct player *player, uint16_t mana,
 
 int player_mana_write(TALLOC_CTX *context, struct packet *packet, uv_buf_t *buf);
 
-int player_mana_read(struct packet *packet, const uv_buf_t *buf);
+int player_mana_read(struct packet *packet);
 
 int player_mana_handle(struct player *player, struct packet *packet);
 	

@@ -139,10 +139,11 @@ int server_start(struct server *server);
  * pointed to by @a packet and is responsible for freeing it.
  */
 int server_send_packet(const struct server *server, const struct player *player,
-	const struct packet *packet);
+					   const struct packet *packet);
 
 
-int server_broadcast_packet(const struct server *server, const struct packet *packet);
+int server_broadcast_packet(const struct server *server, const struct packet *packet,
+							int8_t id);
 
 #ifdef __cplusplus
 }

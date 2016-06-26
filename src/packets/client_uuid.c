@@ -85,7 +85,7 @@ out:
 	return ret;
 }
 
-int client_uuid_read(struct packet *packet, const uv_buf_t *buf)
+int client_uuid_read(struct packet *packet)
 {
 	int ret = -1, pos = 0, uuid_len = 0;
 	TALLOC_CTX *temp_context;
@@ -108,7 +108,7 @@ int client_uuid_read(struct packet *packet, const uv_buf_t *buf)
 		goto out;
 	}
 
-	binary_reader_read_string_buffer(buf->base, pos, &uuid_len, &uuid);
+	binary_reader_read_string_buffer(packet->data_buffer, pos, &uuid_len, &uuid);
 
 	uuid_copy = talloc_size(temp_context, uuid_len + 1);
 	if (uuid_copy == NULL) {

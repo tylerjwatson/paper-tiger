@@ -44,7 +44,8 @@ int player_hp_new(TALLOC_CTX *ctx, const struct player *player, uint16_t life, u
 
 int player_hp_write(TALLOC_CTX *context, struct packet *packet, uv_buf_t *buf);
 
-int player_hp_read(struct packet *packet, const uv_buf_t *buf);
+int player_hp_read(struct packet *packet);
+	
 
 int player_hp_handle(struct player *player, struct packet *packet);
 	

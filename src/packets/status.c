@@ -84,13 +84,13 @@ out:
 	return ret;
 }
 
-int status_write(const struct game *game, const struct packet *packet, uv_buf_t buffer)
+int status_write(const struct game *game, struct packet *packet)
 {
 	struct status *status = (struct status *)packet->data;
 	int pos = 0;
 
-	pos += binary_writer_write_value(buffer.base + pos, status->message_duration);
-	pos += binary_writer_write_string(buffer.base + pos, status->message);
+	pos += binary_writer_write_value(packet->data_buffer + pos, status->message_duration);
+	pos += binary_writer_write_string(packet->data_buffer + pos, status->message);
 
 	return pos;
 }

@@ -44,9 +44,9 @@ struct disconnect {
 
 int disconnect_new(TALLOC_CTX *ctx, const struct player *player, const char *reason, struct packet **out_packet);
 
-int disconnect_write(const struct game *game, const struct packet *packet, uv_buf_t buf);
+int disconnect_write(const struct game *game, struct packet *packet);
 	
-int disconnect_read(struct packet *packet, const uv_buf_t *buf);
+int disconnect_read(struct packet *packet);
 
 int disconnect_handle(struct player *player, struct packet *packet);
 

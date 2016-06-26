@@ -52,7 +52,7 @@ int section_tile_frame_new(TALLOC_CTX *ctx, const struct player *player, struct 
 							struct packet **out_packet);
 
 
-int section_tile_frame_write(const struct game *game, const struct packet *packet, uv_buf_t buffer);
+int section_tile_frame_write(const struct game *game, struct packet *packet);
 
 #ifdef __cplusplus
 }

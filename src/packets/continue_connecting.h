@@ -41,7 +41,7 @@ struct continue_connecting {
 	
 int continue_connecting_new(TALLOC_CTX *ctx, uint8_t id, struct packet **out_packet);
 
-int continue_connecting_write(const struct game *game, const struct packet *packet, uv_buf_t buf);
+int continue_connecting_write(const struct game *game, struct packet *packet);
 
 #ifdef __cplusplus
 }

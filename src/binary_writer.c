@@ -39,7 +39,7 @@ int binary_writer_7bit_len(int value)
 	return count;
 }
 
-void binary_writer_write_7bit_int(char *buf, int value, int *pos)
+void binary_writer_write_7bit_int(uint8_t *buf, int value, int *pos)
 {
 	uint32_t v = (uint32_t) value;   // support negative numbers
 
@@ -53,7 +53,7 @@ void binary_writer_write_7bit_int(char *buf, int value, int *pos)
 	(*pos)++;
 }
 
-int binary_writer_write_string(char *dest, const char *src)
+int binary_writer_write_string(void *dest, const char *src)
 {
 	int len, pos = 0;
 	

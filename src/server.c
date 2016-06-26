@@ -27,30 +27,29 @@
 #include "player.h"
 #include "packet.h"
 
-static int __handle_packet(struct player *player, struct packet *packet, const uv_buf_t *buf)
+static int __handle_packet(struct player *player, struct packet *packet)
 {
-	struct packet_handler *packet_handler;
+	struct packet_handler *handler;
 	int ret = -1;
-
-	packet_handler = packet_handler_for_type(packet->type);
-	if (packet_handler == NULL) {
-		_ERROR("error: received unknown message type %d from slot %d.\n", packet->type, player->id);
+	
+	if (packet_deserialize(packet) < 0) {
+		_ERROR("%s: packet deserialize failed for type %d in slot %d.\n", __FUNCTION__,
+			   packet->type, player->id);
 		return -1;
 	}
 
-	/*
-	 * If the read handler for the function is NULL then we are safe
-	 * to assume that the packet has no body.
-	 */
-	if (packet_handler->read_func != NULL && (ret = packet_handler->read_func(packet, buf)) < 0) {
-		_ERROR("%s: packet parsing failed for slot %d.\n", __FUNCTION__, 
-			player->id);
-		return ret;
+	handler = packet_handler_for_type(packet->type);
+	if (handler == NULL || handler->handle_func == NULL) {
+		_ERROR("%s: unknown message of type %d for slot %d.\n", __FUNCTION__,
+			   packet->type, player->id);
+		return -1;
 	}
-
-	if (packet_handler->handle_func != NULL && (ret = packet_handler->handle_func(player, packet)) < 0) {
-		_ERROR("%s: read handler for packet failed for slot %d.\n", __FUNCTION__, player->id);
-		return ret;
+	
+	ret = handler->handle_func(player, packet);
+	if (ret < 0) {
+		_ERROR("%s:handler failed for type %d from slot %d.\n", __FUNCTION__,
+			   packet->type, player->id);
+		return -1;
 	}
 
 	return 0;
@@ -59,58 +58,56 @@ static int __handle_packet(struct player *player, struct packet *packet, const u
 static void __on_read(uv_stream_t *stream, ssize_t len, const uv_buf_t *buf)
 {
 	struct player *player = (struct player *)stream->data;
+	struct packet *incoming_packet = (struct packet *)player->incoming_packet;
 
 	if (len < 0) {
-		//_ERROR("%s: %s while reading from slot %d\n", __FUNCTION__, uv_err_name(len), player->id);
 		player_close(player);
 		return;
 	}
-
-	if (len == 0) {
-		goto out;
-	}
-
-	if (player->incoming_packet == NULL && len == PACKET_HEADER_SIZE) {
-		if (packet_new(player, player, buf, &player->incoming_packet) < 0) {
-			_ERROR("%s: error parsing packet header for slot %d\n", __FUNCTION__, player->id);
-			goto player_out;
-		}
-
-		if (player->incoming_packet->len == PACKET_HEADER_SIZE) {
-			goto handle_packet;
-		} 
-
-		goto out;
-	}
-
-handle_packet:
-	__handle_packet(player, player->incoming_packet, buf);
-
-	talloc_free(player->incoming_packet);
-	player->incoming_packet = NULL;
-
-	goto out;
-
-player_out:
-	_ERROR("%s: read error from slot %d", __FUNCTION__, player->id);
-	player_close(player);
 	
-out:
-	talloc_free(buf->base);
+	if (len == 0) {
+		return;
+	}
+	
+	if (incoming_packet->state == packet_state_read_data) {
+		if (__handle_packet(player, incoming_packet) < 0) {
+			_ERROR("%s: packet handler for type %d failed.\n", __FUNCTION__, incoming_packet->type);
+		}
+		
+    	talloc_free(incoming_packet);
+		player->incoming_packet = NULL;
+	}
 }
 
 static void __alloc_buffer(uv_handle_t *handle, size_t size, uv_buf_t *out_buf)
 {
 	struct player *player = (struct player *)handle->data;
-
-	if (player->incoming_packet == NULL) {
-		size = PACKET_HEADER_SIZE;
-	}
-	else {
-		size = player->incoming_packet->len - PACKET_HEADER_SIZE;
+	struct packet *incoming_packet = player->incoming_packet;
+	uint8_t *buffer;
+	int16_t len;
+	
+	if (incoming_packet == NULL) {
+		incoming_packet = talloc(player, struct packet);
+		if (incoming_packet == NULL) {
+			_ERROR("%s: out of memory allocating incoming packet buffer\n", __FUNCTION__);
+			return;
+		}
+		
+		packet_init(incoming_packet);
+		player->incoming_packet = incoming_packet;
+		
+		len = sizeof(player->incoming_packet->header);
+		buffer = player->incoming_packet->header;
+		
+		incoming_packet->state = packet_state_read_header;
+	} else {
+		len = incoming_packet->len - PACKET_HEADER_SIZE;
+		buffer = incoming_packet->data_buffer;
+		
+		incoming_packet->state = packet_state_read_data;
 	}
 	
-	*out_buf = uv_buf_init(talloc_zero_size(player, size), size);
+	*out_buf = uv_buf_init((char *)buffer, len);
 }
 
 void __on_connection(uv_stream_t *handle, int status)
@@ -166,96 +163,28 @@ void __on_connection(uv_stream_t *handle, int status)
 
 static void __on_write(uv_write_t *req, int status)
 {
-	//talloc_free(req->write_buffer.base);  // WTF???? double-free?????
 	talloc_free(req);
 }
 
-static int server_packet_to_buffer(const struct game *game, const uv_write_t *req, const struct packet *packet, uv_buf_t *bufs)
+int server_send(const struct server *server, struct packet *packet)
 {
-	struct packet_handler *packet_handler;
-	char *header_buf, *payload_buf;
-
-	int ret = 0, packet_len = 0, pos = 0;
-
-	header_buf = talloc_zero_size(req, PACKET_HEADER_SIZE);
-	if (header_buf == NULL) {
-		_ERROR("%s: out of memory allocating packet header buffer.\n", __FUNCTION__);
-		ret = -ENOMEM;
-		goto out;
-	}
-
-	payload_buf = talloc_zero_size(req, PACKET_PAYLOAD_SIZE);
-	if (payload_buf == NULL) {
-		_ERROR("%s: out of memory allocating packet payload buffer.\n", __FUNCTION__);
-		ret = -ENOMEM;
-		goto out;
-	}
-
-	bufs[0] = uv_buf_init(header_buf, PACKET_HEADER_SIZE);
-	bufs[1] = uv_buf_init(payload_buf, PACKET_PAYLOAD_SIZE);
-
-	packet_handler = packet_handler_for_type(packet->type);
-	if (packet_handler == NULL) {
-		_ERROR("%s: could not find packet handler for type %d.\n", __FUNCTION__, packet->type);
-		ret = -1;
-		goto out;
-	}
-
-	if (packet_handler->write_func != NULL && (packet_len = packet_handler->write_func(game, packet, bufs[1])) < 0) {
-		_ERROR("%s: error in write handler for packet type %d.\n", __FUNCTION__, packet->type);
-		ret = -1;
-		goto out;
-	}
-
-	if (packet_len >= 65535) {
-		_ERROR("%s: packet overran max length.\n", __FUNCTION__);
-		ret = -1;
-		goto out;
-	}
-
-	bufs[1].len = packet_len;
-
-	packet_write_header(packet->type, packet_len + PACKET_HEADER_SIZE, &bufs[0], &pos);
-
-out:
-	return ret;
+	int ret = 0;
+	
+	/*
+	 * Re-parent the packet underneath the server, the server owns it now
+	 * and is reponsible for keeping it alive until the packet is sent to
+	 * all recipients.
+	 */
+	talloc_steal(server, packet);
+	
+	
 }
 
-int server_send_packet(const struct server *server, const struct player *player, const struct packet *packet)
+
+int server_send_packet(const struct server *server, const struct player *player,
+					   const struct packet *packet)
 {
-	TALLOC_CTX *temp_context;
-	uv_write_t *write_request;
-	uv_buf_t bufs[2];
-	int ret = -1;
-
-	temp_context = talloc_new(NULL);
-	if (temp_context == NULL) {
-		_ERROR("%s: out of memory allocating temporary context for packet buffers.\n", __FUNCTION__);
-		ret = -ENOMEM;
-		goto out;
-	}
-	
-	write_request = talloc(temp_context, uv_write_t);
-	if (write_request == NULL) {
-		_ERROR("%s: out of memory writing packet to slot %d\n", __FUNCTION__, player->id);
-		ret = -ENOMEM;
-		goto out;
-	}
-
-	server_packet_to_buffer(server->game, (const uv_write_t *)write_request, packet, bufs);
-
-	write_request->data = (void *)player;
-	
-	if (uv_write(talloc_steal(player->handle, write_request), (uv_stream_t *)player->handle, bufs, bufs[1].base != NULL ? 2 : 1, __on_write) < 0) {
-		_ERROR("%s: write failed to slot %d.\n", __FUNCTION__, player->id);
-		goto out;
-	}
-
-	ret = 0;
-out:
-	talloc_free(temp_context);
-
-	return ret;
+	return -1;
 }
 
 
@@ -313,45 +242,8 @@ int server_start(struct server *server)
 	return 0;
 }
 
-int server_broadcast_packet(const struct server *server, const struct packet *packet)
+int server_broadcast_packet(const struct server *server, const struct packet *packet,
+							int8_t ignore_id)
 {
-	TALLOC_CTX *temp_context;
-	uv_write_t *write_request;
-	uv_buf_t bufs[2];
-	uint8_t online_slots[GAME_MAX_PLAYERS];
-	int online_len;
-
-	int ret = -1;
-
-	temp_context = talloc_new(NULL);
-	if (temp_context == NULL) {
-		_ERROR("%s: out of memory allocating temporary context for packet buffers.\n", __FUNCTION__);
-		ret = -ENOMEM;
-		goto out;
-	}
-
-	write_request = talloc(temp_context, uv_write_t);
-	if (write_request == NULL) {
-		_ERROR("%s: out of memory writing packet\n", __FUNCTION__);
-		ret = -ENOMEM;
-		goto out;
-	}
-
-	server_packet_to_buffer(server->game, (const uv_write_t *)write_request, packet, bufs);
-
-	online_len = game_online_players(server->game, online_slots);
-	for (int i = 0; i < online_len; i++) {
-		struct player *player = server->game->players[i];
-
-		if (uv_write(talloc_steal(server, write_request), (uv_stream_t *)player->handle, bufs, bufs[1].base != NULL ? 2 : 1, __on_write) < 0) {
-			_ERROR("%s: write failed to slot %d.\n", __FUNCTION__, player->id);
-			goto out;
-		}
-	}
-
-	ret = 0;
-out:
-	talloc_free(temp_context);
-
-	return ret;
+	return 0;
 }

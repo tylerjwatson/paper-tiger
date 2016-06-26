@@ -44,9 +44,9 @@ static inline int binary_writer_write_internal(void  *dest, const void *src, int
 	
 int binary_writer_7bit_len(int value);
 
-void binary_writer_write_7bit_int(char *buf, int value, int *pos);
+void binary_writer_write_7bit_int(uint8_t *buf, int value, int *pos);
 
-int binary_writer_write_string(char *dest, const char *src);
+int binary_writer_write_string(void *dest, const char *src);
 
 #ifdef __cplusplus
 }

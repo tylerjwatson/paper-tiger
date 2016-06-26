@@ -65,7 +65,7 @@ out:
 	return ret;
 }
 
-int connection_complete_write(const struct game *game, const struct packet *packet, uv_buf_t buf)
+int connection_complete_write(const struct game *game, struct packet *packet)
 {
 	/*
 	 * This packet has no payload.

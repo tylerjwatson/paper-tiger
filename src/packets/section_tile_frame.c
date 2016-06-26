@@ -77,15 +77,15 @@ out:
 	return ret;
 }
 
-int section_tile_frame_write(const struct game *game, const struct packet *packet, uv_buf_t buffer)
+int section_tile_frame_write(const struct game *game, struct packet *packet)
 {
 	struct section_tile_frame *section_tile_frame = (struct section_tile_frame *)packet->data;
 	int pos = 0;
 
-	pos += binary_writer_write_value(buffer.base + pos, section_tile_frame->x);
-	pos += binary_writer_write_value(buffer.base + pos, section_tile_frame->y);
-	pos += binary_writer_write_value(buffer.base + pos, section_tile_frame->dx);
-	pos += binary_writer_write_value(buffer.base + pos, section_tile_frame->dy);
+	pos += binary_writer_write_value(packet->data_buffer + pos, section_tile_frame->x);
+	pos += binary_writer_write_value(packet->data_buffer + pos, section_tile_frame->y);
+	pos += binary_writer_write_value(packet->data_buffer + pos, section_tile_frame->dx);
+	pos += binary_writer_write_value(packet->data_buffer + pos, section_tile_frame->dy);
 
 	return pos;
 }

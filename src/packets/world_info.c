@@ -35,7 +35,7 @@
 
 #define ARRAY_SIZEOF(a) sizeof(a)/sizeof(a[0])
 
-static int __fill_world_info_buffer(struct world_info *world_info, char *buffer)
+static int __fill_world_info_buffer(struct world_info *world_info, uint8_t *buffer)
 {
 	int pos = 0;
 	
@@ -248,10 +248,10 @@ static void __fill_world_info(struct world *world, struct world_info *world_info
 	world_info->lobby_id = 0;
 }
 
-int world_info_write(const struct game *game, const struct packet *packet, uv_buf_t buf)
+int world_info_write(const struct game *game, struct packet *packet)
 {
 	struct world_info *world_info = (struct world_info *)packet->data;
-	int packet_len = __fill_world_info_buffer(world_info, buf.base);
+	int packet_len = __fill_world_info_buffer(world_info, packet->data_buffer);
 
 	return packet_len;
 }

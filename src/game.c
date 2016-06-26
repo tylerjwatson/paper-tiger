@@ -37,6 +37,9 @@
 #include "world_section.h"
 #include "colour.h"
 
+#include "packets/player_mana.h"
+#include "packets/player_hp.h"
+#include "packets/player_info.h"
 #include "packets/tile_section.h"
 #include "packets/section_tile_frame.h"
 #include "packets/chat_message.h"
@@ -53,8 +56,6 @@
 #define TIME_NOON 27000
 #define TIME_MIDNIGHT 16200
 #define TIME_DUSK 0
-
-static int game_send_world(const struct game *game, const struct player *player);
 
 static void __game_update(uv_timer_t *timer)
 {
@@ -109,7 +110,8 @@ static int game_on_player_join(const struct game *game, const struct player *pla
 		player->id,
 		player->remote_addr);
 
-	game_send_world(game, player);
+	//game_send_world(game, player);
+	game_sync_players(game, player);
 
 	return 0;
 }
@@ -244,7 +246,51 @@ int game_online_players(const struct game *game, uint8_t *out_ids)
 	return count;
 }
 
-static int game_send_world(const struct game *game, const struct player *player)
+int game_sync_players(const struct game *game, const struct player *new_player)
+{
+	struct packet *player_info, *hp, *mp, *spawn;
+	int ret = -1;
+	
+	if (player_info_new((void *)game, new_player, &player_info) < 0) {
+		_ERROR("%s: player_info packet failed.\n", __FUNCTION__);
+		ret = -1;
+		goto out;
+	}
+
+	if (player_hp_new((void *)game, new_player, new_player->life, new_player->life_max, &hp) < 0) {
+		_ERROR("%s: player_hp packet failed.\n", __FUNCTION__);
+		ret = -1;
+		goto player_hp_out;
+	}
+	
+	if (player_mana_new((void *)game, new_player, new_player->mana, new_player->mana_max, &mp) < 0) {
+		_ERROR("%s: player_mana packet failed.\n", __FUNCTION__);
+		ret = -1;
+		goto player_mana_out;
+	}
+	
+	server_broadcast_packet(game->server, player_info, new_player->id);
+	server_broadcast_packet(game->server, hp, new_player->id);
+	server_broadcast_packet(game->server, mp, new_player->id);
+	
+	ret = 0;
+	
+	/*
+	 * Fall through
+	 */
+	talloc_free(mp);
+
+player_mana_out:
+	talloc_free(hp);
+
+player_hp_out:
+	talloc_free(player_info);
+
+out:
+	return ret;
+}
+
+int game_send_world(const struct game *game, const struct player *player)
 {
 	int ret = -1, num_packets;
 	struct packet *status, *tile_section, *section_frame;
@@ -270,7 +316,7 @@ static int game_send_world(const struct game *game, const struct player *player)
 	server_send_packet(game->server, player, status);
 
 	for(unsigned section = 0; section < game->world->max_sections; section++) {
-		world_section_to_coords(game->world, section, &section_coords);
+		section_coords = world_section_num_to_coords(player->game->world, section);
 		
 		if (tile_section_new(temp_context, player, section, &tile_section) < 0) {
 			_ERROR("%s: out of memory allocating status packet for world sending.\n", __FUNCTION__);

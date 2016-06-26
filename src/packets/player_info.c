@@ -24,9 +24,11 @@
 
 #include "../packet.h"
 #include "../player.h"
+#include "../game.h"
 
-
+#include "../binary_writer.h"
 #include "../binary_reader.h"
+
 #include "../util.h"
 
 int player_info_handle(struct player *player, struct packet *packet)
@@ -34,6 +36,15 @@ int player_info_handle(struct player *player, struct packet *packet)
 	struct player_info *player_info = (struct player_info *)packet->data;
 	
 	player->name = talloc_strdup(player, player_info->name);
+	
+	player->stats.difficulty = player_info->difficulty;
+	player->stats.eye_colour = player_info->eye_colour;
+	player->stats.hair = player_info->hair;
+	player->stats.hair_colour = player_info->hair_colour;
+	player->stats.hair_dye = player_info->hair_dye;
+	player->stats.hide_misc = player_info->hide_misc;
+	player->stats.hide_visuals = player_info->hide_visuals;
+	player->stats.hide_visuals2 = player_info->hide_visuals2;
 	
 	printf("%s (%s) has joined to slot %d.\n", player->name, player->remote_addr, player->id);
 	
@@ -45,6 +56,8 @@ int player_info_new(TALLOC_CTX *ctx, const struct player *player, struct packet 
 	int ret = -1;
 	TALLOC_CTX *temp_context;
 	struct packet *packet;
+	struct player_info *player_info;
+	char *name_copy;
 
 	temp_context = talloc_new(NULL);
 	if (temp_context == NULL) {
@@ -60,14 +73,44 @@ int player_info_new(TALLOC_CTX *ctx, const struct player *player, struct packet 
 		goto out;
 	}
 
-	/*
-	 * Packet has no payload.
-	 */
-
 	packet->type = PACKET_TYPE_PLAYER_INFO;
 	packet->len = PACKET_HEADER_SIZE;
 	packet->data = NULL;
+	
+	player_info = talloc(temp_context, struct player_info);
+	if (player_info == NULL) {
+		_ERROR("%s: out of memory allocating player_info structure.\n", __FUNCTION__);
+		ret = -ENOMEM;
+		goto out;
+	}
+	
+	name_copy = talloc_strdup(temp_context, player->name);
+	if (name_copy == NULL) {
+		_ERROR("%s: out of memory copying name to player_info struct\n", __FUNCTION__);
+		ret = -ENOMEM;
+		goto out;
+	}
 
+	player_info->id = player->id;
+	player_info->difficulty = player->stats.difficulty;
+	player_info->eye_colour = player->stats.eye_colour;
+	player_info->hair = player->stats.hair;
+	player_info->hair_colour = player->stats.hair_colour;
+	player_info->hair_dye = player->stats.hair_dye;
+	player_info->hide_misc = player->stats.hide_misc;
+	player_info->hide_visuals = player->stats.hide_visuals;
+	player_info->hide_visuals2 = player->stats.hide_visuals2;
+	player_info->pants_colour = player->stats.pants_colour;
+	player_info->shirt_colour = player->stats.shirt_colour;
+	player_info->shoe_colour = player->stats.shoe_colour;
+	player_info->skin_colour = player->stats.skin_colour;
+	player_info->skin_variant = player->stats.skin_variant;
+	player_info->under_shirt_colour = player->stats.under_shirt_colour;
+	
+	player_info->name = talloc_steal(player_info, name_copy);
+	
+	packet->data = talloc_steal(packet, player_info);
+	
 	*out_packet = (struct packet *)talloc_steal(ctx, packet);
 
 	ret = 0;
@@ -77,7 +120,7 @@ out:
 	return ret;
 }
 
-int player_info_read(struct packet *packet, const uv_buf_t *buf)
+int player_info_read(struct packet *packet)
 {
 	int ret = -1, pos = 0, name_len = 0;
 	TALLOC_CTX *temp_context;
@@ -99,11 +142,11 @@ int player_info_read(struct packet *packet, const uv_buf_t *buf)
 		goto out;
 	}
 
-	player_info->id = buf->base[pos++];
-	player_info->skin_variant = buf->base[pos++];
-	player_info->hair = buf->base[pos++];
+	player_info->id = packet->data_buffer[pos++];
+	player_info->skin_variant = packet->data_buffer[pos++];
+	player_info->hair = packet->data_buffer[pos++];
 
-	binary_reader_read_string_buffer(buf->base, pos, &name_len, &name);
+	binary_reader_read_string_buffer(packet->data_buffer, pos, &name_len, &name);
 
 	player_info->name = talloc_size(player_info, name_len + 1);
 	memcpy(player_info->name, name, name_len);
@@ -111,27 +154,27 @@ int player_info_read(struct packet *packet, const uv_buf_t *buf)
 
 	pos += name_len + 1;
 	
-	player_info->hair_dye = buf->base[pos++];
-	player_info->hide_visuals = buf->base[pos++];
-	player_info->hide_visuals2 = buf->base[pos++];
-	player_info->hide_misc = buf->base[pos++];
+	player_info->hair_dye = packet->data_buffer[pos++];
+	player_info->hide_visuals = packet->data_buffer[pos++];
+	player_info->hide_visuals2 = packet->data_buffer[pos++];
+	player_info->hide_misc = packet->data_buffer[pos++];
 
-	player_info->hair_colour = *(struct colour *)(buf->base + pos);
+	player_info->hair_colour = *(struct colour *)(packet->data_buffer + pos);
 	pos += sizeof(struct colour);
-	player_info->skin_colour = *(struct colour *)(buf->base + pos);
+	player_info->skin_colour = *(struct colour *)(packet->data_buffer + pos);
 	pos += sizeof(struct colour);
-	player_info->eye_colour = *(struct colour *)(buf->base + pos);
+	player_info->eye_colour = *(struct colour *)(packet->data_buffer + pos);
 	pos += sizeof(struct colour);
-	player_info->shirt_colour = *(struct colour *)(buf->base + pos);
+	player_info->shirt_colour = *(struct colour *)(packet->data_buffer + pos);
 	pos += sizeof(struct colour);
-	player_info->under_shirt_colour = *(struct colour *)(buf->base + pos);
+	player_info->under_shirt_colour = *(struct colour *)(packet->data_buffer + pos);
 	pos += sizeof(struct colour);
-	player_info->pants_colour = *(struct colour *)(buf->base + pos);
+	player_info->pants_colour = *(struct colour *)(packet->data_buffer + pos);
 	pos += sizeof(struct colour);
-	player_info->shoe_colour = *(struct colour *)(buf->base + pos);
+	player_info->shoe_colour = *(struct colour *)(packet->data_buffer + pos);
 	pos += sizeof(struct colour);
 
-	player_info->difficulty = buf->base[pos];
+	player_info->difficulty = packet->data_buffer[pos];
 
 	packet->data = (void *)talloc_steal(packet, player_info);
 
@@ -140,4 +183,29 @@ out:
 	talloc_free(temp_context);
 
 	return ret;
+}
+
+int player_info_write(const struct game *game, struct packet *packet)
+{
+	int pos = 0;
+	struct player_info *player_info = (struct player_info *)packet->data;
+	
+	pos += binary_writer_write_value(packet->data_buffer + pos, player_info->id);
+	pos += binary_writer_write_value(packet->data_buffer + pos, player_info->skin_variant);
+	pos += binary_writer_write_value(packet->data_buffer + pos, player_info->hair);
+	pos += binary_writer_write_string(packet->data_buffer + pos, player_info->name);
+	pos += binary_writer_write_value(packet->data_buffer + pos, player_info->hair_dye);
+	pos += binary_writer_write_value(packet->data_buffer + pos, player_info->hide_visuals);
+	pos += binary_writer_write_value(packet->data_buffer + pos, player_info->hide_visuals2);
+	pos += binary_writer_write_value(packet->data_buffer + pos, player_info->hide_misc);
+	pos += binary_writer_write_value(packet->data_buffer + pos, player_info->hair_colour);
+	pos += binary_writer_write_value(packet->data_buffer + pos, player_info->skin_colour);
+	pos += binary_writer_write_value(packet->data_buffer + pos, player_info->eye_colour);
+	pos += binary_writer_write_value(packet->data_buffer + pos, player_info->shirt_colour);
+	pos += binary_writer_write_value(packet->data_buffer + pos, player_info->under_shirt_colour);
+	pos += binary_writer_write_value(packet->data_buffer + pos, player_info->pants_colour);
+	pos += binary_writer_write_value(packet->data_buffer + pos, player_info->shoe_colour);
+	pos += binary_writer_write_value(packet->data_buffer + pos, player_info->difficulty);
+	
+	return pos;
 }

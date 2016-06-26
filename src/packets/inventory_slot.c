@@ -86,7 +86,7 @@ out:
 	return ret;
 }
 
-int inventory_slot_read(struct packet *packet, const uv_buf_t *buf)
+int inventory_slot_read(struct packet *packet)
 {
 	int ret = -1, pos = 0;
 	TALLOC_CTX *temp_context;
@@ -106,12 +106,12 @@ int inventory_slot_read(struct packet *packet, const uv_buf_t *buf)
 		goto out; 
 	}
 
-	item_slot->id = buf->base[pos++];
-	item_slot->slot_id = buf->base[pos++];
-	item_slot->stack = *(int16_t *)(buf->base + pos);
+	item_slot->id = packet->data_buffer[pos++];
+	item_slot->slot_id = packet->data_buffer[pos++];
+	item_slot->stack = *(int16_t *)(packet->data_buffer + pos);
 	pos += sizeof(uint16_t);
-	item_slot->prefix = buf->base[pos++];
-	item_slot->net_id = *(int16_t *)(buf->base + pos);
+	item_slot->prefix = packet->data_buffer[pos++];
+	item_slot->net_id = *(int16_t *)(packet->data_buffer + pos);
 
 	packet->data = (void *)talloc_steal(packet, item_slot);
 

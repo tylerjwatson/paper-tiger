@@ -79,7 +79,7 @@ struct world_info {
 
 int world_info_new(TALLOC_CTX *ctx, const struct player *player, struct packet **out_packet);
 
-int world_info_write(const struct game *game, const struct packet *packet, uv_buf_t buf);
+int world_info_write(const struct game *game, struct packet *packet);
 
 #ifdef __cplusplus
 }

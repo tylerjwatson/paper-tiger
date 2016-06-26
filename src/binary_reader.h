@@ -57,7 +57,7 @@ int binary_reader_read_single(struct binary_reader_context *context, float *out_
 
 int binary_reader_read_string(struct binary_reader_context *context, char **out_value);
 
-int binary_reader_read_string_buffer(char *buf, int pos, int *out_len, char **out_value);
+int binary_reader_read_string_buffer(uint8_t *buf, int pos, int *out_len, char **out_value);
 
 int binary_reader_read_uint16(struct binary_reader_context *context, uint16_t *out_value);
 
@@ -67,7 +67,7 @@ int binary_reader_read_uint64(struct binary_reader_context *context, uint64_t *o
 
 int binary_reader_close(struct binary_reader_context *context);
 
-int binary_reader_read_7bit_int(const char *buf, int *pos, int *out_value);
+int binary_reader_read_7bit_int(const uint8_t *buf, int *pos, int *out_value);
 
 #ifdef __cplusplus
 }

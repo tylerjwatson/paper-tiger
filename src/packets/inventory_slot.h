@@ -38,7 +38,7 @@ extern "C" {
 
 int inventory_slot_new(TALLOC_CTX *ctx, const struct player *player, const struct item_slot slot, struct packet **out_packet);
 
-int inventory_slot_read(struct packet *packet, const uv_buf_t *buf);
+int inventory_slot_read(struct packet *packet);
 
 int inventory_slot_handle(struct player *player, struct packet *packet);
 

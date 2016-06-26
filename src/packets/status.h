@@ -47,7 +47,7 @@ struct status {
 int status_new(TALLOC_CTX *ctx, const struct player *player, uint32_t duration,
 			   const char *message, struct packet **out_packet);
 
-int status_write(const struct game *game, const struct packet *packet, uv_buf_t buffer);
+int status_write(const struct game *game, struct packet *packet);
 
 #ifdef __cplusplus
 }

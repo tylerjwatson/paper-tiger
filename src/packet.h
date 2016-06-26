@@ -23,7 +23,9 @@
 #include <uv.h>
 #include <stdint.h>
 
+#include "game.h"
 #include "talloc/talloc.h"
+#include "bitmap.h"
 
 #define PACKET_HEADER_SIZE 3
 #define PACKET_PAYLOAD_SIZE 0xFFFF
@@ -64,27 +66,31 @@ extern "C" {
  */
 
 struct player;
-struct game;
 
+enum packet_state {
+	packet_state_read_header,
+	packet_state_read_data
+};
 /**
  * Describes a Terraria message.  Contains the packet header information and a pointer to
  * the concrete object which contains the body of the Terraria message.
  */
 struct packet {
 	/**
-	 * The packet length including the 3-byte message header, in bytes.
+	 * The Terraria message header.
 	 */
-	uint16_t len;
-	
-	/**
-	 * The Terraria message type.
-	 */
-	uint8_t type;
+	union {
+		struct {
+    		uint16_t len;
+    		uint8_t type;
+		};
+		uint8_t header[3];
+	};
 
-	/**
-	 * A pointer to the packet payload object that was deserialized using the `packet_read_cb` function
-	 * inside the packet handler table.
-	 */
+	enum packet_state state;
+	uint8_t data_buffer[65535];
+	word_t recipients[GAME_MAX_PLAYERS / sizeof(word_t)];
+
 	void *data;
 };
 
@@ -112,7 +118,7 @@ struct packet {
  * @returns
  * `0` if the encoding was successful, `< 0` otherwise.
  */
-typedef int (*packet_write_cb)(const struct game *game, const struct packet *packet, uv_buf_t buffer);
+typedef int (*packet_write_cb)(const struct game *game, struct packet *packet);
 
 /**
  * @brief Function to call to translate a packet from a network buffer to a fully-qualified `struct packet`.
@@ -139,7 +145,7 @@ typedef int (*packet_write_cb)(const struct game *game, const struct packet *pac
  * At the return of this function, the `data` member of the packet must point to a valid packet body, or 
  * `NULL` if the packet does not have a body.
  */
-typedef int (*packet_read_cb)(struct packet *packet, const uv_buf_t *buffer);
+typedef int (*packet_read_cb)(struct packet *packet);
 
 /**
  * @brief Function to be called when a message is to be handled by the server.
@@ -183,11 +189,13 @@ struct packet_handler {
  */
 struct packet_handler *packet_handler_for_type(uint8_t type);
 
-void packet_write_header(uint8_t type, uint16_t len, uv_buf_t *buf, int *pos);
+int packet_init(struct packet *packet);
 
-int packet_read_header(const uv_buf_t *buf, uint8_t *out_type, uint16_t *out_len);
+int packet_serialize(const struct game *game, struct packet *packet);
 
-int packet_new(TALLOC_CTX *ctx, struct player *player, const uv_buf_t *buf, struct packet **out_packet);
+int packet_deserialize(const struct packet *packet);
+
+int packet_recipient_all_online(const struct game *game, const struct packet *packet, int8_t ignore_id);
 
 #ifdef __cplusplus
 }

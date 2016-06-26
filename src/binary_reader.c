@@ -232,7 +232,7 @@ int binary_reader_read_single(struct binary_reader_context *context, float *out_
 	return 0;
 }
 
-int binary_reader_read_string_buffer(char *buf, int pos, int *out_len, char **out_value)
+int binary_reader_read_string_buffer(uint8_t *buf, int pos, int *out_len, char **out_value)
 {
 	if (binary_reader_read_7bit_int(buf, &pos, out_len) < 0) {
 		return -1;
@@ -340,7 +340,7 @@ int binary_reader_close(struct binary_reader_context *context)
 	return 0;
 }
 
-int binary_reader_read_7bit_int(const char *buffer, int *pos, int32_t *out_value)
+int binary_reader_read_7bit_int(const uint8_t *buffer, int *pos, int32_t *out_value)
 {
 	int count = 0, shift = 0;
 	uint8_t byte;

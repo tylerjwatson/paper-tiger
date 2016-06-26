@@ -71,7 +71,7 @@ out:
 	return ret;
 }
 
-int player_hp_read(struct packet *packet, const uv_buf_t *buf)
+int player_hp_read(struct packet *packet)
 {
 	int ret = -1, pos = 0;
 	TALLOC_CTX *temp_context;
@@ -91,10 +91,10 @@ int player_hp_read(struct packet *packet, const uv_buf_t *buf)
 		goto out;
 	}
 
-	player_hp->id = buf->base[pos++];
-	player_hp->life = *(uint16_t *)(buf->base + pos);
+	player_hp->id = packet->data_buffer[pos++];
+	player_hp->life = *(uint16_t *)(packet->data_buffer + pos);
 	pos += sizeof(uint16_t);
-	player_hp->life_max = *(uint16_t *)(buf->base + pos);
+	player_hp->life_max = *(uint16_t *)(packet->data_buffer + pos);
 
 	packet->data = talloc_steal(packet, player_hp);
 	

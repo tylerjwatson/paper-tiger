@@ -39,7 +39,7 @@ int chat_message_handle(struct player *player, struct packet *packet)
 	
 	chat_message->id = player->id;
 
-	server_broadcast_packet(player->game->server, packet);
+	server_broadcast_packet(player->game->server, packet, -1);
 
 	return 0;
 }
@@ -51,6 +51,7 @@ int chat_message_new(TALLOC_CTX *ctx, const struct player *player, const struct 
 	TALLOC_CTX *temp_context;
 	struct packet *packet;
 	struct chat_message *chat_message;
+	char *message_copy;
 	
 	temp_context = talloc_new(NULL);
 	if (temp_context == NULL) {
@@ -78,12 +79,16 @@ int chat_message_new(TALLOC_CTX *ctx, const struct player *player, const struct 
 
 	chat_message->id = player->id;
 	chat_message->colour = colour;
-	chat_message->message = talloc_strdup(chat_message, message);
-	if (chat_message->message == NULL) {
+	
+	
+	message_copy = talloc_strdup(temp_context, message);
+	if (message_copy == NULL) {
 		_ERROR("%s: out of memory copying chat message to packet.\n", __FUNCTION__);
 		ret = -ENOMEM;
 		goto out;
 	}
+	
+	chat_message->message = talloc_steal(packet, message_copy);
 	
 	packet->data = (void *)talloc_steal(packet, chat_message);
 
@@ -97,7 +102,7 @@ out:
 	return ret;
 }
 
-int chat_message_read(struct packet *packet, const uv_buf_t *buf)
+int chat_message_read(struct packet *packet)
 {
 	int ret = -1, pos = 0, message_len = 0;
 	TALLOC_CTX *temp_context;
@@ -120,11 +125,11 @@ int chat_message_read(struct packet *packet, const uv_buf_t *buf)
 		goto out;
 	}
 
-	chat_message->id = buf->base[pos++];
-	chat_message->colour = *(struct colour *)(buf->base + pos);
+	chat_message->id = packet->data_buffer[pos++];
+	chat_message->colour = *(struct colour *)(packet->data_buffer + pos);
 	pos += sizeof(struct colour);
 
-	binary_reader_read_string_buffer(buf->base, pos, &message_len, &message);
+	binary_reader_read_string_buffer(packet->data_buffer, pos, &message_len, &message);
 
 	message_copy = talloc_size(temp_context, message_len + 1);
 	if (message_copy == NULL) {
@@ -146,14 +151,14 @@ out:
 	return ret;
 }
 
-int chat_message_write(const struct game *game, const struct packet *packet, uv_buf_t buffer)
+int chat_message_write(const struct game *game, struct packet *packet)
 {
 	struct chat_message *chat_message = (struct chat_message *)packet->data;
 	int pos = 0;
 
-	pos += binary_writer_write_value(buffer.base + pos, chat_message->id);
-	pos += binary_writer_write_value(buffer.base + pos, chat_message->colour);
-	pos += binary_writer_write_string(buffer.base + pos, chat_message->message);
+	pos += binary_writer_write_value(packet->data_buffer + pos, chat_message->id);
+	pos += binary_writer_write_value(packet->data_buffer + pos, chat_message->colour);
+	pos += binary_writer_write_string(packet->data_buffer + pos, chat_message->message);
 
 	return pos;
 }

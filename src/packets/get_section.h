@@ -42,7 +42,7 @@ struct get_section {
 };
 
 int get_section_handle(struct player *player, struct packet *packet);
-int get_section_read(struct packet *packet, const uv_buf_t *buf);
+int get_section_read(struct packet *packet);
 
 #ifdef __cplusplus
 }

@@ -25,13 +25,34 @@
 
 #include "talloc/talloc.h"
 #include "item.h"
+#include "colour.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-struct packet;
 struct game;
+struct packet;
+
+struct player_stats {
+	uint8_t skin_variant;
+	uint8_t hair;
+
+	uint8_t hair_dye;
+	uint8_t hide_visuals;
+	uint8_t hide_visuals2;
+	uint8_t hide_misc;
+
+	struct colour hair_colour;
+	struct colour skin_colour;
+	struct colour eye_colour;
+	struct colour shirt_colour;
+	struct colour under_shirt_colour;
+	struct colour pants_colour;
+	struct colour shoe_colour;
+
+	uint8_t difficulty;
+};
 	
 struct player {
     uint32_t id;
@@ -49,6 +70,8 @@ struct player {
 
 	struct item_slot inventory[180];
 
+	struct player_stats stats;
+	
 	struct packet *incoming_packet;
 };
 
