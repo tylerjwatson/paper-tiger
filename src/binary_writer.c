@@ -64,7 +64,7 @@ int binary_writer_write_string(void *dest, const char *src)
 	 */
 
 	binary_writer_write_7bit_int(dest, len, &pos);
-	memcpy(dest + pos, src, len); 
+	memcpy(((char *)dest) + pos, src, len); 
 
 	return len + binary_writer_7bit_len(len);
 }
