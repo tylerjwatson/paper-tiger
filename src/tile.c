@@ -165,6 +165,15 @@ void tile_set_wire_3(struct tile *tile, bool val)
 	}	
 }
 
+void tile_set_wire_4(struct tile *tile, bool val)
+{
+	if (val) {
+		BIT_SET(tile->b_tile_header, 7);
+	} else {
+		BIT_CLEAR(tile->b_tile_header, 7);
+	}	
+}
+
 bool tile_actuator(const struct tile *tile)
 {
 	return (tile->s_tile_header & S_TILE_ACTUATOR) == S_TILE_ACTUATOR;
@@ -211,6 +220,11 @@ bool tile_wire2(const struct tile *tile)
 bool tile_wire3(const struct tile *tile)
 {
 	return (tile->s_tile_header & S_TILE_HEADER_WIRE_3) == S_TILE_HEADER_WIRE_3;
+}
+
+bool tile_wire4(const struct tile *tile)
+{
+	return (tile->b_tile_header & B_TILE_HEADER_WIRE_4) == B_TILE_HEADER_WIRE_4;
 }
 
 void tile_copy(const struct tile *src, struct tile *dest)
@@ -321,6 +335,10 @@ int tile_pack(const struct game *game, const struct tile *tile, uint8_t *dest,
 
 	if (tile_wire3(tile)) {
 		*tile_flags_2 |= 8;
+	}
+
+	if (tile_wire4(tile)) {
+		*tile_flags_3 |= 32;
 	}
 
 	if (tile_half_brick(tile)) {
