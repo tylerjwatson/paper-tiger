@@ -42,7 +42,8 @@ enum {
 };
 
 enum {
-	B_TILE_HEADER_HONEY = 1 << 6
+	B_TILE_HEADER_HONEY = 1 << 6,
+	B_TILE_HEADER_WIRE_4 = 1 << 7
 };
 
 enum {
@@ -109,6 +110,7 @@ void tile_set_lava(struct tile *tile, bool lava);
 void tile_set_wire(struct tile *tile, bool tile_val);
 void tile_set_wire_2(struct tile *tile, bool tile2);
 void tile_set_wire_3(struct tile *tile, bool tile3);
+void tile_set_wire_4(struct tile *tile, bool tile3);
 
 void tile_set_inactive(struct tile *tile, bool val);
 void tile_set_actuator(struct tile *tile, bool val);
