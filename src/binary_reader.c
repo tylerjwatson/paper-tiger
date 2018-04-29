@@ -119,6 +119,11 @@ int binary_reader_open(struct binary_reader_context *context)
 	return 0;
 }
 
+int binary_reader_skip(struct binary_reader_context *context, size_t num_bytes)
+{
+	return fseek(context->fp, num_bytes, SEEK_CUR);
+}
+
 int binary_reader_read_boolean(struct binary_reader_context *context, bool *out_value)
 {
 	return binary_reader_read_byte(context, (uint8_t *)out_value);

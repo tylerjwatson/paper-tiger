@@ -414,6 +414,44 @@ static int __world_read_header(TALLOC_CTX *context, struct world *world)
 		goto out;
 	}
 
+	if (world->version >= 179) {
+		char *seed_text;
+		int32_t temp_seed_text;
+
+		if (world->version != 179) {
+			if (binary_reader_read_string(world->reader, &seed_text) < 0) {
+				_ERROR("%s: out of memory reading world file seed string\n", __FUNCTION__);
+				ret = -ENOMEM;
+				goto out;
+			}
+		} else {
+			if (binary_reader_read_int32(world->reader, &temp_seed_text) < 0) {
+				_ERROR("%s: out of memory reading world file seed string\n", __FUNCTION__);
+				ret = -ENOMEM;
+				goto out;
+			}
+
+			size_t seed_len = snprintf(NULL, 0, "%d", temp_seed_text);
+			seed_text = malloc(seed_len + 1);
+			snprintf(seed_text, seed_len, "%d", temp_seed_text);
+			seed_text[seed_len] = '\0';
+		}
+
+		//TODO: WorldFile.cs:1362 - unused
+		if (binary_reader_read_uint64(world->reader, NULL) < 0) {
+			_ERROR("%s: out of memory reading world generator version\n", __FUNCTION__);
+			ret = -ENOMEM;
+			goto out;
+		}
+
+		//TODO: something with seed text
+		free(seed_text);
+	}
+
+	if (world->version > 181) {
+		binary_reader_skip(world->reader, 16);
+	}
+
 	if (binary_reader_read_int32(world->reader, &world->worldID) < 0) {
 		_ERROR("%s: binary reader error reading world->worldID\n", __FUNCTION__);
 		ret = -1;
