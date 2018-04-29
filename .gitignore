@@ -264,3 +264,5 @@ _Pvt_Extensions
 # JetBrains Rider
 .idea/
 *.sln.iml
+
+build/
