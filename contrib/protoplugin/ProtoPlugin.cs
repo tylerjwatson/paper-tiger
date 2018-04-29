@@ -9,6 +9,7 @@ namespace protoplugin
 	{
 		public static void DumpTileFlags(string path)
 		{
+			Main game = new Main();
 			tile_flags tf = new tile_flags();
 
 			tf.NumTiles = Main.tileFrameImportant.Length;

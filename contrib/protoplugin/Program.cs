@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
-using Steamworks;
 
 namespace protoplugin
 {
@@ -9,10 +8,9 @@ namespace protoplugin
     {
         static void Main(string[] args)
         {
-            SteamUtils.IsOverlayEnabled();
             try
             {
-            Terraria.Program.ForceLoadAssembly(typeof(Terraria.Program).Assembly, true);
+                // Terraria.Program.ForceLoadAssembly(typeof(Terraria.Program).Assembly, true);
             }
             catch (ReflectionTypeLoadException rte)
             {

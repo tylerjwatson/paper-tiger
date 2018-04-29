@@ -7,10 +7,12 @@
 
   <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="3.5.1" />
-    <PackageReference Include="OTAPI" Version="2.0.0.31" />
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="References\Steamworks.NET.dll"/>
+    <Reference Include="References\Steamworks.NET.dll" />
+    <Reference Include="References\OTAPI.dll" />
+    <Reference Include="References\TerrariaServer.exe" />
   </ItemGroup>
 </Project>
