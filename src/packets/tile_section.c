@@ -61,7 +61,7 @@ int tile_section_new(TALLOC_CTX *ctx, const struct player *player, unsigned sect
 		goto out;
 	}
 
-	section_coords = world_section_num_to_coords(player->game->world, section);
+	section_coords = world_section_num_to_coords(&player->game->world, section);
 	
 	packet->type = PACKET_TYPE_TILE_SECTION;
 	
@@ -89,7 +89,7 @@ int tile_section_write_v2(const struct game *game, struct packet *packet)
 	int pos = 0;
 	unsigned section_num;
 	
-	section_num = world_section_num_for_tile_coords(game->world, tile_section->x_start,
+	section_num = world_section_num_for_tile_coords(&game->world, tile_section->x_start,
 													tile_section->y_start);
 	
 	pos += binary_writer_write_value(packet->data_buffer, tile_section->compressed);
@@ -97,10 +97,10 @@ int tile_section_write_v2(const struct game *game, struct packet *packet)
 	/*
 	 * Skipping 2 bytes of GZip header here
 	 */
-	memcpy(&packet->data_buffer[pos], &game->world->section_data[section_num].data[2],
-		   game->world->section_data[section_num].len - 2);
+	memcpy(&packet->data_buffer[pos], &game->world.section_data[section_num].data[2],
+		   game->world.section_data[section_num].len - 2);
 	
-	pos += game->world->section_data[section_num].len;
+	pos += game->world.section_data[section_num].len;
 	pos -= 2;
 	
 	return pos;

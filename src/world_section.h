@@ -21,6 +21,7 @@
 #pragma once
 
 #include <stdint.h>
+#include "talloc.h"
 
 #define Z_CHUNK 65535
 #define WORLD_SECTION_TO_OFFSET(world,x,y)				\
@@ -36,7 +37,7 @@ struct world_section_data {
 	uint8_t data[Z_CHUNK];
 };
 
-int world_section_init(struct world *world);
+int world_section_init(TALLOC_CTX *context, struct world *world);
 
 int world_section_compressor_start(struct world *world);
 

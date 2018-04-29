@@ -58,7 +58,7 @@ int get_section_handle(struct player *player, struct packet *packet)
 	 * Cheat, and statically send the spawn point for now
 	 */
 
-	section_num = world_section_num_for_tile_coords(player->game->world, player->game->world->spawn_tile.x, player->game->world->spawn_tile.y);
+	section_num = world_section_num_for_tile_coords(&player->game->world, player->game->world.spawn_tile.x, player->game->world.spawn_tile.y);
 
 	game_send_world(player->game, player);
 	

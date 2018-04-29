@@ -68,7 +68,7 @@ error:
 	return -1;
 }
 
-static int __world_read_file_header(struct world *world)
+static int __world_read_file_header(TALLOC_CTX *context, struct world *world)
 {
 	uint8_t flag1 = 0;
 	uint8_t flag2 = 0x80;
@@ -85,7 +85,7 @@ static int __world_read_file_header(struct world *world)
 		goto error;
 	}
 
-	world->positions = talloc_array(world, int32_t, world->num_positions);
+	world->positions = talloc_array(context, int32_t, world->num_positions);
 
 	for (int i = 0; i < world->num_positions; i++) {
 		if (binary_reader_read_int32(world->reader, &world->positions[i]) < 0) {
@@ -97,7 +97,7 @@ static int __world_read_file_header(struct world *world)
 		goto error;
 	}
 
-	world->important = talloc_array(world, int8_t, world->num_important);
+	world->important = talloc_array(context, int8_t, world->num_important);
 
 	/*
 	 * Note:
@@ -128,7 +128,7 @@ error:
 	return -1;
 }
 
-static int __world_read_anglers(struct world *world)
+static int __world_read_anglers(TALLOC_CTX *context, struct world *world)
 {
 	int ret = -1;
 
@@ -138,7 +138,7 @@ static int __world_read_anglers(struct world *world)
 		goto out;
 	}
 
-	world->anglers = talloc_array(world, char *, (uint32_t)world->num_anglers);
+	world->anglers = talloc_array(context, char *, (uint32_t)world->num_anglers);
 
 	for(int i = world->num_anglers; i > 0; i--) {
 		char *angler_finished;
@@ -162,7 +162,7 @@ out:
 	return ret;
 }
 
-static int __world_read_npc_killcounts(struct world *world)
+static int __world_read_npc_killcounts(TALLOC_CTX *context, struct world *world)
 {
 	int ret = -1;
 
@@ -172,7 +172,7 @@ static int __world_read_npc_killcounts(struct world *world)
 		goto out;
 	}
 
-	if ((world->kill_counts = talloc_array(world, int32_t, (uint32_t)world->num_kill_counts)) == NULL) {
+	if ((world->kill_counts = talloc_array(context, int32_t, (uint32_t)world->num_kill_counts)) == NULL) {
 		_ERROR("%s: out of memory allocating world->kill_counts\n", __FUNCTION__);
 		ret = -1;
 		goto out;
@@ -347,7 +347,7 @@ out:
 	return ret;
 }
 
-static int __world_read_tile(struct world *world)
+static int __world_read_tile(TALLOC_CTX *context, struct world *world)
 {
 	int ret = 0;
 
@@ -358,7 +358,7 @@ static int __world_read_tile(struct world *world)
 		goto out;
 	}
 
-	if (tile_heap_new(world, (uint32_t)world->max_tiles_x, (uint32_t)world->max_tiles_y, &world->tiles) < 0) {
+	if (tile_heap_new(context, (uint32_t)world->max_tiles_x, (uint32_t)world->max_tiles_y, &world->tiles) < 0) {
 		_ERROR("%s: cannot allocate the tile heap.\n", __FUNCTION__);
 		ret = -1;
 		goto out;
@@ -391,7 +391,7 @@ out:
 	return ret;	
 }
 
-static int __world_read_header(struct world *world)
+static int __world_read_header(TALLOC_CTX *context, struct world *world)
 {
 	char *world_name;
 	int ret;
@@ -407,7 +407,7 @@ static int __world_read_header(struct world *world)
 		return -1;
 	}
 
-	if ((world->world_name = talloc_strdup(world, world_name)) == NULL) {
+	if ((world->world_name = talloc_strdup(context, world_name)) == NULL) {
 		_ERROR("%s: out of memory copying %d bytes for world name.\n", __FUNCTION__, (int)strlen(world_name));
 
 		ret = -ENOMEM;
@@ -609,8 +609,6 @@ static int __world_read_header(struct world *world)
 		goto out;
 	}
 
-
-
 	if (world->version >= 118) {
 		if (binary_reader_read_boolean(world->reader, &world->flags.downed_slime_king) < 0) {
 			_ERROR("%s: binary reader error reading world->flags.downed_slime_king\n", __FUNCTION__);
@@ -759,7 +757,7 @@ static int __world_read_header(struct world *world)
 		goto out;
 	}
 
-	__world_read_anglers(world);
+	__world_read_anglers(context, world);
 
 	if (world->version < 99) {
 		ret = 0;
@@ -823,7 +821,7 @@ static int __world_read_header(struct world *world)
 		goto out;
 	}
 
-	if (__world_read_npc_killcounts(world) < 0) {
+	if (__world_read_npc_killcounts(context, world) < 0) {
 		ret = -1;
 		goto out;
 	}
@@ -884,9 +882,20 @@ out:
 	return ret;
 }
 
-int world_init(struct world *world)
+int world_init(TALLOC_CTX *context, struct world *world, const char *world_path)
 {
 	int ret = 0;
+
+	if ((world->world_path = talloc_strdup(context, world_path)) == NULL) {
+		ret = -ENOMEM;
+		goto out;
+	}
+
+	if (binary_reader_new(context, world->world_path, &world->reader) < 0) {
+		_ERROR("world - could not allocate a binary reader for the world.");
+		ret = -ENOMEM;
+		goto out;
+	}
 
 	if ((ret = binary_reader_open(world->reader)) < 0) {
 		_ERROR("Opening world file failed: %d\n", ret);
@@ -894,60 +903,24 @@ int world_init(struct world *world)
 		goto out;
 	}
 
-	if ((ret = __world_read_file_header(world)) < 0) {
+	if ((ret = __world_read_file_header(context, world)) < 0) {
 		_ERROR("Reading world file headers failed: %d\n", ret);
 		goto out;
 	}
 
-	if ((ret = __world_read_header(world)) < 0) {
+	if ((ret = __world_read_header(context, world)) < 0) {
 		_ERROR("Reading world headers failed: %d\n", ret);
 		goto out;
 	}
 
-	if ((ret = __world_read_tile(world)) < 0) {
+	if ((ret = __world_read_tile(context, world)) < 0) {
 		_ERROR("Reading world headers failed: %d\n", ret);
 	}
 
-	world_section_init(world);
+	world_section_init(context, world);
 	//world_section_compressor_start(world);
 
 out:
-	return ret;
-}
-
-int world_new(TALLOC_CTX *parent_context, const struct game *game, const char *world_path,
-			  struct world **out_world)
-{
-	int ret = 0;
-	TALLOC_CTX *tempContext;
-	struct world *world;
-
-	if ((tempContext = talloc_new(NULL)) == NULL) {
-		ret = -ENOMEM;
-		goto failed;
-	}
-
-	world = talloc_zero(tempContext, struct world);
-
-	if ((world->world_path = talloc_strdup(world, world_path)) == NULL) {
-		ret = -ENOMEM;
-		goto failed;
-	}
-
-	if (binary_reader_new(world, world->world_path, &world->reader) < 0) {
-		_ERROR("world - could not allocate a binary reader for the world.");
-		ret = -ENOMEM;
-		goto failed;
-	}
-
-	world->game = (struct game *)game;
-
-
-	*out_world = talloc_steal(parent_context, world);
-	ret = 0;
-
-failed:
-	talloc_free(tempContext);
 	return ret;
 }
 

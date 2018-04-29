@@ -280,10 +280,7 @@ struct world {
 	uv_timer_t section_compress_worker;
 };
 
-int world_new(TALLOC_CTX *parent_context, const struct game *game, const char *world_path,
-			  struct world **out_world);
-
-int world_init(struct world *world);
+int world_init(TALLOC_CTX *context, struct world *world, const char *world_path);
 
 struct tile *world_tile_at(struct world *world, const uint32_t x, const uint32_t y);
 

@@ -176,7 +176,7 @@ int world_section_compressor_start(struct world *world)
 	return 0;
 }
 
-static int world_section_init_section_data(struct world *world)
+static int world_section_init_section_data(TALLOC_CTX *context, struct world *world)
 {
 	int ret = -1;
 	TALLOC_CTX *temp_context;
@@ -200,7 +200,7 @@ static int world_section_init_section_data(struct world *world)
 		section_data[i].section = i;
 	}
 	
-	world->section_data = talloc_steal(world, section_data);
+	world->section_data = talloc_steal(context, section_data);
 	
 	ret = 0;
 out:
@@ -243,7 +243,7 @@ static int world_section_compress_all(struct world *world)
 	return 0;
 }
 
-int world_section_init(struct world *world)
+int world_section_init(TALLOC_CTX *context, struct world *world)
 {
 	int ret = -1;
 	TALLOC_CTX *temp_context;
@@ -263,16 +263,11 @@ int world_section_init(struct world *world)
 		goto out;
 	}
 
-	world->section_dirty = talloc_steal(world, dirty_table);
-	
-	if (uv_timer_init(world->game->event_loop, &world->section_compress_worker) < 0) {
-		_ERROR("%s: initializing section compress worker failed.\n", __FUNCTION__);
-		goto out;
-	}
+	world->section_dirty = talloc_steal(context, dirty_table);
 
 	world->section_compress_worker.data = world;
 
-	if (world_section_init_section_data(world) < 0) {
+	if (world_section_init_section_data(context, world) < 0) {
 		_ERROR("%s: init section data failed.\n", __FUNCTION__);
 		goto out;
 	}
@@ -283,6 +278,10 @@ int world_section_init(struct world *world)
 	}
 	
 	ret = 0;
+
+	/*
+	 * fall through
+	 */
 out:
 	talloc_free(temp_context);
 

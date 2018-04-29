@@ -262,7 +262,7 @@ int world_info_new(TALLOC_CTX *ctx, const struct player *player, struct packet *
 	TALLOC_CTX *temp_context;
 	struct packet *packet;
 	struct world_info *world_info;
-	struct world *world = player->game->world;
+	struct world *world = &player->game->world;
 
 	temp_context = talloc_new(NULL);
 	if (temp_context == NULL) {

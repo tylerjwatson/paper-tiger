@@ -83,6 +83,7 @@ int main(int argc, char **argv)
 {
 	int ret = 0;
 	struct game *game;
+	struct world world;
 	clock_t start;
 	clock_t diff;
 
@@ -106,10 +107,19 @@ int main(int argc, char **argv)
 	printf("done.\n");
 
 	printf("%s: loading world from %s... ", __FUNCTION__, options_worldPath);
-	if (world_new(game, game, options_worldPath, &game->world) < 0
-		|| world_init(game->world) < 0) {
+
+	world.game = game;
+
+	if (world_init(game, &world, options_worldPath) < 0) {
 		ret = -1;
 		printf("World init failed: %d\n", ret);
+		goto out;
+	}
+
+	game->world = world;
+
+	if (uv_timer_init(game->event_loop, &world.section_compress_worker) < 0) {
+		_ERROR("%s: initializing section compress worker failed.\n", __FUNCTION__);
 		goto out;
 	}
 
@@ -140,13 +150,13 @@ int main(int argc, char **argv)
 		game->server->listen_address,
 		game->server->port);
 
-	printf(" * %s (%dx%d)\n", game->world->world_name, 
-		game->world->max_tiles_x, 
-		game->world->max_tiles_y);
+	printf(" * %s (%dx%d)\n", world.world_name, 
+		world.max_tiles_x, 
+		world.max_tiles_y);
 
 	printf(" * Expert: %s, Crimson: %s\n",
-		game->world->expert_mode ? "Yes" : "No",
-		game->world->flags.crimson ? "Yes" : "No"
+		game->world.expert_mode ? "Yes" : "No",
+		game->world.flags.crimson ? "Yes" : "No"
 	);
 
 	printf("\n");

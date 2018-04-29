@@ -25,6 +25,7 @@
 #include <uv.h>
 
 #include "talloc/talloc.h"
+#include "world.h"
 #include "bitmap.h"
 
 #define GAME_MAX_PLAYERS 255
@@ -77,7 +78,7 @@ struct game {
 	/**
 	 * Pointer to the world running under this game context.
 	 */
-	struct world *world;
+	struct world world;
 	
 	/**
 	 * Pointer to the TCP server subsystem which accepts TCP clients and deals with

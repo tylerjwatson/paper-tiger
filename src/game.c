@@ -298,7 +298,7 @@ int game_send_world(const struct game *game, const struct player *player)
 	
 	struct vector_2d section_coords;
 
-	num_packets = game->world->max_sections_x * game->world->max_sections_y * 2;
+	num_packets = game->world.max_sections_x * game->world.max_sections_y * 2;
 
 	temp_context = talloc_new(game);
 	if (temp_context == NULL) {
@@ -315,8 +315,8 @@ int game_send_world(const struct game *game, const struct player *player)
 	
 	server_send_packet(game->server, player, status);
 
-	for(unsigned section = 0; section < game->world->max_sections; section++) {
-		section_coords = world_section_num_to_coords(player->game->world, section);
+	for(unsigned section = 0; section < game->world.max_sections; section++) {
+		section_coords = world_section_num_to_coords(&player->game->world, section);
 		
 		if (tile_section_new(temp_context, player, section, &tile_section) < 0) {
 			_ERROR("%s: out of memory allocating status packet for world sending.\n", __FUNCTION__);
