@@ -84,7 +84,7 @@ int game_find_next_slot(struct game *context)
 
 int game_start_event_loop(struct game *context)
 {
-	return uv_run(context->event_loop, UV_RUN_DEFAULT);
+	return uv_run(&context->event_loop, UV_RUN_DEFAULT);
 }
 
 static int game_on_player_leave(const struct game *game, const struct player *player)
@@ -132,6 +132,7 @@ int game_new(TALLOC_CTX *context, struct game **out_context)
 {
 	int ret = -1;
 	struct game *game = NULL;
+	uint32_t *player_slots = NULL;
 	TALLOC_CTX *tempContext;
 
 	if ((tempContext = talloc_new(NULL)) == NULL) {
@@ -144,15 +145,14 @@ int game_new(TALLOC_CTX *context, struct game **out_context)
 	 * Init game stuff here
 	 */
 	game->ms_per_frame = 1000. / FRAMES_PER_SEC;
+	
+	uv_loop_init(&game->event_loop);
 
-	if ((game->event_loop = talloc_zero(game, uv_loop_t)) == NULL) {
-		_ERROR("%s: Could not allocate a game event loop.\n", __FUNCTION__);
+	if ((player_slots = talloc_zero_array(tempContext, word_t, GAME_MAX_PLAYERS / sizeof(word_t))) == NULL) {
 		ret = -1;
 		goto out;
 	}
-	
-	uv_loop_init(game->event_loop);
-	game->player_slots = talloc_zero_array(game, word_t, GAME_MAX_PLAYERS / sizeof(word_t));
+
 	talloc_set_destructor(game, __game_destructor);
 	
 	if (dataloader_load_tile_flags(game) < 0) {
@@ -168,6 +168,8 @@ int game_new(TALLOC_CTX *context, struct game **out_context)
 	}
 
 	game_init(game);
+
+	game->player_slots = talloc_steal(game, player_slots);
 
 	*out_context = talloc_steal(context, game);
 
@@ -196,7 +198,7 @@ int game_update_loop_init(struct game *game)
 		goto out;
 	}
 	
-	uv_timer_init(game->event_loop, update_timer);
+	uv_timer_init(&game->event_loop, update_timer);
 	update_timer->data = game;
 	uv_timer_start(update_timer, __game_update, (uint64_t)game->ms_per_frame, (uint64_t)game->ms_per_frame);
 

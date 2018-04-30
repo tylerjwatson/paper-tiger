@@ -80,7 +80,7 @@ static int __handle_test(struct game *game, struct console_command *command)
 
 static int __handle_quit(struct game *game, struct console_command *command)
 {
-	uv_stop(game->event_loop);
+	uv_stop(&game->event_loop);
 	return 0;
 }
 
@@ -310,8 +310,8 @@ out:
 
 int console_init(struct console *console)
 {
-	uv_tty_init(console->game->event_loop, console->console_handle, 0, 1);
-	uv_tty_init(console->game->event_loop, console->console_write_handle, 1, 0);
+	uv_tty_init(&console->game->event_loop, console->console_handle, 0, 1);
+	uv_tty_init(&console->game->event_loop, console->console_write_handle, 1, 0);
 
 	uv_tty_set_mode(console->console_handle, UV_TTY_MODE_NORMAL);
 

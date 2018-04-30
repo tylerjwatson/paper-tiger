@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "binary_writer.h": "c"
+        "binary_writer.h": "c",
+        "array": "cpp"
     }
 }

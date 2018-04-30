@@ -100,17 +100,19 @@ struct game {
 	/**
 	 * Bitmap of connected players, decides which slot ID connecting clients receive
 	 */
-	word_t *player_slots;
+	uint32_t *player_slots;
 	
 	/**
 	 * Main libuv event loop for the game.
 	 */
-    uv_loop_t *event_loop;
+    uv_loop_t event_loop;
 	
 	/**
 	 * libuv timer which fires every @a ms_per_frame ms.  Serves as the game update loop.
 	 */
 	uv_timer_t *update_handle;
+
+	uint32_t num_tile_frame_important;
 	
 	/**
 	 * Array of tile frame important data, loaded from @a flags.dat.

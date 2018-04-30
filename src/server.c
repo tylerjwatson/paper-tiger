@@ -137,7 +137,7 @@ void __on_connection(uv_stream_t *handle, int status)
 	
 	client_handle = talloc(player, uv_tcp_t);
 	
-	uv_tcp_init(server->game->event_loop, client_handle);
+	uv_tcp_init(&server->game->event_loop, client_handle);
 	uv_tcp_nodelay(client_handle, true);
 	
 	if (uv_accept(handle, (uv_stream_t *)client_handle) < 0) {
@@ -228,7 +228,7 @@ int server_start(struct server *server)
 {
 	struct sockaddr_in server_addr;
 	
-	uv_tcp_init(server->game->event_loop, server->tcp_handle);
+	uv_tcp_init(&server->game->event_loop, server->tcp_handle);
 	uv_ip4_addr(server->listen_address, server->port, &server_addr);
 	uv_tcp_bind(server->tcp_handle, (const struct sockaddr *)&server_addr, 0);
 	

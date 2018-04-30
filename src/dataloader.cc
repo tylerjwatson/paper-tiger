@@ -55,14 +55,15 @@ int dataloader_load_tile_flags(struct game *game)
 		goto out;
 	}
 
-	tile_frame_important = talloc_zero_array(temp_context, bool, tile_flags.tile_frame_important_size());
+	game->num_tile_frame_important = tile_flags.tile_frame_important_size();
+	tile_frame_important = talloc_zero_array(temp_context, bool, game->num_tile_frame_important);
 	if (tile_frame_important == NULL) {
 		_ERROR("%s: out of memory allocating tile frame important array.\n", __FUNCTION__);
 		ret = -ENOMEM;
 		goto out;
 	}
 
-	for (int i = 0; i < tile_flags.tile_frame_important_size(); i++) {
+	for (int i = 0; i < game->num_tile_frame_important; i++) {
 		const bool& flags = tile_flags.tile_frame_important(i);
 		tile_frame_important[i] = flags;
 	}

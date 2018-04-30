@@ -79,6 +79,18 @@ static int parse_command_line(int argc, char **argv)
 	return 0;
 }
 
+static void __free_handle(uv_handle_t *handle)
+{
+	if (handle != NULL) {
+		free(handle);
+	}
+}
+
+static void __close_handle(uv_handle_t *handle, void *context)
+{
+	uv_close(handle, __free_handle);
+}
+
 int main(int argc, char **argv)
 {
 	int ret = 0;
@@ -86,13 +98,14 @@ int main(int argc, char **argv)
 	struct world world;
 	clock_t start;
 	clock_t diff;
+	int loop_close_result = 0;
 
 	printf("Paper Tiger Terraria Server\n");
 	printf(" by Tyler W. <tyler@tw.id.au>\n\n");
 
 	parse_command_line(argc, argv);
-	talloc_enable_leak_report_full();
-	talloc_set_log_stderr();
+	// talloc_enable_leak_report_full();
+	// talloc_set_log_stderr();
 
 	start = clock();
 
@@ -118,7 +131,7 @@ int main(int argc, char **argv)
 
 	game->world = world;
 
-	if (uv_timer_init(game->event_loop, &world.section_compress_worker) < 0) {
+	if (uv_timer_init(&game->event_loop, &world.section_compress_worker) < 0) {
 		_ERROR("%s: initializing section compress worker failed.\n", __FUNCTION__);
 		goto out;
 	}
@@ -167,25 +180,16 @@ int main(int argc, char **argv)
 	
 	game_start_event_loop(game);
 
-	uv_timer_stop(game->update_handle);
-	
-	if (game->console) {
-		uv_read_stop((uv_stream_t *)game->console->console_handle);
-		uv_read_stop((uv_stream_t *)game->console->console_write_handle);
+	uv_walk(&game->event_loop, __close_handle, NULL);
+	uv_run(&game->event_loop, UV_RUN_DEFAULT);
+
+	if (uv_loop_close(&game->event_loop) == UV_EBUSY) {
+		printf("%s: warning: event loop has not signalled a close.", __FUNCTION__);
 	}
-	
-	uv_read_stop((uv_stream_t *)game->server->tcp_handle);
 
-	uv_close((uv_handle_t *)game->update_handle, NULL);
-	uv_close((uv_handle_t *)game->console->console_handle, NULL);
-	uv_close((uv_handle_t *)game->server->tcp_handle, NULL);
-
-	uv_loop_close(game->event_loop);
 out:
-	
 	talloc_free(game);
-
-	talloc_report_full(NULL, stdout);
+	talloc_free(NULL);
 
 	return ret;
 }

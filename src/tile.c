@@ -19,6 +19,7 @@
  */
 
 #include <string.h>
+#include <signal.h>
 
 #include "tile.h"
 #include "world.h"
@@ -290,6 +291,11 @@ int tile_pack(const struct game *game, const struct tile *tile, uint8_t *dest,
 			
 			pos += binary_writer_write_value(dest + pos, msb);
 		} 
+
+		if (tile->type < 0 || tile->type > game->num_tile_frame_important) {
+			printf("%s: tile type %d is out of range of %d", __FUNCTION__, tile->type, game->num_tile_frame_important);
+			raise(SIGINT);
+		}
 
 		if (game->tile_frame_important[tile->type]) {
 			pos += binary_writer_write_value(dest + pos, tile->frame_x);
