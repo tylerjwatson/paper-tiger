@@ -25,6 +25,7 @@
 #include <uv.h>
 
 #include "talloc/talloc.h"
+#include "console.h"
 #include "world.h"
 #include "bitmap.h"
 
@@ -61,7 +62,6 @@ extern "C" {
 struct colour;
 struct player;
 struct server;
-struct console;
 struct hook_context;
 
 /**
@@ -95,7 +95,7 @@ struct game {
 	 */
     struct player *players[256];
 	
-	struct console *console;
+	struct console console;
 	
 	/**
 	 * Bitmap of connected players, decides which slot ID connecting clients receive

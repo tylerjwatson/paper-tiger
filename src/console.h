@@ -22,12 +22,13 @@
 
 #include <uv.h>
 
-#include "game.h"
 #include "server.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+struct game;
 
 /**
  * @defgroup console Console subsystem
@@ -49,9 +50,9 @@ struct console {
 	 * A reference to the libuv tty handle which reads from and to the owning
 	 * terminal.
 	 */
-	uv_tty_t *console_handle;
+	uv_tty_t console_handle;
 
-	uv_tty_t *console_write_handle;
+	uv_tty_t console_write_handle;
 
 	/**
 	 * Backpointer to the game which owns the instance of the console context.
@@ -91,26 +92,6 @@ struct console_command_handler {
 };
 
 /**
- * @brief	Allocate a new console context.
- * 
- * Allocates a new console structure underneath the talloc context pointed to by @a context.
- * 
- * @param[in]		context		A pointer to the talloc context in which to allocate this memory
- * 								under
- * @param[in]		game		A pointer to the game context which owns this console context
- * @param[out]		out_console	A pointer to the address where the allocated console object will
- * 								be stored.
- * 
- * @remarks
- * On successful return of this function, the console handle may be initialized by calling
- * @a console_init.
- * 
- * @returns
- * `0` if the allocation of a new console context succeeded, or `< 0` otherwise.
- */
-int console_new(TALLOC_CTX *context, struct game *game, struct console **out_console);
-
-/**
  * @brief Initializes a newly-allocated console context.
  * 
  * Initializes the libuv tty handle contained in @ref console->console_handle to accept input
@@ -123,8 +104,7 @@ int console_new(TALLOC_CTX *context, struct game *game, struct console **out_con
  * `0` if the initialization was successful, `< 0` otherwise.  If this function cannot
  * return successfully, paper tiger will be unable to process console input.
  */
-int console_init(struct console *console);
-
+int console_init(struct console *console, struct game *game);
 
 void console_vsprintf(const struct console *console, const char *fmt, ...);
 

@@ -79,16 +79,9 @@ static int parse_command_line(int argc, char **argv)
 	return 0;
 }
 
-static void __free_handle(uv_handle_t *handle)
-{
-	if (handle != NULL) {
-		free(handle);
-	}
-}
-
 static void __close_handle(uv_handle_t *handle, void *context)
 {
-	uv_close(handle, __free_handle);
+	uv_close(handle, NULL);
 }
 
 int main(int argc, char **argv)
@@ -145,12 +138,7 @@ int main(int argc, char **argv)
 		goto out;
 	}
 
-	if (options_console == true && console_new(game, game, &game->console) < 0) {
-		_ERROR("Initializing console failed.\n");
-		ret = -1;
-		goto out;
-	}
-	
+
 	if (server_start(game->server) < 0) {
 		_ERROR("Starting server for game context failed.\n");
 		ret = -1;
@@ -174,10 +162,12 @@ int main(int argc, char **argv)
 
 	printf("\n");
 
-	if (game->console) {
-		console_init(game->console);
+	if (options_console == true && console_init(&game->console, game) < 0) {
+		_ERROR("Initializing console failed.\n");
+		ret = -1;
+		goto out;
 	}
-	
+
 	game_start_event_loop(game);
 
 	uv_walk(&game->event_loop, __close_handle, NULL);
@@ -189,8 +179,6 @@ int main(int argc, char **argv)
 
 out:
 	talloc_free(game);
-	talloc_free(NULL);
-
 	return ret;
 }
 

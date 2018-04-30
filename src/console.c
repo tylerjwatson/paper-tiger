@@ -17,13 +17,14 @@
 * You should have received a copy of the GNU General Public License
 * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
 */
+#include "console.h"
+
 #include <string.h>
 #include <stdio.h>
 #include <time.h>
 #include <stdarg.h>
 
 #include "player.h"
-#include "console.h"
 #include "game.h"
 #include "util.h"
 #include "param.h"
@@ -150,7 +151,7 @@ void console_vsprintf(const struct console *console, const char *fmt, ...)
 	
 	buf.len = len;
 	
-	uv_write(req, (uv_stream_t *)console->console_write_handle, &buf, 1, __on_write);
+	uv_write(req, (uv_stream_t *)&console->console_write_handle, &buf, 1, __on_write);
 }
 
 
@@ -238,7 +239,7 @@ out:
 		talloc_free(buf->base);
 	}
 
-	__print_prompt((uv_stream_t *)game->console->console_write_handle);
+	__print_prompt((uv_stream_t *)&game->console.console_write_handle);
 }
 
 static void __alloc_buffer(uv_handle_t *handle, size_t suggested_size, uv_buf_t *buf)
@@ -257,70 +258,20 @@ out:
 	talloc_free(temp_context);
 }
 
-static int __console_destructor(struct console *handle)
+int console_init(struct console *console, struct game *game)
 {
-	return 0;
-}
-
-int console_new(TALLOC_CTX *context, struct game *game, struct console **out_console)
-{
-	int ret = -1;
-	TALLOC_CTX *temp_context;
-	struct console *console;
-	uv_tty_t *tty_handle, *tty_write_handle;
-
-	if ((temp_context = talloc_new(NULL)) == NULL) {
-		_ERROR("%s: cannot allocate temporary context for console handle.\n", __FUNCTION__);
-		ret = -ENOMEM;
-		goto out;
-	}
-
-	if ((console = talloc_zero(temp_context, struct console)) == NULL) {
-		_ERROR("%s: cannot allocate console context.\n", __FUNCTION__);
-		ret = -ENOMEM;
-		goto out;
-	}
-
-	if ((tty_handle = talloc_zero(temp_context, uv_tty_t)) == NULL) {
-		_ERROR("%s: Cannot allocate console handle.\n", __FUNCTION__);
-		ret = -ENOMEM;
-		goto out;
-	}
-
-	if ((tty_write_handle = talloc_zero(temp_context, uv_tty_t)) == NULL) {
-		_ERROR("%s: Cannot allocate console handle.\n", __FUNCTION__);
-		ret = -ENOMEM;
-		goto out;
-	}
-
-	talloc_set_destructor(console, __console_destructor);
-
-	console->console_handle = talloc_steal(console, tty_handle);
-	console->console_write_handle = talloc_steal(console, tty_write_handle);
-
 	console->game = game;
+	uv_tty_init(&console->game->event_loop, &console->console_handle, 0, 1);
+	uv_tty_init(&console->game->event_loop, &console->console_write_handle, 1, 0);
 
-	ret = 0;
-	*out_console = talloc_steal(context, console);
-out:
-	talloc_free(temp_context);
+	uv_tty_set_mode(&console->console_handle, UV_TTY_MODE_NORMAL);
 
-	return ret;
-}
+	console->console_handle.data = console->game;
+	console->console_write_handle.data = console->game;
 
-int console_init(struct console *console)
-{
-	uv_tty_init(&console->game->event_loop, console->console_handle, 0, 1);
-	uv_tty_init(&console->game->event_loop, console->console_write_handle, 1, 0);
+	uv_read_start((uv_stream_t *)&console->console_handle, __alloc_buffer, __on_read);
 
-	uv_tty_set_mode(console->console_handle, UV_TTY_MODE_NORMAL);
-
-	console->console_handle->data = console->game;
-	console->console_write_handle->data = console->game;
-
-	uv_read_start((uv_stream_t *)console->console_handle, __alloc_buffer, __on_read);
-
-	__print_prompt((uv_stream_t *)console->console_write_handle);
+	__print_prompt((uv_stream_t *)&console->console_write_handle);
 
 	return 0;
 }

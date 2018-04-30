@@ -92,7 +92,7 @@ static int game_on_player_leave(const struct game *game, const struct player *pl
 	game_send_message(game, player, colour_black, "%s v%d.%d.",
 		PRODUCT_NAME, VERSION_MAJOR, VERSION_MINOR);
 
-	console_vsprintf(game->console,
+	console_vsprintf(&game->console,
 		"\033[31;1m* %s has left.\033[0m\n",
 		player->name);
 
@@ -104,7 +104,7 @@ static int game_on_player_join(const struct game *game, const struct player *pla
 	game_send_message(game, player, colour_black, "%s v%d.%d.",
 		PRODUCT_NAME, VERSION_MAJOR, VERSION_MINOR);
 
-	console_vsprintf(game->console, 
+	console_vsprintf(&game->console, 
 		"\033[32;1m* %s has joined.  Slot=%d IP=%s\033[0m\n", 
 		player->name,
 		player->id,

@@ -35,7 +35,7 @@ int chat_message_handle(struct player *player, struct packet *packet)
 {
 	struct chat_message *chat_message = (struct chat_message *)packet->data;
 
-	console_vsprintf(player->game->console, "<\033[33;1m%s\033[0m> %s\n", player->name, chat_message->message);
+	console_vsprintf(&player->game->console, "<\033[33;1m%s\033[0m> %s\n", player->name, chat_message->message);
 	
 	chat_message->id = player->id;
 
