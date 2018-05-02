@@ -3,27 +3,25 @@
  * Copyright (C) 2016  Tyler Watson <tyler@tw.id.au>
  *
  * This file is part of paper-tiger.
- * 
+ *
  * paper-tiger is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * paper-tiger is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
+#include <errno.h>
 #include <stdbool.h>
 #include <string.h>
 #include <time.h>
-#include <errno.h>
 #include <uv.h>
 
 #ifndef _WIN32
@@ -32,12 +30,12 @@
 //#define PROTOBUF_USE_DLLS
 #endif
 
-#include "talloc/talloc.h"
 #include "console.h"
-#include "util.h"
+#include "game.h"
 #include "getopt.h"
 #include "server.h"
-#include "game.h"
+#include "talloc/talloc.h"
+#include "util.h"
 #include "world.h"
 
 #define OPTIONS "sw:"
@@ -48,16 +46,17 @@ extern "C" {
 
 /**
  * @defgroup paper-tiger The Paper Tiger API
- * 
+ *
  * Paper Tiger is an open-source Terraria server that aims to implement
  * official Terraria clients in a more efficient and cross-platform
  * manner.
  */
-	
+
 static const char *options_worldPath = NULL;
 static bool options_console = true;
 
-static int parse_command_line(int argc, char **argv)
+static int
+parse_command_line(int argc, char **argv)
 {
 	int c;
 
@@ -79,12 +78,14 @@ static int parse_command_line(int argc, char **argv)
 	return 0;
 }
 
-static void __close_handle(uv_handle_t *handle, void *context)
+static void
+__close_handle(uv_handle_t *handle, void *context)
 {
 	uv_close(handle, NULL);
 }
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
 	int ret = 0;
 	struct game *game;
@@ -103,7 +104,7 @@ int main(int argc, char **argv)
 	start = clock();
 
 	printf("%s: initializing game context... ", __FUNCTION__);
-	
+
 	if (game_new(NULL, &game) < 0) {
 		printf("failed.\n");
 		_ERROR("%s: game initialization failed.  The process cannot continue.\n", __FUNCTION__);
@@ -138,7 +139,6 @@ int main(int argc, char **argv)
 		goto out;
 	}
 
-
 	if (server_start(game->server) < 0) {
 		_ERROR("Starting server for game context failed.\n");
 		ret = -1;
@@ -146,19 +146,13 @@ int main(int argc, char **argv)
 	}
 
 	game_update_loop_init(game);
-	
-	printf("\nStarted successfully on %s:%d\n", 
-		game->server->listen_address,
-		game->server->port);
 
-	printf(" * %s (%dx%d)\n", world.world_name, 
-		world.max_tiles_x, 
-		world.max_tiles_y);
+	printf("\nStarted successfully on %s:%d\n", game->server->listen_address, game->server->port);
 
-	printf(" * Expert: %s, Crimson: %s\n",
-		game->world.expert_mode ? "Yes" : "No",
-		game->world.flags.crimson ? "Yes" : "No"
-	);
+	printf(" * %s (%dx%d)\n", world.world_name, world.max_tiles_x, world.max_tiles_y);
+
+	printf(" * Expert: %s, Crimson: %s\n", game->world.expert_mode ? "Yes" : "No",
+		   game->world.flags.crimson ? "Yes" : "No");
 
 	printf("\n");
 
@@ -181,7 +175,6 @@ out:
 	talloc_free(game);
 	return ret;
 }
-
 
 #ifdef __cplusplus
 }

@@ -3,17 +3,17 @@
  * Copyright (C) 2016  Tyler Watson <tyler@tw.id.au>
  *
  * This file is part of paper-tiger.
- * 
+ *
  * paper-tiger is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
- 
+
  * paper-tiger is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -24,26 +24,26 @@
 #include <time.h>
 #include <uv.h>
 
-#include "player.h"
+#include "bitmap.h"
+#include "colour.h"
+#include "config.h"
 #include "console.h"
+#include "dataloader.h"
 #include "hook.h"
 #include "packet.h"
+#include "player.h"
 #include "server.h"
-#include "bitmap.h"
-#include "dataloader.h"
 #include "util.h"
-#include "config.h"
 #include "world.h"
 #include "world_section.h"
-#include "colour.h"
 
-#include "packets/player_mana.h"
+#include "packets/chat_message.h"
 #include "packets/player_hp.h"
 #include "packets/player_info.h"
-#include "packets/tile_section.h"
+#include "packets/player_mana.h"
 #include "packets/section_tile_frame.h"
-#include "packets/chat_message.h"
 #include "packets/status.h"
+#include "packets/tile_section.h"
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -57,20 +57,24 @@
 #define TIME_MIDNIGHT 16200
 #define TIME_DUSK 0
 
-static void __game_update(uv_timer_t *timer)
+static void
+__game_update(uv_timer_t *timer)
 {
 	struct game *game = (struct game *)timer->data;
- 
-	(void)game; //unused
-	//TODO: Update the game shit.
+
+	(void)game; // unused
+				// TODO: Update the game shit.
 }
 
-static int __game_destructor(struct game *context)
+static int
+__game_destructor(struct game *context)
 {
+	tile_container_destroy(&context->world.tile_container);
 	return 0;
 }
 
-int game_find_next_slot(struct game *context)
+int
+game_find_next_slot(struct game *context)
 {
 	for (unsigned i = 0; i < GAME_MAX_PLAYERS; i++) {
 		if (bitmap_get(context->player_slots, i) == false) {
@@ -82,41 +86,38 @@ int game_find_next_slot(struct game *context)
 	return -1;
 }
 
-int game_start_event_loop(struct game *context)
+int
+game_start_event_loop(struct game *context)
 {
 	return uv_run(&context->event_loop, UV_RUN_DEFAULT);
 }
 
-static int game_on_player_leave(const struct game *game, const struct player *player)
+static int
+game_on_player_leave(const struct game *game, const struct player *player)
 {
-	game_send_message(game, player, colour_black, "%s v%d.%d.",
-		PRODUCT_NAME, VERSION_MAJOR, VERSION_MINOR);
+	game_send_message(game, player, colour_black, "%s v%d.%d.", PRODUCT_NAME, VERSION_MAJOR, VERSION_MINOR);
 
-	console_vsprintf(&game->console,
-		"\033[31;1m* %s has left.\033[0m\n",
-		player->name);
+	console_vsprintf(&game->console, "\033[31;1m* %s has left.\033[0m\n", player->name);
 
 	return 0;
 }
 
-static int game_on_player_join(const struct game *game, const struct player *player)
+static int
+game_on_player_join(const struct game *game, const struct player *player)
 {
-	game_send_message(game, player, colour_black, "%s v%d.%d.",
-		PRODUCT_NAME, VERSION_MAJOR, VERSION_MINOR);
+	game_send_message(game, player, colour_black, "%s v%d.%d.", PRODUCT_NAME, VERSION_MAJOR, VERSION_MINOR);
 
-	console_vsprintf(&game->console, 
-		"\033[32;1m* %s has joined.  Slot=%d IP=%s\033[0m\n", 
-		player->name,
-		player->id,
-		player->remote_addr);
+	console_vsprintf(&game->console, "\033[32;1m* %s has joined.  Slot=%d IP=%s\033[0m\n", player->name, player->id,
+					 player->remote_addr);
 
-	//game_send_world(game, player);
+	// game_send_world(game, player);
 	game_sync_players(game, player);
 
 	return 0;
 }
 
-static int game_init(struct game *game)
+static int
+game_init(struct game *game)
 {
 	int ret = -1;
 
@@ -128,7 +129,8 @@ static int game_init(struct game *game)
 	return ret;
 }
 
-int game_new(TALLOC_CTX *context, struct game **out_context)
+int
+game_new(TALLOC_CTX *context, struct game **out_context)
 {
 	int ret = -1;
 	struct game *game = NULL;
@@ -145,7 +147,7 @@ int game_new(TALLOC_CTX *context, struct game **out_context)
 	 * Init game stuff here
 	 */
 	game->ms_per_frame = 1000. / FRAMES_PER_SEC;
-	
+
 	uv_loop_init(&game->event_loop);
 
 	if ((player_slots = talloc_zero_array(tempContext, word_t, GAME_MAX_PLAYERS / sizeof(word_t))) == NULL) {
@@ -154,7 +156,7 @@ int game_new(TALLOC_CTX *context, struct game **out_context)
 	}
 
 	talloc_set_destructor(game, __game_destructor);
-	
+
 	if (dataloader_load_tile_flags(game) < 0) {
 		_ERROR("%s: loading tile flags failed.\n", __FUNCTION__);
 		ret = -1;
@@ -179,7 +181,8 @@ out:
 	return ret;
 }
 
-int game_update_loop_init(struct game *game)
+int
+game_update_loop_init(struct game *game)
 {
 	int ret = -1;
 	TALLOC_CTX *temp_context;
@@ -197,7 +200,7 @@ int game_update_loop_init(struct game *game)
 		_ERROR("%s: Allocating an update timer failed.\n", __FUNCTION__);
 		goto out;
 	}
-	
+
 	uv_timer_init(&game->event_loop, update_timer);
 	update_timer->data = game;
 	uv_timer_start(update_timer, __game_update, (uint64_t)game->ms_per_frame, (uint64_t)game->ms_per_frame);
@@ -211,11 +214,12 @@ out:
 	return ret;
 }
 
-int game_send_message(const struct game *game, const struct player *player, const struct colour colour, 
-					  const char *fmt, ...)
+int
+game_send_message(const struct game *game, const struct player *player, const struct colour colour, const char *fmt,
+				  ...)
 {
 	struct packet *chat_packet;
-	
+
 	char msg[1024];
 	va_list args;
 
@@ -228,14 +232,15 @@ int game_send_message(const struct game *game, const struct player *player, cons
 		return -ENOMEM;
 	}
 
-	((struct chat_message *)chat_packet->data)->id = 0xFF; //nameless broadcast
-	
+	((struct chat_message *)chat_packet->data)->id = 0xFF; // nameless broadcast
+
 	server_send_packet(game->server, player, chat_packet);
 
 	return -1;
 }
 
-int game_online_players(const struct game *game, uint8_t *out_ids)
+int
+game_online_players(const struct game *game, uint8_t *out_ids)
 {
 	int count = 0;
 
@@ -248,11 +253,12 @@ int game_online_players(const struct game *game, uint8_t *out_ids)
 	return count;
 }
 
-int game_sync_players(const struct game *game, const struct player *new_player)
+int
+game_sync_players(const struct game *game, const struct player *new_player)
 {
 	struct packet *player_info, *hp, *mp, *spawn;
 	int ret = -1;
-	
+
 	if (player_info_new((void *)game, new_player, &player_info) < 0) {
 		_ERROR("%s: player_info packet failed.\n", __FUNCTION__);
 		ret = -1;
@@ -264,19 +270,19 @@ int game_sync_players(const struct game *game, const struct player *new_player)
 		ret = -1;
 		goto player_hp_out;
 	}
-	
+
 	if (player_mana_new((void *)game, new_player, new_player->mana, new_player->mana_max, &mp) < 0) {
 		_ERROR("%s: player_mana packet failed.\n", __FUNCTION__);
 		ret = -1;
 		goto player_mana_out;
 	}
-	
+
 	server_broadcast_packet(game->server, player_info, new_player->id);
 	server_broadcast_packet(game->server, hp, new_player->id);
 	server_broadcast_packet(game->server, mp, new_player->id);
-	
+
 	ret = 0;
-	
+
 	/*
 	 * Fall through
 	 */
@@ -292,12 +298,13 @@ out:
 	return ret;
 }
 
-int game_send_world(const struct game *game, const struct player *player)
+int
+game_send_world(const struct game *game, const struct player *player)
 {
 	int ret = -1, num_packets;
 	struct packet *status, *tile_section, *section_frame;
 	TALLOC_CTX *temp_context;
-	
+
 	struct vector_2d section_coords;
 
 	num_packets = game->world.max_sections_x * game->world.max_sections_y * 2;
@@ -314,27 +321,27 @@ int game_send_world(const struct game *game, const struct player *player)
 		ret = -ENOMEM;
 		goto out;
 	}
-	
+
 	server_send_packet(game->server, player, status);
 
-	for(unsigned section = 0; section < game->world.max_sections; section++) {
+	for (unsigned section = 0; section < game->world.max_sections; section++) {
 		section_coords = world_section_num_to_coords(&player->game->world, section);
-		
+
 		if (tile_section_new(temp_context, player, section, &tile_section) < 0) {
 			_ERROR("%s: out of memory allocating status packet for world sending.\n", __FUNCTION__);
 			ret = -ENOMEM;
 			goto out;
 		}
-		
+
 		if (section_tile_frame_new(temp_context, player, section_coords, &section_frame) < 0) {
 			_ERROR("%s: out of memory allocating status packet for world sending.\n", __FUNCTION__);
 			ret = -ENOMEM;
 			goto out;
 		}
-		
+
 		server_send_packet(game->server, player, tile_section);
 		server_send_packet(game->server, player, section_frame);
-		
+
 		talloc_free(tile_section);
 		talloc_free(section_frame);
 	}

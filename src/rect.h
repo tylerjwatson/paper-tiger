@@ -33,15 +33,16 @@ struct rect {
 	int16_t h;
 };
 
-static inline struct rect rect_new(int x, int y, int w, int h)
+static inline struct rect
+rect_new(int x, int y, int w, int h)
 {
 	struct rect r;
-	
+
 	r.h = h;
 	r.w = w;
 	r.x = x;
 	r.y = y;
-	
+
 	return r;
 }
 

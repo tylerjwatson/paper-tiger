@@ -26,9 +26,9 @@ extern "C" {
 
 struct game;
 
-int dataloader_load_tile_flags(struct game *world);
+int
+dataloader_load_tile_flags(struct game *world);
 
 #ifdef __cplusplus
 }
 #endif
-

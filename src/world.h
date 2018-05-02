@@ -3,17 +3,17 @@
  * Copyright (C) 2016  Tyler Watson <tyler@tw.id.au>
  *
  * This file is part of paper-tiger.
- * 
+ *
  * paper-tiger is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * paper-tiger is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -23,17 +23,17 @@
 #define WORLD_SECTION_WIDTH 200
 #define WORLD_SECTION_HEIGHT 150
 
-
-#include <stdbool.h>
 #include <errno.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <uv.h>
 
 #include "talloc/talloc.h"
 
-#include "vector_2d.h"
-#include "rect.h"
 #include "bitmap.h"
+#include "rect.h"
+#include "tile.h"
+#include "vector_2d.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -109,29 +109,29 @@ struct world {
 	 * Internal unique world identifier.
 	 */
 	int32_t worldID;
-	
-	/** 
+
+	/**
 	 * World name
 	 */
-	char *world_name;		
-	
+	char *world_name;
+
 	/** Fully-qualified path to the world file */
 	char *world_path;
-	
+
 	/**
 	 * World version as recorded in the world file.
 	 */
 	int version;
-	
+
 	/** Number of elements in the positions array */
 	uint16_t num_positions;
-	
+
 	/** Array of position data */
 	int32_t *positions;
-	
+
 	/** Number of elements in the importance array */
 	uint16_t num_important;
-	
+
 	/** Array of importance data */
 	int8_t *important;
 
@@ -140,15 +140,15 @@ struct world {
 	float top_world;
 	float bottom_world;
 
-	/** 
+	/**
 	 * The number of tiles in the world's X axis.
 	 */
-	uint32_t max_tiles_x;		
-	
-	/** 
+	uint32_t max_tiles_x;
+
+	/**
 	 * The number of tiles i n the world's Y axis.
 	 */
-	uint32_t max_tiles_y;	
+	uint32_t max_tiles_y;
 
 	/**
 	 * Contains the maximum number of sections in the world.
@@ -171,7 +171,7 @@ struct world {
 	 * Indicates whether the world has expert mode enabled
 	 */
 	bool expert_mode;
-	
+
 	int8_t moon_type;
 	int32_t tree_x[3];
 	int32_t tree_style[4];
@@ -180,12 +180,12 @@ struct world {
 	int32_t ice_back_style;
 	int32_t jungle_back_style;
 	int32_t hell_back_style;
-	
+
 	/*
 	 * Coordinates for the spawn point in the map.
 	 */
 	struct vector_2d spawn_tile;
-	
+
 	double world_surface;
 	double rock_layer;
 	double temp_time;
@@ -193,18 +193,18 @@ struct world {
 	bool temp_blood_moon;
 	int32_t temp_moon_phase;
 	bool temp_eclipse;
-	
+
 	/*
 	 * Contains the coordinates of the map's dungeon.
 	 */
 	struct vector_2d dungeon;
-	
+
 	/*
 	 * 	A list of flags relating to events that have happened in the
 	 * world.
 	 */
 	struct world_flags flags;
-	
+
 	uint8_t shadow_orb_count;
 	int32_t altar_count;
 
@@ -230,17 +230,17 @@ struct world {
 
 	int32_t cultist_delay;
 	int32_t angler_quest;
-	
+
 	/**
 	 * The number of angler string elements in the anglers array.
 	 */
 	int32_t num_anglers;
-	
+
 	/**
 	 * Angler text array
 	 */
 	char **anglers;
-	
+
 	bool saved_angler;
 
 	bool saved_stylist;
@@ -250,7 +250,7 @@ struct world {
 	 * Number of elements in the kill counts table
 	 */
 	int16_t num_kill_counts;
-	
+
 	/**
 	 * Array of kill counts
 	 */
@@ -264,14 +264,16 @@ struct world {
 	/**
 	 * 2D array of tile structures which make up the world.
 	 */
-	struct tile **tiles;
+	// struct tile **tiles;
+
+	struct tile_container tile_container;
 
 	/**
 	 * Reference to a binary reader which is used to read data from
 	 * the world file specified on the command line.
 	 */
 	struct binary_reader_context *reader;
-	
+
 	/**
 	 * Indicates if world_init has completed
 	 */
@@ -280,12 +282,15 @@ struct world {
 	uv_timer_t section_compress_worker;
 };
 
-int world_init(TALLOC_CTX *context, struct world *world, const char *world_path);
+int
+world_init(TALLOC_CTX *context, struct world *world, const char *world_path);
 
-struct tile *world_tile_at(struct world *world, const uint32_t x, const uint32_t y);
+struct tile *
+world_tile_at(struct world *world, const uint32_t x, const uint32_t y);
 
-int world_pack_tile_section(TALLOC_CTX *context, struct world *world, struct rect rect,
-							uint8_t *tile_buffer, int *out_buf_len);
+int
+world_pack_tile_section(TALLOC_CTX *context, struct world *world, struct rect rect, uint8_t *tile_buffer,
+						int *out_buf_len);
 
 #ifdef __cplusplus
 }

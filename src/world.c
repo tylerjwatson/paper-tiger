@@ -3,17 +3,17 @@
  * Copyright (C) 2016  Tyler Watson <tyler@tw.id.au>
  *
  * This file is part of paper-tiger.
- * 
+ *
  * paper-tiger is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * paper-tiger is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -22,18 +22,19 @@
 #include <string.h>
 #include <zlib.h>
 
-#include "rect.h"
-#include "game.h"
-#include "world.h"
-#include "world_section.h"
-#include "util.h"
-#include "tile.h"
 #include "binary_reader.h"
 #include "binary_writer.h"
+#include "game.h"
+#include "rect.h"
+#include "tile.h"
+#include "util.h"
+#include "world.h"
+#include "world_section.h"
 
 #define RELOGIC_MAGIC_NUMBER 27981915666277746
 
-static int __world_read_file_metadata(struct world *world)
+static int
+__world_read_file_metadata(struct world *world)
 {
 	int64_t magic;
 	int64_t temp;
@@ -48,7 +49,7 @@ static int __world_read_file_metadata(struct world *world)
 		goto error;
 	}
 
-	type = (enum relogic_file_type) (magic >> 56 & 0xFF);
+	type = (enum relogic_file_type)(magic >> 56 & 0xFF);
 
 	if (type != relogic_file_type_world) {
 		return -1;
@@ -68,7 +69,8 @@ error:
 	return -1;
 }
 
-static int __world_read_file_header(TALLOC_CTX *context, struct world *world)
+static int
+__world_read_file_header(TALLOC_CTX *context, struct world *world)
 {
 	uint8_t flag1 = 0;
 	uint8_t flag2 = 0x80;
@@ -101,9 +103,9 @@ static int __world_read_file_header(TALLOC_CTX *context, struct world *world)
 
 	/*
 	 * Note:
-	 * 
+	 *
 	 * I have no idea what the fuck this routine does.
-	 * 
+	 *
 	 * See WorldFile::LoadFileFormatHeader()
 	 */
 	for (int i = 0; i < world->num_important; i++) {
@@ -128,7 +130,8 @@ error:
 	return -1;
 }
 
-static int __world_read_anglers(TALLOC_CTX *context, struct world *world)
+static int
+__world_read_anglers(TALLOC_CTX *context, struct world *world)
 {
 	int ret = -1;
 
@@ -140,7 +143,7 @@ static int __world_read_anglers(TALLOC_CTX *context, struct world *world)
 
 	world->anglers = talloc_array(context, char *, (uint32_t)world->num_anglers);
 
-	for(int i = world->num_anglers; i > 0; i--) {
+	for (int i = world->num_anglers; i > 0; i--) {
 		char *angler_finished;
 
 		if (binary_reader_read_string(world->reader, &angler_finished) < 0) {
@@ -162,7 +165,8 @@ out:
 	return ret;
 }
 
-static int __world_read_npc_killcounts(TALLOC_CTX *context, struct world *world)
+static int
+__world_read_npc_killcounts(TALLOC_CTX *context, struct world *world)
 {
 	int ret = -1;
 
@@ -191,7 +195,8 @@ out:
 	return ret;
 }
 
-static int __world_load_tile(struct world *world, uint32_t x, uint32_t y, uint16_t *out_tile_copies)
+static int
+__world_load_tile(struct world *world, uint32_t x, uint32_t y, uint16_t *out_tile_copies)
 {
 	int ret = -1;
 	int liquid_type = 0;
@@ -209,7 +214,7 @@ static int __world_load_tile(struct world *world, uint32_t x, uint32_t y, uint16
 	 * num4 = tile_colour_flags
 	 */
 
-	//if (x == 4090 && y == 65)
+	// if (x == 4090 && y == 65)
 	//	DebugBreak();
 
 	if (binary_reader_read_byte(world->reader, &tile_flags_1) < 0) {
@@ -231,7 +236,6 @@ static int __world_load_tile(struct world *world, uint32_t x, uint32_t y, uint16
 				ret = -1;
 				goto out;
 			}
-
 		}
 	}
 
@@ -251,8 +255,8 @@ static int __world_load_tile(struct world *world, uint32_t x, uint32_t y, uint16
 		if (world->important[tile->type] == false) {
 			tile->frame_x = tile->frame_y = -1;
 		} else {
-			if (binary_reader_read_int16(world->reader, &tile->frame_x) < 0
-					|| binary_reader_read_int16(world->reader, &tile->frame_y) < 0) {
+			if (binary_reader_read_int16(world->reader, &tile->frame_x) < 0 ||
+				binary_reader_read_int16(world->reader, &tile->frame_y) < 0) {
 				_ERROR("%s: binary reader error reading tile->frame_[xy]", __FUNCTION__);
 				ret = -1;
 				goto out;
@@ -319,7 +323,7 @@ static int __world_load_tile(struct world *world, uint32_t x, uint32_t y, uint16
 		tile_set_wire_3(tile, (tile_wire_flags & TILE_WIRE_3) == TILE_WIRE_3);
 	}
 
-	//TODO: tile slope
+	// TODO: tile slope
 
 	tile_set_actuator(tile, (tile_colour_flags & WORLD_FILE_TILE_COLOUR_ACTUATOR) == WORLD_FILE_TILE_COLOUR_ACTUATOR);
 	tile_set_inactive(tile, (tile_colour_flags & WORLD_FILE_TILE_COLOUR_INACTIVE) == WORLD_FILE_TILE_COLOUR_INACTIVE);
@@ -332,14 +336,13 @@ static int __world_load_tile(struct world *world, uint32_t x, uint32_t y, uint16
 				_ERROR("%s: binary error reading tile_copies from tile", __FUNCTION__);
 			}
 		} else {
-			if (binary_reader_read_byte(world->reader, (uint8_t *) &tile_copies) < 0) {
+			if (binary_reader_read_byte(world->reader, (uint8_t *)&tile_copies) < 0) {
 				_ERROR("%s: binary error reading tile_copies from tile", __FUNCTION__);
 			}
-
 		}
 	}
 
-	//TODO: some WorldGen.TileCounts bullshit
+	// TODO: some WorldGen.TileCounts bullshit
 
 	*out_tile_copies = tile_copies;
 	ret = 0;
@@ -347,10 +350,10 @@ out:
 	return ret;
 }
 
-static int __world_read_tile(TALLOC_CTX *context, struct world *world)
+static int
+__world_read_tile(TALLOC_CTX *context, struct world *world)
 {
 	int ret = 0;
-
 
 	if (fseek(world->reader->fp, world->positions[1], SEEK_SET) < 0) {
 		_ERROR("%s: could not seek to position %d in world file.\n", __FUNCTION__, world->positions[1]);
@@ -358,11 +361,17 @@ static int __world_read_tile(TALLOC_CTX *context, struct world *world)
 		goto out;
 	}
 
-	if (tile_heap_new(context, (uint32_t)world->max_tiles_x, (uint32_t)world->max_tiles_y, &world->tiles) < 0) {
-		_ERROR("%s: cannot allocate the tile heap.\n", __FUNCTION__);
+	if (tile_container_init(context, &world->tile_container, world) < 0) {
+		_ERROR("%s: could not seek to position %d in world file.\n", __FUNCTION__, world->positions[1]);
 		ret = -1;
 		goto out;
 	}
+
+	// if (tile_heap_new(context, (uint32_t)world->max_tiles_x, (uint32_t)world->max_tiles_y, &world->tiles) < 0) {
+	// 	_ERROR("%s: cannot allocate the tile heap.\n", __FUNCTION__);
+	// 	ret = -1;
+	// 	goto out;
+	// }
 
 	for (unsigned int x = 0; x < world->max_tiles_x; x++) {
 		for (unsigned int y = 0; y < world->max_tiles_y; y++) {
@@ -377,21 +386,22 @@ static int __world_read_tile(TALLOC_CTX *context, struct world *world)
 
 			src_tile = world_tile_at(world, x, y);
 
-			for(unsigned y_copy = 1; y_copy <= num_copies; y_copy++) {
+			for (unsigned y_copy = 1; y_copy <= num_copies; y_copy++) {
 				tile_copy(src_tile, world_tile_at(world, x, y + y_copy));
 			}
 
 			y += num_copies;
 		}
 
-		//return -2;
+		// return -2;
 	}
 
 out:
-	return ret;	
+	return ret;
 }
 
-static int __world_read_header(TALLOC_CTX *context, struct world *world)
+static int
+__world_read_header(TALLOC_CTX *context, struct world *world)
 {
 	char *world_name;
 	int ret;
@@ -437,14 +447,14 @@ static int __world_read_header(TALLOC_CTX *context, struct world *world)
 			seed_text[seed_len] = '\0';
 		}
 
-		//TODO: WorldFile.cs:1362 - unused
+		// TODO: WorldFile.cs:1362 - unused
 		if (binary_reader_read_uint64(world->reader, NULL) < 0) {
 			_ERROR("%s: out of memory reading world generator version\n", __FUNCTION__);
 			ret = -ENOMEM;
 			goto out;
 		}
 
-		//TODO: something with seed text
+		// TODO: something with seed text
 		free(seed_text);
 	}
 
@@ -527,50 +537,50 @@ static int __world_read_header(TALLOC_CTX *context, struct world *world)
 		goto out;
 	}
 
-	if (binary_reader_read_int32(world->reader, &world->tree_x[0]) < 0
-			|| binary_reader_read_int32(world->reader, &world->tree_x[1]) < 0
-			|| binary_reader_read_int32(world->reader, &world->tree_x[2]) < 0) {
+	if (binary_reader_read_int32(world->reader, &world->tree_x[0]) < 0 ||
+		binary_reader_read_int32(world->reader, &world->tree_x[1]) < 0 ||
+		binary_reader_read_int32(world->reader, &world->tree_x[2]) < 0) {
 		_ERROR("%s: binary reader error reading world->tree_x\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 
-	if (binary_reader_read_int32(world->reader, &world->tree_style[0]) < 0
-			|| binary_reader_read_int32(world->reader, &world->tree_style[1]) < 0
-			|| binary_reader_read_int32(world->reader, &world->tree_style[2]) < 0
-			|| binary_reader_read_int32(world->reader, &world->tree_style[3]) < 0) {
+	if (binary_reader_read_int32(world->reader, &world->tree_style[0]) < 0 ||
+		binary_reader_read_int32(world->reader, &world->tree_style[1]) < 0 ||
+		binary_reader_read_int32(world->reader, &world->tree_style[2]) < 0 ||
+		binary_reader_read_int32(world->reader, &world->tree_style[3]) < 0) {
 		_ERROR("%s: binary reader error reading world->tree_style\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 
-	if (binary_reader_read_int32(world->reader, &world->cave_back_x[0]) < 0
-		|| binary_reader_read_int32(world->reader, &world->cave_back_x[1]) < 0
-		|| binary_reader_read_int32(world->reader, &world->cave_back_x[2]) < 0) {
+	if (binary_reader_read_int32(world->reader, &world->cave_back_x[0]) < 0 ||
+		binary_reader_read_int32(world->reader, &world->cave_back_x[1]) < 0 ||
+		binary_reader_read_int32(world->reader, &world->cave_back_x[2]) < 0) {
 		_ERROR("%s: binary reader error reading world->cave_back_x\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 
-	if (binary_reader_read_int32(world->reader, &world->cave_back_style[0]) < 0
-		|| binary_reader_read_int32(world->reader, &world->cave_back_style[1]) < 0
-		|| binary_reader_read_int32(world->reader, &world->cave_back_style[2]) < 0
-		|| binary_reader_read_int32(world->reader, &world->cave_back_style[3]) < 0) {
+	if (binary_reader_read_int32(world->reader, &world->cave_back_style[0]) < 0 ||
+		binary_reader_read_int32(world->reader, &world->cave_back_style[1]) < 0 ||
+		binary_reader_read_int32(world->reader, &world->cave_back_style[2]) < 0 ||
+		binary_reader_read_int32(world->reader, &world->cave_back_style[3]) < 0) {
 		_ERROR("%s: binary reader error reading world->cave_back_style\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 
-	if (binary_reader_read_int32(world->reader, &world->ice_back_style) < 0
-			|| binary_reader_read_int32(world->reader, &world->jungle_back_style) < 0
-			|| binary_reader_read_int32(world->reader, &world->hell_back_style) < 0) {
+	if (binary_reader_read_int32(world->reader, &world->ice_back_style) < 0 ||
+		binary_reader_read_int32(world->reader, &world->jungle_back_style) < 0 ||
+		binary_reader_read_int32(world->reader, &world->hell_back_style) < 0) {
 		_ERROR("%s: binary reader error reading world->back_styles\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 
-	if (binary_reader_read_int32(world->reader, &world->spawn_tile.x) < 0
-			|| binary_reader_read_int32(world->reader, &world->spawn_tile.y) < 0) {
+	if (binary_reader_read_int32(world->reader, &world->spawn_tile.x) < 0 ||
+		binary_reader_read_int32(world->reader, &world->spawn_tile.y) < 0) {
 		ret = -1;
 		goto out;
 	}
@@ -617,8 +627,8 @@ static int __world_read_header(TALLOC_CTX *context, struct world *world)
 		goto out;
 	}
 
-	if (binary_reader_read_int32(world->reader, &world->dungeon.x) < 0
-			|| binary_reader_read_int32(world->reader, &world->dungeon.y) < 0) {
+	if (binary_reader_read_int32(world->reader, &world->dungeon.x) < 0 ||
+		binary_reader_read_int32(world->reader, &world->dungeon.y) < 0) {
 		_ERROR("%s: binary reader error reading world->dungeon\n", __FUNCTION__);
 		ret = -1;
 		goto out;
@@ -632,16 +642,16 @@ static int __world_read_header(TALLOC_CTX *context, struct world *world)
 
 	//_ERROR("pos %li\n", ftell(world->reader->fp));
 
-	if (binary_reader_read_boolean(world->reader, &world->flags.downed_boss_1) < 0
-			|| binary_reader_read_boolean(world->reader, &world->flags.downed_boss_2) < 0
-			|| binary_reader_read_boolean(world->reader, &world->flags.downed_boss_3) < 0
-			|| binary_reader_read_boolean(world->reader, &world->flags.downed_queen_bee) < 0
-			|| binary_reader_read_boolean(world->reader, &world->flags.downed_mech_1) < 0
-			|| binary_reader_read_boolean(world->reader, &world->flags.downed_mech_2) < 0
-			|| binary_reader_read_boolean(world->reader, &world->flags.downed_mech_3) < 0
-			|| binary_reader_read_boolean(world->reader, &world->flags.downed_mech_any) < 0
-			|| binary_reader_read_boolean(world->reader, &world->flags.downed_plant) < 0
-			|| binary_reader_read_boolean(world->reader, &world->flags.downed_golem) < 0) {
+	if (binary_reader_read_boolean(world->reader, &world->flags.downed_boss_1) < 0 ||
+		binary_reader_read_boolean(world->reader, &world->flags.downed_boss_2) < 0 ||
+		binary_reader_read_boolean(world->reader, &world->flags.downed_boss_3) < 0 ||
+		binary_reader_read_boolean(world->reader, &world->flags.downed_queen_bee) < 0 ||
+		binary_reader_read_boolean(world->reader, &world->flags.downed_mech_1) < 0 ||
+		binary_reader_read_boolean(world->reader, &world->flags.downed_mech_2) < 0 ||
+		binary_reader_read_boolean(world->reader, &world->flags.downed_mech_3) < 0 ||
+		binary_reader_read_boolean(world->reader, &world->flags.downed_mech_any) < 0 ||
+		binary_reader_read_boolean(world->reader, &world->flags.downed_plant) < 0 ||
+		binary_reader_read_boolean(world->reader, &world->flags.downed_golem) < 0) {
 		_ERROR("%s: binary reader error reading world->flags.downed_*\n", __FUNCTION__);
 		ret = -1;
 		goto out;
@@ -655,20 +665,20 @@ static int __world_read_header(TALLOC_CTX *context, struct world *world)
 		}
 	}
 
-	if (binary_reader_read_boolean(world->reader, &world->flags.saved_goblin) < 0
-			|| binary_reader_read_boolean(world->reader, &world->flags.saved_wizard) < 0
-			|| binary_reader_read_boolean(world->reader, &world->flags.saved_mech) < 0) {
+	if (binary_reader_read_boolean(world->reader, &world->flags.saved_goblin) < 0 ||
+		binary_reader_read_boolean(world->reader, &world->flags.saved_wizard) < 0 ||
+		binary_reader_read_boolean(world->reader, &world->flags.saved_mech) < 0) {
 		_ERROR("%s: binary reader error reading world->flags.saved_*\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 
-	if (binary_reader_read_boolean(world->reader, &world->flags.downed_goblins) < 0
-			|| binary_reader_read_boolean(world->reader, &world->flags.downed_clowns) < 0
-			|| binary_reader_read_boolean(world->reader, &world->flags.downed_frost) < 0
-			|| binary_reader_read_boolean(world->reader, &world->flags.downed_pirates) < 0
-			|| binary_reader_read_boolean(world->reader, &world->flags.shadow_orb_smashed) < 0
-			|| binary_reader_read_boolean(world->reader, &world->flags.spawn_meteor) < 0) {
+	if (binary_reader_read_boolean(world->reader, &world->flags.downed_goblins) < 0 ||
+		binary_reader_read_boolean(world->reader, &world->flags.downed_clowns) < 0 ||
+		binary_reader_read_boolean(world->reader, &world->flags.downed_frost) < 0 ||
+		binary_reader_read_boolean(world->reader, &world->flags.downed_pirates) < 0 ||
+		binary_reader_read_boolean(world->reader, &world->flags.shadow_orb_smashed) < 0 ||
+		binary_reader_read_boolean(world->reader, &world->flags.spawn_meteor) < 0) {
 		_ERROR("%s: binary reader error reading world->flags.downed_*\n", __FUNCTION__);
 		ret = -1;
 		goto out;
@@ -679,7 +689,6 @@ static int __world_read_header(TALLOC_CTX *context, struct world *world)
 		ret = -1;
 		goto out;
 	}
-
 
 	if (binary_reader_read_int32(world->reader, &world->altar_count) < 0) {
 		_ERROR("%s: binary reader error reading world->altar_count\n", __FUNCTION__);
@@ -751,22 +760,22 @@ static int __world_read_header(TALLOC_CTX *context, struct world *world)
 		goto out;
 	}
 
-	if (binary_reader_read_int32(world->reader, &world->ore_tiers[0]) < 0
-			|| binary_reader_read_int32(world->reader, &world->ore_tiers[1]) < 0
-			|| binary_reader_read_int32(world->reader, &world->ore_tiers[2]) < 0) {
+	if (binary_reader_read_int32(world->reader, &world->ore_tiers[0]) < 0 ||
+		binary_reader_read_int32(world->reader, &world->ore_tiers[1]) < 0 ||
+		binary_reader_read_int32(world->reader, &world->ore_tiers[2]) < 0) {
 		_ERROR("%s: binary reader error reading world->ore_tiers\n", __FUNCTION__);
 		ret = -1;
 		goto out;
 	}
 
-	if (binary_reader_read_byte(world->reader, &world->bg[0]) < 0
-			|| binary_reader_read_byte(world->reader, &world->bg[1]) < 0
-			|| binary_reader_read_byte(world->reader, &world->bg[2]) < 0
-			|| binary_reader_read_byte(world->reader, &world->bg[3]) < 0
-			|| binary_reader_read_byte(world->reader, &world->bg[4]) < 0
-			|| binary_reader_read_byte(world->reader, &world->bg[5]) < 0
-			|| binary_reader_read_byte(world->reader, &world->bg[6]) < 0
-			|| binary_reader_read_byte(world->reader, &world->bg[7]) < 0) {
+	if (binary_reader_read_byte(world->reader, &world->bg[0]) < 0 ||
+		binary_reader_read_byte(world->reader, &world->bg[1]) < 0 ||
+		binary_reader_read_byte(world->reader, &world->bg[2]) < 0 ||
+		binary_reader_read_byte(world->reader, &world->bg[3]) < 0 ||
+		binary_reader_read_byte(world->reader, &world->bg[4]) < 0 ||
+		binary_reader_read_byte(world->reader, &world->bg[5]) < 0 ||
+		binary_reader_read_byte(world->reader, &world->bg[6]) < 0 ||
+		binary_reader_read_byte(world->reader, &world->bg[7]) < 0) {
 		_ERROR("%s: binary reader error reading world->bg\n", __FUNCTION__);
 		ret = -1;
 		goto out;
@@ -880,15 +889,15 @@ static int __world_read_header(TALLOC_CTX *context, struct world *world)
 		goto out;
 	}
 
-	if (binary_reader_read_boolean(world->reader, &world->flags.downed_fishron) < 0
-		|| binary_reader_read_boolean(world->reader, &world->flags.downed_martians) < 0
-		|| binary_reader_read_boolean(world->reader, &world->flags.downed_ancient_cultist) < 0
-		|| binary_reader_read_boolean(world->reader, &world->flags.downed_moonlord) < 0
-		|| binary_reader_read_boolean(world->reader, &world->flags.downed_halloween_king) < 0
-		|| binary_reader_read_boolean(world->reader, &world->flags.downed_halloween_tree) < 0
-		|| binary_reader_read_boolean(world->reader, &world->flags.downed_christmas_ice_queen) < 0
-		|| binary_reader_read_boolean(world->reader, &world->flags.downed_christmas_santank) < 0
-		|| binary_reader_read_boolean(world->reader, &world->flags.downed_christmas_tree) < 0) {
+	if (binary_reader_read_boolean(world->reader, &world->flags.downed_fishron) < 0 ||
+		binary_reader_read_boolean(world->reader, &world->flags.downed_martians) < 0 ||
+		binary_reader_read_boolean(world->reader, &world->flags.downed_ancient_cultist) < 0 ||
+		binary_reader_read_boolean(world->reader, &world->flags.downed_moonlord) < 0 ||
+		binary_reader_read_boolean(world->reader, &world->flags.downed_halloween_king) < 0 ||
+		binary_reader_read_boolean(world->reader, &world->flags.downed_halloween_tree) < 0 ||
+		binary_reader_read_boolean(world->reader, &world->flags.downed_christmas_ice_queen) < 0 ||
+		binary_reader_read_boolean(world->reader, &world->flags.downed_christmas_santank) < 0 ||
+		binary_reader_read_boolean(world->reader, &world->flags.downed_christmas_tree) < 0) {
 		_ERROR("%s: binary reader error reading world->flags.downed_*\n", __FUNCTION__);
 		ret = -1;
 		goto out;
@@ -899,15 +908,15 @@ static int __world_read_header(TALLOC_CTX *context, struct world *world)
 		goto out;
 	}
 
-	if (binary_reader_read_boolean(world->reader, &world->flags.downed_tower_solar) < 0
-			|| binary_reader_read_boolean(world->reader, &world->flags.downed_tower_vortex) < 0
-			|| binary_reader_read_boolean(world->reader, &world->flags.downed_tower_nebula) < 0
-			|| binary_reader_read_boolean(world->reader, &world->flags.downed_tower_stardust) < 0
-			|| binary_reader_read_boolean(world->reader, &world->flags.active_tower_solar) < 0
-			|| binary_reader_read_boolean(world->reader, &world->flags.active_tower_vortex) < 0
-			|| binary_reader_read_boolean(world->reader, &world->flags.active_tower_nebula) < 0
-			|| binary_reader_read_boolean(world->reader, &world->flags.active_tower_stardust) < 0
-			|| binary_reader_read_boolean(world->reader, &world->flags.lunar_apocalypse_up) < 0) {
+	if (binary_reader_read_boolean(world->reader, &world->flags.downed_tower_solar) < 0 ||
+		binary_reader_read_boolean(world->reader, &world->flags.downed_tower_vortex) < 0 ||
+		binary_reader_read_boolean(world->reader, &world->flags.downed_tower_nebula) < 0 ||
+		binary_reader_read_boolean(world->reader, &world->flags.downed_tower_stardust) < 0 ||
+		binary_reader_read_boolean(world->reader, &world->flags.active_tower_solar) < 0 ||
+		binary_reader_read_boolean(world->reader, &world->flags.active_tower_vortex) < 0 ||
+		binary_reader_read_boolean(world->reader, &world->flags.active_tower_nebula) < 0 ||
+		binary_reader_read_boolean(world->reader, &world->flags.active_tower_stardust) < 0 ||
+		binary_reader_read_boolean(world->reader, &world->flags.lunar_apocalypse_up) < 0) {
 		_ERROR("%s: binary reader error reading world->flags.downed_fishron\n", __FUNCTION__);
 		ret = -1;
 		goto out;
@@ -920,7 +929,8 @@ out:
 	return ret;
 }
 
-int world_init(TALLOC_CTX *context, struct world *world, const char *world_path)
+int
+world_init(TALLOC_CTX *context, struct world *world, const char *world_path)
 {
 	int ret = 0;
 
@@ -956,19 +966,28 @@ int world_init(TALLOC_CTX *context, struct world *world, const char *world_path)
 	}
 
 	world_section_init(context, world);
-	//world_section_compressor_start(world);
+	// world_section_compressor_start(world);
 
 out:
 	return ret;
 }
 
-struct tile *world_tile_at(struct world *world, const uint32_t x, const uint32_t y)
+struct tile *
+world_tile_at(struct world *world, const uint32_t x, const uint32_t y)
 {
-	return &world->tiles[x][y];
+	if (x > world->max_tiles_x || y > world->max_tiles_y) {
+		_ERROR("%s: warning: asked for tile which is outside the bounds of the world: %d,%d for a ", __FUNCTION__, x,
+			   y);
+
+		return NULL;
+	}
+
+	return &world->tile_container.tile_memory[y * world->max_tiles_x + x];
 }
 
-int world_pack_tile_section(TALLOC_CTX *context, struct world *world, struct rect rect,
-							uint8_t *tile_buffer, int *out_buf_len)
+int
+world_pack_tile_section(TALLOC_CTX *context, struct world *world, struct rect rect, uint8_t *tile_buffer,
+						int *out_buf_len)
 {
 	struct tile *tile;
 	int staging_len = 0, pos = 0, ret = -1;
@@ -977,28 +996,28 @@ int world_pack_tile_section(TALLOC_CTX *context, struct world *world, struct rec
 	uint8_t staging_buffer[13];
 
 	for (unsigned y = rect.y; y < rect.y + rect.h; y++)
-	for (unsigned x = rect.x; x < rect.x + rect.w; x++) {
-		tile = world_tile_at(world, x, y);
+		for (unsigned x = rect.x; x < rect.x + rect.w; x++) {
+			tile = world_tile_at(world, x, y);
 
-		header_1 = header_2 = header_3 = 0;
-		
-		staging_len = tile_pack(world->game, tile, staging_buffer, &header_1, &header_2, &header_3);
-		pos += binary_writer_write_value(tile_buffer + pos, header_1);
+			header_1 = header_2 = header_3 = 0;
 
-		if ((header_1 & 1) == 1) {
-			pos += binary_writer_write_value(tile_buffer + pos, header_2);
+			staging_len = tile_pack(world->game, tile, staging_buffer, &header_1, &header_2, &header_3);
+			pos += binary_writer_write_value(tile_buffer + pos, header_1);
 
-			if ((header_2 & 1) == 1) {
-				pos += binary_writer_write_value(tile_buffer + pos, header_3);
+			if ((header_1 & 1) == 1) {
+				pos += binary_writer_write_value(tile_buffer + pos, header_2);
+
+				if ((header_2 & 1) == 1) {
+					pos += binary_writer_write_value(tile_buffer + pos, header_3);
+				}
 			}
-		}
 
-		if (tile_buffer != NULL) {
-			memcpy(tile_buffer + pos, staging_buffer, staging_len);
-		}
+			if (tile_buffer != NULL) {
+				memcpy(tile_buffer + pos, staging_buffer, staging_len);
+			}
 
-		pos += staging_len;
-	}
+			pos += staging_len;
+		}
 
 	*out_buf_len = pos;
 

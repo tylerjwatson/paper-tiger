@@ -3,37 +3,38 @@
  * Copyright (C) 2016  Tyler Watson <tyler@tw.id.au>
  *
  * This file is part of paper-tiger.
- * 
+ *
  * paper-tiger is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * paper-tiger is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <assert.h>
 #include <string.h>
 #include <zlib.h>
-#include <assert.h>
 
 #include "world_section.h"
 
-#include "world.h"
-#include "tile.h"
+#include "binary_writer.h"
+#include "bitmap.h"
 #include "game.h"
 #include "rect.h"
-#include "vector_2d.h"
+#include "tile.h"
 #include "util.h"
-#include "bitmap.h"
-#include "binary_writer.h"
+#include "vector_2d.h"
+#include "world.h"
 
-static int __zstream_init(z_stream *stream)
+static int
+__zstream_init(z_stream *stream)
 {
 	stream->zalloc = Z_NULL;
 	stream->zfree = Z_NULL;
@@ -42,7 +43,8 @@ static int __zstream_init(z_stream *stream)
 	return deflateInit(stream, Z_DEFAULT_COMPRESSION);
 }
 
-int world_section_compress(const struct world *world, unsigned section, uint8_t *buffer)
+int
+world_section_compress(const struct world *world, unsigned section, uint8_t *buffer)
 {
 	struct rect tile_rect;
 	struct tile *tile;
@@ -58,12 +60,12 @@ int world_section_compress(const struct world *world, unsigned section, uint8_t 
 	 * The section header rectangle must be written to the input first
 	 * before the tile stream.
 	 */
-	
+
 	in_pos += binary_writer_write_value(in + in_pos, tile_rect.x);
 	in_pos += binary_writer_write_value(in + in_pos, tile_rect.y);
 	in_pos += binary_writer_write_value(in + in_pos, tile_rect.w);
 	in_pos += binary_writer_write_value(in + in_pos, tile_rect.h);
-	
+
 	if (__zstream_init(&compression_stream) != Z_OK) {
 		_ERROR("%s: cannot initialize zlib for compression routines.\n", __FUNCTION__);
 		return -1;
@@ -98,40 +100,41 @@ int world_section_compress(const struct world *world, unsigned section, uint8_t 
 		} while (compression_stream.avail_out == 0);
 		in_pos = 0;
 	}
-	
+
 	/*
 	 * Tile entity count, chest count and sign count
 	 */
 	compression_stream.avail_in = 6;
 	memset(in, 0, 6);
 	compression_stream.next_in = in;
-	
+
 	do {
 		compression_stream.avail_out = Z_CHUNK;
 		compression_stream.next_out = out;
-		
+
 		ret = deflate(&compression_stream, Z_FINISH);
 		have = Z_CHUNK - compression_stream.avail_out;
-		
+
 		memcpy(&buffer[buffer_pos], out, have);
 		buffer_pos += have;
 	} while (compression_stream.avail_out == 0);
-	
+
 	ret = buffer_pos;
 out:
 	deflateEnd(&compression_stream);
-	
+
 	return ret;
 }
 
-static void __compress_section(uv_timer_t *handle)
+static void
+__compress_section(uv_timer_t *handle)
 {
 	struct world *world = (struct world *)handle->data;
 	struct world_section_data *section_data;
-	
+
 	uint8_t buffer[Z_CHUNK];
 	int section_len;
-	
+
 	for (unsigned section = 0; section < world->max_sections; section++) {
 		if (bitmap_get(world->section_dirty, section) == false) {
 			continue;
@@ -147,20 +150,20 @@ static void __compress_section(uv_timer_t *handle)
 		 * If a section fails to zcompress then it remains dirty and will be tackled
 		 * again next round.
 		 */
-		 
-		//printf("compressing section %d\n", section);
+
+		// printf("compressing section %d\n", section);
 		section_len = world_section_compress(world, section, buffer);
 		if (section_len < 0) {
 			_ERROR("%s: zcompressor error compressing section %d.\n", __FUNCTION__, section);
 			continue;
 		}
-		
+
 		section_data = &world->section_data[section];
 		memcpy(section_data->data, buffer, section_len);
 		section_data->len = section_len;
-		
+
 		bitmap_clear(world->section_dirty, section);
-		
+
 		/*
 		 * The compressor worker only compresses one section at a time per
 		 * iteration of the compressor loop.
@@ -169,52 +172,55 @@ static void __compress_section(uv_timer_t *handle)
 	}
 }
 
-int world_section_compressor_start(struct world *world)
+int
+world_section_compressor_start(struct world *world)
 {
 	uv_timer_start(&world->section_compress_worker, __compress_section, 0, 100);
 
 	return 0;
 }
 
-static int world_section_init_section_data(TALLOC_CTX *context, struct world *world)
+static int
+world_section_init_section_data(TALLOC_CTX *context, struct world *world)
 {
 	int ret = -1;
 	TALLOC_CTX *temp_context;
 	struct world_section_data *section_data;
-	
+
 	temp_context = talloc_new(NULL);
 	if (temp_context == NULL) {
 		_ERROR("%s: out of memory allocating temp context for section data.\n", __FUNCTION__);
 		ret = -ENOMEM;
 		goto out;
 	}
-	
+
 	section_data = talloc_zero_array(temp_context, struct world_section_data, world->max_sections);
 	if (section_data == NULL) {
 		_ERROR("%s: out of memory allocating section data array.\n", __FUNCTION__);
 		ret = -ENOMEM;
 		goto out;
 	}
-	
-	for(unsigned i = 0; i < world->max_sections; i++) {
+
+	for (unsigned i = 0; i < world->max_sections; i++) {
 		section_data[i].section = i;
 	}
-	
+
 	world->section_data = talloc_steal(context, section_data);
-	
+
 	ret = 0;
 out:
 	talloc_free(temp_context);
 	return ret;
 }
 
-static int world_section_compress_all(struct world *world)
+static int
+world_section_compress_all(struct world *world)
 {
 	struct world_section_data *section_data;
-	
+
 	uint8_t buffer[Z_CHUNK];
 	int section_len;
-	
+
 	for (unsigned section = 0; section < world->max_sections; section++) {
 		/*
 		 * Note:
@@ -227,23 +233,24 @@ static int world_section_compress_all(struct world *world)
 		 * If a section fails to zcompress then it remains dirty and will be tackled
 		 * again next round.
 		 */
-		
+
 		section_len = world_section_compress(world, section, buffer);
 		if (section_len < 0) {
 			_ERROR("%s: zcompressor error compressing section %d.\n", __FUNCTION__, section);
 			return -1;
 		}
-		
+
 		section_data = &world->section_data[section];
-		
+
 		memcpy(section_data->data, buffer, section_len);
 		section_data->len = section_len;
 	}
-	
+
 	return 0;
 }
 
-int world_section_init(TALLOC_CTX *context, struct world *world)
+int
+world_section_init(TALLOC_CTX *context, struct world *world)
 {
 	int ret = -1;
 	TALLOC_CTX *temp_context;
@@ -271,12 +278,12 @@ int world_section_init(TALLOC_CTX *context, struct world *world)
 		_ERROR("%s: init section data failed.\n", __FUNCTION__);
 		goto out;
 	}
-	
+
 	if (world_section_compress_all(world) < 0) {
 		_ERROR("%s: compressing section data failed.\n", __FUNCTION__);
 		goto out;
 	}
-	
+
 	ret = 0;
 
 	/*
@@ -288,7 +295,8 @@ out:
 	return ret;
 }
 
-struct vector_2d world_section_num_to_coords(const struct world *world, unsigned section)
+struct vector_2d
+world_section_num_to_coords(const struct world *world, unsigned section)
 {
 	struct vector_2d coords;
 
@@ -298,7 +306,8 @@ struct vector_2d world_section_num_to_coords(const struct world *world, unsigned
 	return coords;
 }
 
-int world_section_to_tile_rect(const struct world *world, unsigned section, struct rect *out_rect)
+int
+world_section_to_tile_rect(const struct world *world, unsigned section, struct rect *out_rect)
 {
 	struct rect r;
 	struct vector_2d section_coords;
@@ -312,51 +321,55 @@ int world_section_to_tile_rect(const struct world *world, unsigned section, stru
 	r.x = section_coords.x * WORLD_SECTION_WIDTH;
 	r.y = section_coords.y * WORLD_SECTION_HEIGHT;
 	r.w = WORLD_SECTION_WIDTH;
-	r.h	= WORLD_SECTION_HEIGHT;
+	r.h = WORLD_SECTION_HEIGHT;
 
 	*out_rect = r;
 
 	return 0;
 }
 
-struct rect world_section_for_tile_coords(const struct world *world, uint16_t tile_x, uint16_t tile_y)
+struct rect
+world_section_for_tile_coords(const struct world *world, uint16_t tile_x, uint16_t tile_y)
 {
 	struct rect top_rect;
-	
+
 	top_rect.x = (tile_x / WORLD_SECTION_WIDTH) * WORLD_SECTION_WIDTH;
 	top_rect.y = (tile_y / WORLD_SECTION_HEIGHT) * WORLD_SECTION_HEIGHT;
 	top_rect.w = WORLD_SECTION_WIDTH;
 	top_rect.h = WORLD_SECTION_HEIGHT;
-	
+
 	return top_rect;
 }
 
-static unsigned int world_section_coords_to_num(const struct world *world, unsigned x, unsigned y)
+static unsigned int
+world_section_coords_to_num(const struct world *world, unsigned x, unsigned y)
 {
 	return world->max_sections_y * x + y;
 }
 
-unsigned int world_section_num_for_tile_coords(const struct world *world, uint16_t tile_x, uint16_t tile_y)
+unsigned int
+world_section_num_for_tile_coords(const struct world *world, uint16_t tile_x, uint16_t tile_y)
 {
 	struct rect tile_coords;
 	unsigned sec;
-	
+
 	tile_coords = world_section_for_tile_coords(world, tile_x, tile_y);
 	tile_coords.x /= WORLD_SECTION_WIDTH;
 	tile_coords.y /= WORLD_SECTION_HEIGHT;
-	
+
 	sec = world_section_coords_to_num(world, tile_coords.x, tile_coords.y);
-	
+
 	return sec;
 }
 
-int world_section_cube(const struct world *world, unsigned section, struct vector_2d *section_list)
+int
+world_section_cube(const struct world *world, unsigned section, struct vector_2d *section_list)
 {
 	return -1;
 }
 
-int world_section_send_list(const struct world *world, const struct player *player,
-							int section_len, unsigned *in_sections)
+int
+world_section_send_list(const struct world *world, const struct player *player, int section_len, unsigned *in_sections)
 {
 	return -1;
 }

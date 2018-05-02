@@ -22,15 +22,16 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "talloc/talloc.h"
 #include "binary_writer.h"
+#include "talloc/talloc.h"
 #include "util.h"
 
-int binary_writer_7bit_len(int value)
+int
+binary_writer_7bit_len(int value)
 {
 	int count = 1;
 
-	uint32_t v = (uint32_t) value;   // support negative numbers
+	uint32_t v = (uint32_t)value; // support negative numbers
 	while (v >= 0x80) {
 		count++;
 		v >>= 7;
@@ -39,9 +40,10 @@ int binary_writer_7bit_len(int value)
 	return count;
 }
 
-void binary_writer_write_7bit_int(uint8_t *buf, int value, int *pos)
+void
+binary_writer_write_7bit_int(uint8_t *buf, int value, int *pos)
 {
-	uint32_t v = (uint32_t) value;   // support negative numbers
+	uint32_t v = (uint32_t)value; // support negative numbers
 
 	while (v >= 0x80) {
 		buf[*pos] = (uint8_t)(v | 0x80);
@@ -53,10 +55,11 @@ void binary_writer_write_7bit_int(uint8_t *buf, int value, int *pos)
 	(*pos)++;
 }
 
-int binary_writer_write_string(void *dest, const char *src)
+int
+binary_writer_write_string(void *dest, const char *src)
 {
 	int len, pos = 0;
-	
+
 	len = strlen(src);
 
 	/*
@@ -64,7 +67,7 @@ int binary_writer_write_string(void *dest, const char *src)
 	 */
 
 	binary_writer_write_7bit_int(dest, len, &pos);
-	memcpy(((char *)dest) + pos, src, len); 
+	memcpy(((char *)dest) + pos, src, len);
 
 	return len + binary_writer_7bit_len(len);
 }

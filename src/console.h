@@ -33,11 +33,11 @@ struct game;
 /**
  * @defgroup console Console subsystem
  * @ingroup paper-tiger
- * 
+ *
  * The console and command subsystem uses libuv tty handles to read input
  * from stdin (or another source) in a cross-platform manner, and pass the
  * string input to the command system once the parameters have been parsed.
- * 
+ *
  * @{
  */
 
@@ -78,10 +78,9 @@ struct console_command {
 /**
  * Describes a function to be called when a command is entered into the console.
  */
-typedef int(*console_command_cb)(struct game *game, struct console_command *command);
+typedef int (*console_command_cb)(struct game *game, struct console_command *command);
 
-
-/** 
+/**
  * Describes a console command handler which is entered into the table of command
  * handlers in @a console.c.
  */
@@ -93,20 +92,22 @@ struct console_command_handler {
 
 /**
  * @brief Initializes a newly-allocated console context.
- * 
+ *
  * Initializes the libuv tty handle contained in @ref console->console_handle to accept input
  * to and from stdin.
- * 
+ *
  * @param[in]		console		A pointer to the console object allocated with a call to
  * 								@a console_new
- * 
+ *
  * @returns
  * `0` if the initialization was successful, `< 0` otherwise.  If this function cannot
  * return successfully, paper tiger will be unable to process console input.
  */
-int console_init(struct console *console, struct game *game);
+int
+console_init(struct console *console, struct game *game);
 
-void console_vsprintf(const struct console *console, const char *fmt, ...);
+void
+console_vsprintf(const struct console *console, const char *fmt, ...);
 
 /**
  * @}
@@ -115,4 +116,3 @@ void console_vsprintf(const struct console *console, const char *fmt, ...);
 #ifdef __cplusplus
 }
 #endif
-

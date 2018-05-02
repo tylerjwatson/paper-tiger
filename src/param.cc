@@ -3,12 +3,14 @@
 
 #include <regex>
 
-//shamelessly stolen from http://stackoverflow.com/questions/554013/regular-expression-to-split-on-spaces-unless-in-quotes
+// shamelessly stolen from
+// http://stackoverflow.com/questions/554013/regular-expression-to-split-on-spaces-unless-in-quotes
 static const char *REGEX_PARAM = "[^\\s\"']+|\"([^\"]*)\"|'([^']*)'";
 
 static const std::regex __param_regex(REGEX_PARAM);
 
-static int __param_init(struct param *param)
+static int
+__param_init(struct param *param)
 {
 	param->input_string[strcspn(param->input_string, "\r\n")] = '\0';
 
@@ -19,7 +21,7 @@ static int __param_init(struct param *param)
 
 	param->num_parameters = std::distance(params_begin, params_end);
 
-	//if (param->num_parameters > 1) {
+	// if (param->num_parameters > 1) {
 	//	/*
 	//	 * Discard the end-most match as it seems to be rubbish.
 	//	 *
@@ -53,7 +55,8 @@ static int __param_init(struct param *param)
 	return 0;
 }
 
-int param_new(TALLOC_CTX *context, const char *input_string, struct param **out_param)
+int
+param_new(TALLOC_CTX *context, const char *input_string, struct param **out_param)
 {
 	int ret = -1;
 	TALLOC_CTX *temp_context;
@@ -91,7 +94,8 @@ out:
 	return ret;
 }
 
-void param_free(struct param *param)
+void
+param_free(struct param *param)
 {
 	talloc_free(param);
 }

@@ -20,9 +20,9 @@
 
 #pragma once
 
-#include <limits.h>    /* for CHAR_BIT */
-#include <stdint.h>   /* for uint32_t */
+#include <limits.h> /* for CHAR_BIT */
 #include <stdbool.h>
+#include <stdint.h> /* for uint32_t */
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,30 +30,30 @@ extern "C" {
 
 typedef uint32_t word_t;
 
-enum {
-    BITS_PER_WORD = sizeof(word_t) * CHAR_BIT
-};
+enum { BITS_PER_WORD = sizeof(word_t) * CHAR_BIT };
 
 #define WORD_OFFSET(b) ((b) / BITS_PER_WORD)
-#define BIT_OFFSET(b)  ((b) % BITS_PER_WORD)
+#define BIT_OFFSET(b) ((b) % BITS_PER_WORD)
 
-static inline void bitmap_set(word_t *words, int n)
+static inline void
+bitmap_set(word_t *words, int n)
 {
-    words[WORD_OFFSET(n)] |= (1 << BIT_OFFSET(n));
+	words[WORD_OFFSET(n)] |= (1 << BIT_OFFSET(n));
 }
 
-static inline void bitmap_clear(word_t *words, int n)
+static inline void
+bitmap_clear(word_t *words, int n)
 {
-    words[WORD_OFFSET(n)] &= ~(1 << BIT_OFFSET(n));
+	words[WORD_OFFSET(n)] &= ~(1 << BIT_OFFSET(n));
 }
 
-static inline bool bitmap_get(word_t *words, int n)
+static inline bool
+bitmap_get(word_t *words, int n)
 {
-    word_t bit = words[WORD_OFFSET(n)] & (1 << BIT_OFFSET(n));
-    return bit != 0;
+	word_t bit = words[WORD_OFFSET(n)] & (1 << BIT_OFFSET(n));
+	return bit != 0;
 }
 
 #ifdef __cplusplus
 }
 #endif
-

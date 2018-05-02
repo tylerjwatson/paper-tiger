@@ -18,20 +18,21 @@
  * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <string>
 #include <fstream>
 #include <stdbool.h>
+#include <string>
 
 #include "talloc/talloc.h"
 
 #include "dataloader.h"
-#include "util.h"
 #include "game.h"
+#include "util.h"
 #include "world.h"
 
 #include "tile_flags.pb.h"
 
-int dataloader_load_tile_flags(struct game *game)
+int
+dataloader_load_tile_flags(struct game *game)
 {
 	int ret = -1;
 	TALLOC_CTX *temp_context;
@@ -64,7 +65,7 @@ int dataloader_load_tile_flags(struct game *game)
 	}
 
 	for (int i = 0; i < game->num_tile_frame_important; i++) {
-		const bool& flags = tile_flags.tile_frame_important(i);
+		const bool &flags = tile_flags.tile_frame_important(i);
 		tile_frame_important[i] = flags;
 	}
 
