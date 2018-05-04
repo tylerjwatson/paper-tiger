@@ -36,10 +36,10 @@ int chat_message_handle(struct player *player, struct packet *packet)
 	struct chat_message *chat_message = (struct chat_message *)packet->data;
 
 	console_vsprintf(&player->game->console, "<\033[33;1m%s\033[0m> %s\n", player->name, chat_message->message);
-	
+
 	chat_message->id = player->id;
 
-	server_broadcast_packet(player->game->server, packet, -1);
+	server_broadcast_packet(&player->game->server, packet, -1);
 
 	return 0;
 }
@@ -52,7 +52,7 @@ int chat_message_new(TALLOC_CTX *ctx, const struct player *player, const struct 
 	struct packet *packet;
 	struct chat_message *chat_message;
 	char *message_copy;
-	
+
 	temp_context = talloc_new(NULL);
 	if (temp_context == NULL) {
 		_ERROR("%s: out of memory allocating temp context for packet %d\n", __FUNCTION__, PACKET_TYPE_CHAT_MESSAGE);
@@ -73,23 +73,23 @@ int chat_message_new(TALLOC_CTX *ctx, const struct player *player, const struct 
 		ret = -ENOMEM;
 		goto out;
 	}
-	
+
 	packet->type = PACKET_TYPE_CHAT_MESSAGE;
 	packet->len = PACKET_HEADER_SIZE + strlen(message) + binary_writer_7bit_len(strlen(message));
 
 	chat_message->id = player->id;
 	chat_message->colour = colour;
-	
-	
+
+
 	message_copy = talloc_strdup(temp_context, message);
 	if (message_copy == NULL) {
 		_ERROR("%s: out of memory copying chat message to packet.\n", __FUNCTION__);
 		ret = -ENOMEM;
 		goto out;
 	}
-	
+
 	chat_message->message = talloc_steal(packet, message_copy);
-	
+
 	packet->data = (void *)talloc_steal(packet, chat_message);
 
 	*out_packet = (struct packet *)talloc_steal(ctx, packet);

@@ -133,13 +133,15 @@ main(int argc, char **argv)
 	diff = clock() - start;
 	printf("done (%dms).\n", (int)(diff * 1000 / CLOCKS_PER_SEC));
 
-	if (server_new(game, "0.0.0.0", 7777, game, &game->server) < 0) {
+	if (server_init(game, &game->server, "0.0.0.0", 7777) < 0) {
 		_ERROR("Initializing TCP server for game context failed.\n");
 		ret = -1;
 		goto out;
 	}
 
-	if (server_start(game->server) < 0) {
+    game->server.game = game;
+
+	if (server_start(&game->server) < 0) {
 		_ERROR("Starting server for game context failed.\n");
 		ret = -1;
 		goto out;
@@ -147,7 +149,7 @@ main(int argc, char **argv)
 
 	game_update_loop_init(game);
 
-	printf("\nStarted successfully on %s:%d\n", game->server->listen_address, game->server->port);
+	printf("\nStarted successfully on %s:%d\n", game->server.listen_address, game->server.port);
 
 	printf(" * %s (%dx%d)\n", world.world_name, world.max_tiles_x, world.max_tiles_y);
 

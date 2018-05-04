@@ -120,7 +120,9 @@ tile_container_init(TALLOC_CTX *context, struct tile_container *container, struc
 
 	write(fd, "", 1);
 
-	if (container->tile_memory = mmap(NULL, tile_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0) == MAP_FAILED) {
+	if ((container->tile_memory = (struct tile *)mmap(NULL, tile_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0)) ==
+		MAP_FAILED) {
+		return -1;
 	}
 
 	container->mmap_size = tile_size;

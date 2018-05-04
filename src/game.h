@@ -84,7 +84,7 @@ struct game {
 	 * Pointer to the TCP server subsystem which accepts TCP clients and deals with
 	 * packet communication to and from connected clients.
 	 */
-	struct server *server;
+	struct server server;
 
 	/**
 	 * Array of players.

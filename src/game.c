@@ -234,7 +234,7 @@ game_send_message(const struct game *game, const struct player *player, const st
 
 	((struct chat_message *)chat_packet->data)->id = 0xFF; // nameless broadcast
 
-	server_send_packet(game->server, player, chat_packet);
+	server_send_packet(&game->server, player, chat_packet);
 
 	return -1;
 }
@@ -277,9 +277,9 @@ game_sync_players(const struct game *game, const struct player *new_player)
 		goto player_mana_out;
 	}
 
-	server_broadcast_packet(game->server, player_info, new_player->id);
-	server_broadcast_packet(game->server, hp, new_player->id);
-	server_broadcast_packet(game->server, mp, new_player->id);
+	server_broadcast_packet(&game->server, player_info, new_player->id);
+	server_broadcast_packet(&game->server, hp, new_player->id);
+	server_broadcast_packet(&game->server, mp, new_player->id);
 
 	ret = 0;
 
@@ -322,7 +322,7 @@ game_send_world(const struct game *game, const struct player *player)
 		goto out;
 	}
 
-	server_send_packet(game->server, player, status);
+	server_send_packet(&game->server, player, status);
 
 	for (unsigned section = 0; section < game->world.max_sections; section++) {
 		section_coords = world_section_num_to_coords(&player->game->world, section);
@@ -339,8 +339,8 @@ game_send_world(const struct game *game, const struct player *player)
 			goto out;
 		}
 
-		server_send_packet(game->server, player, tile_section);
-		server_send_packet(game->server, player, section_frame);
+		server_send_packet(&game->server, player, tile_section);
+		server_send_packet(&game->server, player, section_frame);
 
 		talloc_free(tile_section);
 		talloc_free(section_frame);

@@ -67,7 +67,7 @@ struct server {
 	 * libuv TCP handle which is the TCP listener presenting network I/O on the game's event
 	 * loop.
 	 */
-	uv_tcp_t *tcp_handle;
+	uv_tcp_t tcp_handle;
 };
 
 /**
@@ -95,8 +95,8 @@ struct server {
  * `0` if the server context was allocated successfully, `< 0` if an error occurred.
  */
 int
-server_new(TALLOC_CTX *context, const char *listen_address, const uint16_t port, struct game *game,
-		   struct server **out_server);
+server_init(TALLOC_CTX *context, struct server *server, const char *listen_address, const uint16_t port);
+
 
 /**
  * @brief starts the server

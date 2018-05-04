@@ -44,7 +44,7 @@ int continue_connecting2_handle(struct player *player, struct packet *packet)
 		return -1;
 	}
 
-	server_send_packet(player->game->server, player, world_info);
+	server_send_packet(&player->game->server, player, world_info);
 
 	return 0;
 }

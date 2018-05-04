@@ -113,7 +113,7 @@ __handle_disconnect(struct game *game, struct console_command *command)
 		return -2;
 	}
 
-	server_send_packet(player->game->server, player, disconnect);
+	server_send_packet(&player->game->server, player, disconnect);
 
 	talloc_free(disconnect);
 

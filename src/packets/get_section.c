@@ -19,7 +19,7 @@
 */
 
 #include <string.h>
-#include <stdbool.h> 
+#include <stdbool.h>
 
 #include "get_section.h"
 #include "tile_section.h"
@@ -51,9 +51,9 @@ int get_section_handle(struct player *player, struct packet *packet)
 	struct get_section *get_section = (struct get_section *)packet->data;
 	struct packet *connection_complete;
 	int section_num;
-	
+
 	(void)get_section;
-	
+
 	/*
 	 * Cheat, and statically send the spawn point for now
 	 */
@@ -61,16 +61,16 @@ int get_section_handle(struct player *player, struct packet *packet)
 	section_num = world_section_num_for_tile_coords(&player->game->world, player->game->world.spawn_tile.x, player->game->world.spawn_tile.y);
 
 	game_send_world(player->game, player);
-	
+
 	if (connection_complete_new(player, player, &connection_complete) < 0) {
 		_ERROR("%s: allocating connection complete packet failed.\n", __FUNCTION__);
 		return -1;
 	}
-	
-	server_send_packet(player->game->server, player, connection_complete);
-	
+
+	server_send_packet(&player->game->server, player, connection_complete);
+
 	hook_on_player_join(player->game->hooks, player->game, player);
-	
+
 	return 0;
 }
 
@@ -87,7 +87,7 @@ int get_section_read(struct packet *packet)
 		ret = -ENOMEM;
 		goto out;
 	}
-	
+
 	get_section = talloc_zero(temp_context, struct get_section);
 	if (get_section == NULL) {
 		_ERROR("%s: out of memory allocating get section.\n", __FUNCTION__);
@@ -104,6 +104,6 @@ int get_section_read(struct packet *packet)
 	ret = 0;
 out:
 	talloc_free(temp_context);
-	
+
 	return ret;
 }

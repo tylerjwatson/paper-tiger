@@ -115,11 +115,17 @@ packet_handler_for_type(uint8_t type)
 int
 packet_read_header(const uv_buf_t *buf, uint8_t *out_type, uint16_t *out_len)
 {
+	uint16_t len;
+	uint8_t packet_type;
+
 	if (buf->len < 3) {
 		return -1;
 	}
 
-	*out_len = *(uint16_t *)buf->base;
+	packet_type = buf->base[2];
+	len = ntohs(*(uint16_t *)buf->base);
+
+	*out_len = len;
 	*out_type = buf->base[2];
 
 	return 0;
