@@ -112,7 +112,7 @@ tile_container_init(TALLOC_CTX *context, struct tile_container *container, struc
 	}
 
 	if (lseek(fd, tile_size, SEEK_SET) < 0) {
-		_ERROR("%s: cannot seek %s to %d bytes: %s\n", __FUNCTION__, container->mmap_file_name, tile_size,
+		_ERROR("%s: cannot seek %s to %zu bytes: %s\n", __FUNCTION__, container->mmap_file_name, tile_size,
 			   strerror(errno));
 		ret = -1;
 		goto error;

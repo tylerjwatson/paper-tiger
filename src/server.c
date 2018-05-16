@@ -179,6 +179,8 @@ server_send(const struct server *server, struct packet *packet)
 	 * all recipients.
 	 */
 	talloc_steal(server, packet);
+
+	return ret;
 }
 
 int
@@ -190,10 +192,10 @@ server_send_packet(const struct server *server, const struct player *player, con
 int
 server_init(TALLOC_CTX *context, struct server *server, const char *listen_address, const uint16_t port)
 {
-    server->port = port > 0 ? port : 7777;
-    server->listen_address = talloc_strdup(context, listen_address);
+	server->port = port > 0 ? port : 7777;
+	server->listen_address = talloc_strdup(context, listen_address);
 
-    return 0;
+	return 0;
 }
 
 int
