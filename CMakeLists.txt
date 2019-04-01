@@ -4,7 +4,6 @@ project(paper-tiger)
 set(CMAKE_CXX_STANDARD 11)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/CMakeModules")
-set(PROTOBUF_IMPORT_DIRS "${PROJECT_SOURCE_DIR}/src/proto")
 
 if(NOT CMAKE_LIBRARY_ARCHITECTURE)
 	set(CMAKE_LIBRARY_ARCHITECTURE "x86")
@@ -18,21 +17,6 @@ else()
 endif()
 
 include(FindZLIB)
-include(FindProtobuf)
-
-if(NOT PROTOBUF_FOUND)
-	message(FATAL_ERROR "libprotobuf not found and is required.")
-endif()
-
-if(WIN32)
-	find_library(PROTO_LIB_DEBUG
-		NAMES libprotobufd
-	)
-
-	find_library(PROTO_LIB_RELEASE
-		NAMES libprotobuf
-	)
-endif(WIN32)
 
 if(NOT ZLIB_FOUND)
 	message(FATAL_ERROR "zlib not found and is required.")
@@ -42,21 +26,12 @@ if(NOT LIBUV_FOUND)
 	message(FATAL_ERROR "LibUV not found and is required.")
 endif()
 
-
-file(GLOB PROTO_DEF "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/*.proto")
-
-#proto generator
-protobuf_generate_cpp(PROTO_SRCS PROTO_HEADERS ${PROTO_DEF})
-
-SET(PROTOBUF_GENERATE_CPP_APPEND_PATH PROTOBUF)
 	
 add_library(talloc STATIC src/talloc/talloc.c)
 
-include_directories("${PROJECT_SOURCE_DIR}" 
+include_directories("${PROJECT_SOURCE_DIR}/include" 
 					"${LIBUV_INCLUDE_DIRS}" 
-					"${ZLIB_INCLUDE_DIRS}"
-					"${PROTOBUF_INCLUDE_DIRS}"
-					"${CMAKE_CURRENT_BINARY_DIR}")				
+					"${ZLIB_INCLUDE_DIRS}")				
 
 
 add_executable(paper-tiger
@@ -133,23 +108,12 @@ add_executable(paper-tiger
 
 	${PROTO_SRCS}
 	${PROTO_HEADERS})
-
-SET_SOURCE_FILES_PROPERTIES(${PROTO_SRCS} ${PROTO_HEADERS} PROPERTIES GENERATED TRUE)
-
-source_group("packets" FILES continue_connecting.c)
 	
 set_property(TARGET paper-tiger PROPERTY C_STANDARD 11)
-
-IF(WIN32)
-	set(PROTO_LIB optimized ${PROTO_LIB_RELEASE} debug ${PROTO_LIB_DEBUG})
-ELSE(WIN32)
-	set(PROTO_LIB ${PROTOBUF_LIBRARY})
-ENDIF(WIN32)
 
 target_link_libraries(paper-tiger 
 	talloc 
 	"${LIBUV_LIBRARIES}"
-	"${ZLIB_LIBRARIES}"
-	${PROTO_LIB})
+	"${ZLIB_LIBRARIES}")
 
 install(TARGETS paper-tiger RUNTIME DESTINATION bin)

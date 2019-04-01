@@ -68,7 +68,7 @@ struct hook_context;
  * Describes a game context.  Contains all references and information that a game needs
  * in order to run.
  */
-struct game {
+typedef struct {
 	/**
 	 * Time in milliseconds that an update frame may run for.  Defaults to 60 ticks per
 	 * second.
@@ -124,7 +124,7 @@ struct game {
 	 * wish to listen for pre-programmed events.
 	 */
 	struct hook_context *hooks;
-};
+} ptGame;
 
 /**
  * @brief finds the next free slot from the game's player slot bitmap
