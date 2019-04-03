@@ -20,20 +20,13 @@
 
 #include <string.h>
 
+#include "packets/continue_connecting2.h"
+#include "packets/world_info.h"
 
-
-
-
-
-
-#include "continue_connecting2.h"
-#include "world_info.h"
-
-#include "../player.h"
-#include "../game.h"
-#include "../packet.h"
-#include "../server.h"
-#include "../util.h"
+#include "player.h"
+#include "packet.h"
+#include "server.h"
+#include "util.h"
 
 int continue_connecting2_handle(struct player *player, struct packet *packet)
 {
@@ -44,7 +37,7 @@ int continue_connecting2_handle(struct player *player, struct packet *packet)
 		return -1;
 	}
 
-	server_send_packet(&player->game->server, player, world_info);
+	server_send_packet(player->game->server, player, world_info);
 
 	return 0;
 }

@@ -20,13 +20,13 @@
 
 #include <string.h>
 
-#include "player_mana.h"
+#include "packets/player_mana.h"
 
-#include "../packet.h"
-#include "../player.h"
+#include "packet.h"
+#include "player.h"
 
-#include "../binary_reader.h"
-#include "../util.h"
+#include "binary_reader.h"
+#include "util.h"
 
 int player_mana_handle(struct player *player, struct packet *packet)
 {
@@ -97,7 +97,7 @@ int player_mana_read(struct packet *packet)
 	player_mana->mana_max = *(uint16_t *)(packet->data_buffer + pos);
 
 	packet->data = talloc_steal(packet, player_mana);
-	
+
 	ret = 0;
 out:
 	talloc_free(temp_context);

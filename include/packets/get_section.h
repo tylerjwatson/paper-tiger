@@ -25,8 +25,9 @@
 
 #include <uv.h>
 
-#include "../talloc/talloc.h"
-#include "../rect.h"
+#include "talloc/talloc.h"
+#include "rect.h"
+#include "game.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,8 +35,7 @@ extern "C" {
 
 struct player;
 struct packet;
-struct game;
-	
+
 struct get_section {
 	int32_t x;
 	int32_t y;

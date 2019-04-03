@@ -28,7 +28,8 @@
 #define PACKET_LEN_WORLD_INFO 29
 
 #include <uv.h>
-#include "../talloc/talloc.h"
+#include "talloc/talloc.h"
+#include "game.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,7 +37,6 @@ extern "C" {
 
 struct player;
 struct packet;
-struct game;
 
 struct world_info {
 	int32_t time;
@@ -79,7 +79,7 @@ struct world_info {
 
 int world_info_new(TALLOC_CTX *ctx, const struct player *player, struct packet **out_packet);
 
-int world_info_write(const struct game *game, struct packet *packet);
+int world_info_write(const ptGame *game, struct packet *packet);
 
 #ifdef __cplusplus
 }

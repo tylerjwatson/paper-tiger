@@ -2,6 +2,6 @@ syntax = "proto3";
 
 message tile_flags {
 	int32 num_tiles = 1;
-	repeated bool tile_frame_important = 2 [packed=true];
+	repeated bool tileFrameImportant = 2 [packed=true];
 	repeated bool tile_solid = 3 [packed=true];
 }

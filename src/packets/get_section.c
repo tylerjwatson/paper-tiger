@@ -1,5 +1,6 @@
 /*
-* upgraded-guacamole - A Terraria server written in C for POSIX operating systems
+* upgraded-guacamole - A Terraria server written in C for POSIX operating
+systems
 * Copyright (C) 2016  Tyler Watson <tyler@tw.id.au>
 *
 * This file is part of upgraded-guacamole.
@@ -18,35 +19,34 @@
 * along with upgraded-guacamole.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
 #include <stdbool.h>
+#include <string.h>
 
-#include "get_section.h"
-#include "tile_section.h"
-#include "section_tile_frame.h"
-#include "status.h"
-#include "connection_complete.h"
-#include "chat_message.h"
+#include "packets/chat_message.h"
+#include "packets/connection_complete.h"
+#include "packets/get_section.h"
+#include "packets/section_tile_frame.h"
+#include "packets/status.h"
+#include "packets/tile_section.h"
 
-#include "../colour.h"
-#include "../server.h"
-#include "../world.h"
-#include "../world_section.h"
-#include "../game.h"
-#include "../hook.h"
-#include "../packet.h"
-#include "../player.h"
-#include "../colour.h"
-#include "../talloc/talloc.h"
-#include "../binary_reader.h"
-#include "../binary_writer.h"
-#include "../util.h"
+#include "binary_reader.h"
+#include "binary_writer.h"
+#include "colour.h"
+#include "hook.h"
+#include "packet.h"
+#include "player.h"
+#include "server.h"
+#include "talloc/talloc.h"
+#include "util.h"
+#include "world.h"
+#include "world_section.h"
 
-#include "../config.h"
+#include "config.h"
 
-#define ARRAY_SIZEOF(a) sizeof(a)/sizeof(a[0])
+#define ARRAY_SIZEOF(a) sizeof(a) / sizeof(a[0])
 
-int get_section_handle(struct player *player, struct packet *packet)
+int
+get_section_handle(struct player *player, struct packet *packet)
 {
 	struct get_section *get_section = (struct get_section *)packet->data;
 	struct packet *connection_complete;
@@ -58,23 +58,27 @@ int get_section_handle(struct player *player, struct packet *packet)
 	 * Cheat, and statically send the spawn point for now
 	 */
 
-	section_num = world_section_num_for_tile_coords(&player->game->world, player->game->world.spawn_tile.x, player->game->world.spawn_tile.y);
+	section_num = world_section_num_for_tile_coords(
+		player->game->world, player->game->world->spawn_tile.x,
+		player->game->world->spawn_tile.y);
 
-	game_send_world(player->game, player);
+	ptGameSendWorld(player->game, player);
 
 	if (connection_complete_new(player, player, &connection_complete) < 0) {
-		_ERROR("%s: allocating connection complete packet failed.\n", __FUNCTION__);
+		_ERROR("%s: allocating connection complete packet failed.\n",
+			   __FUNCTION__);
 		return -1;
 	}
 
-	server_send_packet(&player->game->server, player, connection_complete);
+	server_send_packet(player->game->server, player, connection_complete);
 
 	hook_on_player_join(player->game->hooks, player->game, player);
 
 	return 0;
 }
 
-int get_section_read(struct packet *packet)
+int
+get_section_read(struct packet *packet)
 {
 	TALLOC_CTX *temp_context;
 	int ret = -1, pos = 0;
@@ -83,7 +87,8 @@ int get_section_read(struct packet *packet)
 
 	temp_context = talloc_new(NULL);
 	if (temp_context == NULL) {
-		_ERROR("%s: out of memory allocating temp context for get section.\n", __FUNCTION__);
+		_ERROR("%s: out of memory allocating temp context for get section.\n",
+			   __FUNCTION__);
 		ret = -ENOMEM;
 		goto out;
 	}

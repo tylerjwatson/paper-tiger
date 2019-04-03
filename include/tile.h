@@ -24,6 +24,7 @@
 #include <stdint.h>
 
 #include "talloc/talloc.h"
+#include "game.h"
 
 #define TILE_SECTION_WIDTH 100
 
@@ -34,7 +35,6 @@ extern "C" {
 #define PT_WORLD_PATH "/run/paper-tiger/%d"
 #define PT_TILES_PATH "/run/paper-tiger/%d/tiles.dat"
 
-struct game;
 struct world;
 
 enum {
@@ -145,7 +145,7 @@ int
 tile_pack_completely(const struct world *world, const struct tile *tile, uint8_t *buffer);
 
 int
-tile_pack(const struct game *game, const struct tile *tile, uint8_t *dest, uint8_t *tile_flags_1, uint8_t *tile_flags_2,
+tile_pack(const ptGame *game, const struct tile *tile, uint8_t *dest, uint8_t *tile_flags_1, uint8_t *tile_flags_2,
 		  uint8_t *tile_flags_3);
 
 int

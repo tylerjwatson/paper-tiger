@@ -20,25 +20,25 @@
 
 #include <string.h>
 
-#include "inventory_slot.h"
+#include "packets/inventory_slot.h"
 
-#include "../item.h"
-#include "../game.h"
-#include "../binary_reader.h"
-#include "../player.h"
-#include "../util.h"
-#include "../packet.h"
+#include "item.h"
+#include "game.h"
+#include "binary_reader.h"
+#include "player.h"
+#include "util.h"
+#include "packet.h"
 
 int inventory_slot_handle(struct player *player, struct packet *packet)
 {
 	struct item_slot *inventory_slot = (struct item_slot *)packet->data;
 	struct item_slot player_slot = player->inventory[inventory_slot->slot_id];
-	
+
 	player_slot.net_id = inventory_slot->net_id;
 	player_slot.prefix = inventory_slot->prefix;
 	player_slot.slot_id = inventory_slot->slot_id;
 	player_slot.stack = inventory_slot->stack;
-	
+
 	return 0;
 }
 
@@ -48,7 +48,7 @@ int inventory_slot_new(TALLOC_CTX *ctx, const struct player *player, const struc
 	TALLOC_CTX *temp_context;
 	struct packet *packet;
 	struct item_slot *item_slot;
-	
+
 	temp_context = talloc_new(NULL);
 	if (temp_context == NULL) {
 		_ERROR("%s: out of memory allocating temp context for packet %d\n", __FUNCTION__, PACKET_TYPE_INVENTORY_SLOT);
@@ -76,7 +76,7 @@ int inventory_slot_new(TALLOC_CTX *ctx, const struct player *player, const struc
 	memcpy(item_slot, &slot, sizeof(slot));
 
 	packet->data = (void *)talloc_steal(packet, item_slot);
-	
+
 	*out_packet = (struct packet *)talloc_steal(ctx, packet);
 
 	ret = 0;
@@ -103,7 +103,7 @@ int inventory_slot_read(struct packet *packet)
 	if (item_slot == NULL) {
 		_ERROR("%s: out of memory allocating player info.\n", __FUNCTION__);
 		ret = -ENOMEM;
-		goto out; 
+		goto out;
 	}
 
 	item_slot->id = packet->data_buffer[pos++];

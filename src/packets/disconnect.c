@@ -21,14 +21,13 @@
 
 #include <string.h>
 
-#include "disconnect.h"
+#include "packets/disconnect.h"
 
-#include "../packet.h"
-#include "../server.h"
-#include "../game.h"
-#include "../binary_reader.h"
-#include "../binary_writer.h"
-#include "../util.h"
+#include "packet.h"
+#include "server.h"
+#include "binary_reader.h"
+#include "binary_writer.h"
+#include "util.h"
 
 int disconnect_new(TALLOC_CTX *ctx, const struct player *player, const char * reason, struct packet **out_packet)
 {
@@ -123,11 +122,11 @@ int disconnect_handle(struct player *player, struct packet *packet)
 	struct disconnect *disconnect = (struct disconnect *)packet->data;
 
 	(void)disconnect;
-	
+
 	return 0;
 }
 
-int disconnect_write(const struct game *game, struct packet *packet)
+int disconnect_write(const ptGame *game, struct packet *packet)
 {
 	struct disconnect *disconnect = (struct disconnect *)(packet->data);
 

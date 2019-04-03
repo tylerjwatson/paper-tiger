@@ -12,7 +12,7 @@ Paper Tiger is free, and released under the GPLv2, which you can find in the `LI
 
 Paper tiger is written in a mix of C and C++ and is heavily based on the event-loop paradigm based on [libuv](https://github.com/libuv/libuv).  
 
-libuv provides a cross-platform event loop mechanism, and Paper Tiger leverages this feature to efficiently implement a gameserver in a cross-platform manner without having to deal with threading between POSIX and Win32 environments.  The game's event loop (see `struct game`) is responsible for handling stream I/O from all the connected clients as well as the game update routines and console input.
+libuv provides a cross-platform event loop mechanism, and Paper Tiger leverages this feature to efficiently implement a gameserver in a cross-platform manner without having to deal with threading between POSIX and Win32 environments.  The game's event loop (see `ptGame`) is responsible for handling stream I/O from all the connected clients as well as the game update routines and console input.
 
 The software is primarily written in in C, however there are some parts of the system which leverate c++11 features. One such feature is the parameter parser (see `src/param.cc`) where a cross-platform regex implementation was needed. 
 

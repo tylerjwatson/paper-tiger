@@ -158,7 +158,7 @@ packet_deserialize(const struct packet *packet)
 }
 
 int
-packet_serialize(const struct game *game, struct packet *packet)
+packet_serialize(const ptGame *game, struct packet *packet)
 {
 	struct packet_handler *handler;
 	packet_write_cb cb;
@@ -196,13 +196,13 @@ packet_init(struct packet *packet)
 }
 
 int
-packet_recipient_all_online(const struct game *game, const struct packet *packet, int8_t ignore_id)
+packet_recipient_all_online(const ptGame *game, const struct packet *packet, int8_t ignore_id)
 {
 	int online_len = 0;
 	uint8_t online_players[256];
 	uint8_t id;
 
-	online_len = game_online_players(game, online_players);
+	online_len = ptGameOnlinePlayerSlots(game, online_players);
 
 	for (int i = 0; i < online_len; i++) {
 		id = online_players[i];

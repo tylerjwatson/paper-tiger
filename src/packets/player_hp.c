@@ -20,25 +20,27 @@
 
 #include <string.h>
 
-#include "player_hp.h"
+#include "packets/player_hp.h"
 
-#include "../packet.h"
-#include "../player.h"
+#include "packet.h"
+#include "player.h"
+#include "binary_reader.h"
+#include "util.h"
 
-#include "../binary_reader.h"
-#include "../util.h"
-
-int player_hp_handle(struct player *player, struct packet *packet)
+int
+player_hp_handle(struct player *player, struct packet *packet)
 {
 	struct player_hp *player_hp = (struct player_hp *)packet->data;
-	
+
 	player->life = player_hp->life;
 	player->life_max = player_hp->life_max;
 
 	return 0;
 }
 
-int player_hp_new(TALLOC_CTX *ctx, const struct player *player, uint16_t life, uint16_t life_max, struct packet **out_packet)
+int
+player_hp_new(TALLOC_CTX *ctx, const struct player *player, uint16_t life,
+			  uint16_t life_max, struct packet **out_packet)
 {
 	int ret = -1;
 	TALLOC_CTX *temp_context;
@@ -46,14 +48,16 @@ int player_hp_new(TALLOC_CTX *ctx, const struct player *player, uint16_t life, u
 
 	temp_context = talloc_new(NULL);
 	if (temp_context == NULL) {
-		_ERROR("%s: out of memory allocating temp context for packet %d\n", __FUNCTION__, PACKET_TYPE_PLAYER_HP);
+		_ERROR("%s: out of memory allocating temp context for packet %d\n",
+			   __FUNCTION__, PACKET_TYPE_PLAYER_HP);
 		ret = -ENOMEM;
 		goto out;
 	}
 
 	packet = talloc(temp_context, struct packet);
 	if (packet == NULL) {
-		_ERROR("%s: out of memory allocating packet %d\n", __FUNCTION__, PACKET_TYPE_PLAYER_HP);
+		_ERROR("%s: out of memory allocating packet %d\n", __FUNCTION__,
+			   PACKET_TYPE_PLAYER_HP);
 		ret = -ENOMEM;
 		goto out;
 	}
@@ -71,7 +75,8 @@ out:
 	return ret;
 }
 
-int player_hp_read(struct packet *packet)
+int
+player_hp_read(struct packet *packet)
 {
 	int ret = -1, pos = 0;
 	TALLOC_CTX *temp_context;
@@ -79,14 +84,16 @@ int player_hp_read(struct packet *packet)
 
 	temp_context = talloc_new(NULL);
 	if (temp_context == NULL) {
-		_ERROR("%s: out of memory allocating temp context for player hp.\n", __FUNCTION__);
+		_ERROR("%s: out of memory allocating temp context for player hp.\n",
+			   __FUNCTION__);
 		ret = -ENOMEM;
 		goto out;
 	}
 
 	player_hp = talloc_zero(temp_context, struct player_hp);
 	if (player_hp == NULL) {
-		_ERROR("%s: out of memory allocating player hp packet.\n", __FUNCTION__);
+		_ERROR("%s: out of memory allocating player hp packet.\n",
+			   __FUNCTION__);
 		ret = -ENOMEM;
 		goto out;
 	}
@@ -97,7 +104,7 @@ int player_hp_read(struct packet *packet)
 	player_hp->life_max = *(uint16_t *)(packet->data_buffer + pos);
 
 	packet->data = talloc_steal(packet, player_hp);
-	
+
 	ret = 0;
 out:
 	talloc_free(temp_context);

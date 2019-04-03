@@ -82,7 +82,7 @@ public sealed partial class tile_flags : pb::IMessage<tile_flags> {
     }
   }
 
-  /// <summary>Field number for the "tile_frame_important" field.</summary>
+  /// <summary>Field number for the "tileFrameImportant" field.</summary>
   public const int TileFrameImportantFieldNumber = 2;
   private static readonly pb::FieldCodec<bool> _repeated_tileFrameImportant_codec
       = pb::FieldCodec.ForBool(18);

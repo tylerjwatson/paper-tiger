@@ -29,9 +29,10 @@
 
 #include <uv.h>
 #include <stdint.h>
+#include "talloc/talloc.h"
 
-#include "../talloc/talloc.h"
-#include "../vector_2d.h"
+#include "game.h"
+#include "vector_2d.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,7 +40,6 @@ extern "C" {
 
 struct player;
 struct packet;
-struct game;
 
 struct section_tile_frame {
 	int16_t x;
@@ -52,7 +52,7 @@ int section_tile_frame_new(TALLOC_CTX *ctx, const struct player *player, struct 
 							struct packet **out_packet);
 
 
-int section_tile_frame_write(const struct game *game, struct packet *packet);
+int section_tile_frame_write(const ptGame *game, struct packet *packet);
 
 #ifdef __cplusplus
 }

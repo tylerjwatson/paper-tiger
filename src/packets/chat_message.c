@@ -20,26 +20,25 @@
 
 #include <string.h>
 
-#include "chat_message.h"
-#include "../game.h"
-#include "../console.h"
-#include "../binary_reader.h"
-#include "../binary_writer.h"
-#include "../player.h"
-#include "../util.h"
-#include "../packet.h"
-#include "../server.h"
-#include "../colour.h"
+#include "packets/chat_message.h"
+#include "console.h"
+#include "binary_reader.h"
+#include "binary_writer.h"
+#include "player.h"
+#include "util.h"
+#include "packet.h"
+#include "server.h"
+#include "colour.h"
 
 int chat_message_handle(struct player *player, struct packet *packet)
 {
 	struct chat_message *chat_message = (struct chat_message *)packet->data;
 
-	console_vsprintf(&player->game->console, "<\033[33;1m%s\033[0m> %s\n", player->name, chat_message->message);
+	console_vsprintf(player->game->console, "<\033[33;1m%s\033[0m> %s\n", player->name, chat_message->message);
 
 	chat_message->id = player->id;
 
-	server_broadcast_packet(&player->game->server, packet, -1);
+	server_broadcast_packet(player->game->server, packet, -1);
 
 	return 0;
 }
@@ -151,7 +150,7 @@ out:
 	return ret;
 }
 
-int chat_message_write(const struct game *game, struct packet *packet)
+int chat_message_write(const ptGame *game, struct packet *packet)
 {
 	struct chat_message *chat_message = (struct chat_message *)packet->data;
 	int pos = 0;

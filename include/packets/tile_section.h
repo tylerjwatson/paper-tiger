@@ -29,9 +29,10 @@
 
 #include <uv.h>
 
-#include "../talloc/talloc.h"
+#include "talloc/talloc.h"
 
-#include "../rect.h"
+#include "rect.h"
+#include "game.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,8 +40,7 @@ extern "C" {
 
 struct player;
 struct packet;
-struct game;
-	
+
 struct tile_section {
 	uint8_t compressed;
 	int32_t x_start;
@@ -56,8 +56,8 @@ struct tile_section {
 int tile_section_new(TALLOC_CTX *ctx, const struct player *player, unsigned section,
 					 struct packet **out_packet);
 
-int tile_section_write_v2(const struct game *game, struct packet *packet);
-	
+int tile_section_write_v2(const ptGame *game, struct packet *packet);
+
 #ifdef __cplusplus
 }
 #endif

@@ -29,8 +29,9 @@
 
 #include <uv.h>
 
-#include "../talloc/talloc.h"
-#include "../colour.h"
+#include "talloc/talloc.h"
+#include "colour.h"
+#include "game.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,8 +39,7 @@ extern "C" {
 
 struct player;
 struct packet;
-struct game;
-	
+
 struct player_info {
 	uint8_t id;
 	uint8_t skin_variant;
@@ -57,7 +57,7 @@ struct player_info {
 	struct colour under_shirt_colour;
 	struct colour pants_colour;
 	struct colour shoe_colour;
-	
+
 	struct player *player;
 
 	uint8_t difficulty;
@@ -65,7 +65,7 @@ struct player_info {
 
 int player_info_new(TALLOC_CTX *ctx, const struct player *player, struct packet **out_packet);
 
-int player_info_write(const struct game *game, struct packet *packet);
+int player_info_write(const ptGame *game, struct packet *packet);
 
 int player_info_read(struct packet *packet);
 

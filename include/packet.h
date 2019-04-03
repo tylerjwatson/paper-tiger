@@ -125,7 +125,7 @@ struct packet {
  * @returns
  * `0` if the encoding was successful, `< 0` otherwise.
  */
-typedef int (*packet_write_cb)(const struct game *game, struct packet *packet);
+typedef int (*packet_write_cb)(const ptGame *game, struct packet *packet);
 
 /**
  * @brief Function to call to translate a packet from a network buffer to a fully-qualified `struct packet`.
@@ -201,13 +201,13 @@ int
 packet_init(struct packet *packet);
 
 int
-packet_serialize(const struct game *game, struct packet *packet);
+packet_serialize(const ptGame *game, struct packet *packet);
 
 int
 packet_deserialize(const struct packet *packet);
 
 int
-packet_recipient_all_online(const struct game *game, const struct packet *packet, int8_t ignore_id);
+packet_recipient_all_online(const ptGame *game, const struct packet *packet, int8_t ignore_id);
 
 #ifdef __cplusplus
 }

@@ -20,35 +20,22 @@
 
 #pragma once
 
-#define PACKET_TYPE_STATUS 9
+#include <stdint.h>
 
-/*
- * 4 + message length + message
+/**
+ * Describes the configuration that makes up a paper tiger server instance.
+ *
+ * After calling ptGameSetProperties(), the memory occupied by this structure
+ * must live for the life of the game instance.
  */
-#define PACKET_LEN_STATUS 4
+typedef struct ptGameProperties {
+    /** Specifies how often the game engine ticks in milliseconds */
+    double msPerFrame;
+    /** Specifies a path to the world file. */
+    char *worldFilePath;
+    /** Specifies the maximum number of players on a world at once */
+    uint8_t maxPlayers;
+    /** Specifies whether to enable captive console output */
+    bool enableConsole;
 
-#include <uv.h>
-
-#include "talloc/talloc.h"
-#include "game.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-struct packet;
-struct player;
-
-struct status {
-	uint32_t message_duration;
-	char *message;
-};
-
-int status_new(TALLOC_CTX *ctx, const struct player *player, uint32_t duration,
-			   const char *message, struct packet **out_packet);
-
-int status_write(const ptGame *game, struct packet *packet);
-
-#ifdef __cplusplus
-}
-#endif
+} ptGameProperties;

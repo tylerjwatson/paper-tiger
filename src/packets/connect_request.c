@@ -20,15 +20,14 @@
 
 #include <string.h>
 
-#include "connect_request.h"
-#include "../player.h"
-#include "../packet.h"
-#include "../server.h"
-#include "../game.h"
-#include "../binary_reader.h"
-#include "../util.h"
+#include "packets/connect_request.h"
+#include "player.h"
+#include "packet.h"
+#include "server.h"
+#include "binary_reader.h"
+#include "util.h"
 
-#include "continue_connecting.h"
+#include "packets/continue_connecting.h"
 
 int connect_request_read(struct packet *packet)
 {
@@ -92,7 +91,7 @@ int connect_request_handle(struct player *player, struct packet *packet)
 			goto error;
 		}
 
-		server_send_packet(&player->game->server, player, (const struct packet *)continue_connecting);
+		server_send_packet(player->game->server, player, (const struct packet *)continue_connecting);
 		talloc_free(continue_connecting);
 	}
 	else {

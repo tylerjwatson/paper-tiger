@@ -18,12 +18,20 @@
  * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <libgen.h>
 #include <signal.h>
 #include <string.h>
-#include <sys/mman.h>
 #include <sys/stat.h>
+
+#ifdef _WIN32
+#include <WinSock2.h>
+#include <direct.h>
+#include "fcntl.h"
+#include "windows-mmap.h"
+#else
+#include <sys/mman.h>
 #include <unistd.h>
+#include <libgen.h>
+#endif
 
 #include "binary_writer.h"
 #include "game.h"
@@ -69,11 +77,11 @@ static int
 __make_tile_directory(int world_id)
 {
 	int len = snprintf(NULL, 0, PT_WORLD_PATH, world_id);
-	char pt_base[len + 1];
+	char pt_base[65535];
 
 	snprintf(pt_base, len + 1, PT_WORLD_PATH, world_id);
 
-	int result = mkdir(pt_base, 0700);
+	int result = mkdir(pt_base);
 
 	/*
 	 * If the file exists already, that's cool
@@ -92,7 +100,7 @@ tile_container_init(TALLOC_CTX *context, struct tile_container *container, struc
 	int ret = -1;
 	int tiles_path_len = snprintf(NULL, 0, PT_TILES_PATH, world->worldID);
 	size_t tile_size = sizeof(struct tile) * world->max_tiles_x * world->max_tiles_y;
-	char tiles_path[tiles_path_len + 1];
+	char tiles_path[65535];
 
 	tiles_path_len = snprintf(tiles_path, tiles_path_len + 1, PT_TILES_PATH, world->worldID);
 
@@ -104,7 +112,7 @@ tile_container_init(TALLOC_CTX *context, struct tile_container *container, struc
 		goto error;
 	}
 
-	fd = open(container->mmap_file_name, O_RDWR | O_CREAT, (mode_t)0600);
+	fd = open(container->mmap_file_name, O_RDWR | O_CREAT, 0600);
 	if (fd == -1) {
 		_ERROR("%s: cannot open tile map %s: %s\n", __FUNCTION__, tiles_path, strerror(errno));
 		ret = -1;
@@ -142,7 +150,9 @@ error:
 void
 tile_container_destroy(struct tile_container *container)
 {
+#ifndef _WIN32
 	msync(container->tile_memory, container->mmap_size, MS_SYNC);
+#endif
 	munmap(container->mmap_file_name, container->mmap_size);
 	close(container->mmap_fd);
 }
@@ -383,7 +393,7 @@ tile_pack_completely(const struct world *world, const struct tile *tile, uint8_t
 }
 
 int
-tile_pack(const struct game *game, const struct tile *tile, uint8_t *dest, uint8_t *tile_flags_1, uint8_t *tile_flags_2,
+tile_pack(const ptGame *game, const struct tile *tile, uint8_t *dest, uint8_t *tile_flags_1, uint8_t *tile_flags_2,
 		  uint8_t *tile_flags_3)
 {
 	unsigned pos = 0;
@@ -406,12 +416,12 @@ tile_pack(const struct game *game, const struct tile *tile, uint8_t *dest, uint8
 			pos += binary_writer_write_value(dest + pos, msb);
 		}
 
-		if (tile->type < 0 || tile->type > game->num_tile_frame_important) {
-			printf("%s: tile type %d is out of range of %d", __FUNCTION__, tile->type, game->num_tile_frame_important);
+		if (tile->type < 0 || tile->type > sizeof(game->tileFrameImportant)) {
+			printf("%s: tile type %d is out of range of %ld", __FUNCTION__, tile->type, sizeof(game->tileFrameImportant));
 			raise(SIGINT);
 		}
 
-		if (game->tile_frame_important[tile->type]) {
+		if (game->tileFrameImportant[tile->type]) {
 			pos += binary_writer_write_value(dest + pos, tile->frame_x);
 			pos += binary_writer_write_value(dest + pos, tile->frame_y);
 		}

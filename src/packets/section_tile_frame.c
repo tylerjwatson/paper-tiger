@@ -20,15 +20,14 @@
 
 #include <string.h>
 
-#include "section_tile_frame.h"
+#include "packets/section_tile_frame.h"
 
-#include "../game.h"
-#include "../world.h"
-#include "../packet.h"
-#include "../player.h"
-#include "../binary_writer.h"
-#include "../util.h"
-#include "../rect.h"
+#include "world.h"
+#include "packet.h"
+#include "player.h"
+#include "binary_writer.h"
+#include "util.h"
+#include "rect.h"
 
 int section_tile_frame_new(TALLOC_CTX *ctx, const struct player *player, struct vector_2d coords, struct packet **out_packet)
 {
@@ -59,7 +58,7 @@ int section_tile_frame_new(TALLOC_CTX *ctx, const struct player *player, struct 
 	}
 
 	packet->type = PACKET_TYPE_SECTION_TILE_FRAME;
-	
+
 	section_tile_frame->x = coords.x;
 	section_tile_frame->y = coords.y;
 	section_tile_frame->dx = coords.x + 1;
@@ -77,7 +76,7 @@ out:
 	return ret;
 }
 
-int section_tile_frame_write(const struct game *game, struct packet *packet)
+int section_tile_frame_write(const ptGame *game, struct packet *packet)
 {
 	struct section_tile_frame *section_tile_frame = (struct section_tile_frame *)packet->data;
 	int pos = 0;

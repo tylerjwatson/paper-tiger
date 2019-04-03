@@ -20,13 +20,12 @@
 
 #include <string.h>
 
-#include "connection_complete.h"
-#include "../player.h"
-#include "../packet.h"
-#include "../binary_reader.h"
-#include "../util.h"
-#include "../game.h"
-#include "../hook.h"
+#include "packets/connection_complete.h"
+#include "player.h"
+#include "packet.h"
+#include "binary_reader.h"
+#include "util.h"
+#include "hook.h"
 
 int connection_complete_new(TALLOC_CTX *ctx, const struct player *player, struct packet **out_packet)
 {
@@ -65,7 +64,7 @@ out:
 	return ret;
 }
 
-int connection_complete_write(const struct game *game, struct packet *packet)
+int connection_complete_write(const ptGame *game, struct packet *packet)
 {
 	/*
 	 * This packet has no payload.

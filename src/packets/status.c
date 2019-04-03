@@ -20,16 +20,16 @@
 
 #include <string.h>
 
-#include "status.h"
+#include "packets/status.h"
 
-#include "../game.h"
-#include "../console.h"
-#include "../binary_reader.h"
-#include "../binary_writer.h"
-#include "../player.h"
-#include "../util.h"
-#include "../packet.h"
-#include "../server.h"
+#include "game.h"
+#include "console.h"
+#include "binary_reader.h"
+#include "binary_writer.h"
+#include "player.h"
+#include "util.h"
+#include "packet.h"
+#include "server.h"
 
 int status_new(TALLOC_CTX *ctx, const struct player *player, uint32_t duration,
 			   const char *message, struct packet **out_packet)
@@ -38,7 +38,7 @@ int status_new(TALLOC_CTX *ctx, const struct player *player, uint32_t duration,
 	TALLOC_CTX *temp_context;
 	struct packet *packet;
 	struct status *status;
-	
+
 	temp_context = talloc_new(NULL);
 	if (temp_context == NULL) {
 		_ERROR("%s: out of memory allocating temp context for packet %d\n", __FUNCTION__, PACKET_TYPE_STATUS);
@@ -59,19 +59,19 @@ int status_new(TALLOC_CTX *ctx, const struct player *player, uint32_t duration,
 		ret = -ENOMEM;
 		goto out;
 	}
-	
+
 	packet->type = PACKET_TYPE_STATUS;
 	packet->len = PACKET_HEADER_SIZE + strlen(message) + binary_writer_7bit_len(strlen(message));
 
 	status->message_duration = duration;
-	
+
 	status->message = talloc_strdup(status, message);
 	if (status->message == NULL) {
 		_ERROR("%s: out of memory copying message to packet.\n", __FUNCTION__);
 		ret = -ENOMEM;
 		goto out;
 	}
-	
+
 	packet->data = (void *)talloc_steal(packet, status);
 
 	*out_packet = (struct packet *)talloc_steal(ctx, packet);
@@ -84,7 +84,7 @@ out:
 	return ret;
 }
 
-int status_write(const struct game *game, struct packet *packet)
+int status_write(const ptGame *game, struct packet *packet)
 {
 	struct status *status = (struct status *)packet->data;
 	int pos = 0;

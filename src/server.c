@@ -126,7 +126,7 @@ __on_connection(uv_stream_t *handle, int status)
 		return;
 	}
 
-	if ((player_id = game_find_next_slot(server->game)) < 0) {
+	if ((player_id = ptGameFindSlot(server->game)) < 0) {
 		return;
 	}
 

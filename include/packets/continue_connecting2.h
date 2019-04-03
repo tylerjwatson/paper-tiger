@@ -24,14 +24,15 @@
 #define PACKET_LEN_CONTINUE_CONNECTING2 0
 
 #include <uv.h>
-#include "../talloc/talloc.h"
+#include "game.h"
+#include "talloc/talloc.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 struct player;
-struct packet;	
+struct packet;
 
 int continue_connecting2_handle(struct player *player, struct packet *packet);
 

@@ -23,6 +23,8 @@
 #define PACKET_TYPE_CONNECT_REQUEST 0x01
 
 #include <uv.h>
+#include "game.h"
+
 
 struct packet;
 struct player;

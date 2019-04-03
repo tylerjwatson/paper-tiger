@@ -25,9 +25,10 @@
 #include <uv.h>
 
 #include "bitmap.h"
-#include "console.h"
+#include "colour.h"
+#include "game_properties.h"
+
 #include "talloc/talloc.h"
-#include "world.h"
 
 #define GAME_MAX_PLAYERS 255
 //#define GAME_PROTOCOL_VERSION 156 << this is for 1.3.0
@@ -37,7 +38,9 @@
 extern "C" {
 #endif
 
-/**
+    struct world;
+
+    /**
  * @defgroup game Game system
  * @ingroup paper-tiger
  *
@@ -59,72 +62,76 @@ extern "C" {
  * @{
  */
 
-struct colour;
-struct player;
-struct server;
-struct hook_context;
-
-/**
+    /**
  * Describes a game context.  Contains all references and information that a game needs
  * in order to run.
  */
-typedef struct {
-	/**
+    typedef struct ptGame
+    {
+        ptGameProperties properties;
+
+        /**
 	 * Time in milliseconds that an update frame may run for.  Defaults to 60 ticks per
 	 * second.
 	 */
-	double ms_per_frame;
+        double msPerFrame;
 
-	/**
+        /**
 	 * Pointer to the world running under this game context.
 	 */
-	struct world world;
+        struct world *world;
 
-	/**
+        /**
 	 * Pointer to the TCP server subsystem which accepts TCP clients and deals with
 	 * packet communication to and from connected clients.
 	 */
-	struct server server;
+        struct server *server;
 
-	/**
+        /**
 	 * Array of players.
 	 *
 	 * @remarks
 	 * Due to the limitations of the official Terraria server, the maximum number of
 	 * players supported is 255.
 	 */
-	struct player *players[256];
+        struct player *players[GAME_MAX_PLAYERS];
 
-	struct console console;
+        struct console *console;
 
-	/**
-	 * Bitmap of connected players, decides which slot ID connecting clients receive
-	 */
-	uint32_t *player_slots;
+        /**
+         * Bitmap of connected players, decides which slot ID connecting clients receive
+         */
+        word_t player_slots[GAME_MAX_PLAYERS / sizeof(word_t)];
 
-	/**
+        /**
 	 * Main libuv event loop for the game.
 	 */
-	uv_loop_t event_loop;
+        uv_loop_t event_loop;
 
-	/**
-	 * libuv timer which fires every @a ms_per_frame ms.  Serves as the game update loop.
+        /**
+	 * libuv timer which fires every @a msPerFrame ms.  Serves as the game update loop.
 	 */
-	uv_timer_t *update_handle;
+        uv_timer_t *update_handle;
 
-	uint32_t num_tile_frame_important;
-
-	/**
-	 * Array of tile frame important data, loaded from @a flags.dat.
+        /**
+	 * Array of tile frame important data.
 	 */
-	bool *tile_frame_important;
+        bool tileFrameImportant[419];
 
-	/**
+        /**
 	 * Hook subsystem, that provides hooking callbacks for parts of the system that
 	 * wish to listen for pre-programmed events.
 	 */
-	struct hook_context *hooks;
+        struct hook_context *hooks;
 } ptGame;
+
+/**
+ * Initializes a game.
+ *
+ * @param {ptGame} game
+ * A pointer to a ptGame instance to initialize
+ */
+int ptGameInitialize(ptGame *game);
 
 /**
  * @brief finds the next free slot from the game's player slot bitmap
@@ -141,7 +148,7 @@ typedef struct {
  * are no more slots available or there was an error.
  */
 int
-game_find_next_slot(struct game *context);
+ptGameFindSlot(ptGame *context);
 
 /**
  * @brief starts the game's event loop
@@ -156,7 +163,7 @@ game_find_next_slot(struct game *context);
  * This function currently always returns `0`.
  */
 int
-game_start_event_loop(struct game *context);
+ptGameStartEventLoop(ptGame *context);
 
 /**
  * @brief Allocates a new game context.
@@ -164,7 +171,7 @@ game_start_event_loop(struct game *context);
  * Allocates a new game context under a parent talloc context pointed to by @a context.
  */
 int
-game_new(TALLOC_CTX *context, struct game **out_context);
+ptGameAlloc(TALLOC_CTX *context, ptGame **out_context);
 
 /**
  * @brief Initializes the game update timer which fires at every tickrate interval.
@@ -180,20 +187,20 @@ game_new(TALLOC_CTX *context, struct game **out_context);
  * according to the time it takes for the game update procedure to finish.
  */
 int
-game_update_loop_init(struct game *game);
+ptGameInitializeUpdateLoop(ptGame *game);
 
 int
-game_send_world(const struct game *game, const struct player *player);
+ptGameSendWorld(const ptGame *game, const struct player *player);
 
 int
-game_send_message(const struct game *game, const struct player *player, const struct colour colour, const char *fmt,
-				  ...);
+ptGameSendMessageToPlayer(const ptGame *game, const struct player *player,
+                          const struct colour colour, const char *fmt, ...);
 
 int
-game_online_players(const struct game *game, uint8_t *out_ids);
+ptGameOnlinePlayerSlots(const ptGame *game, uint8_t *out_ids);
 
 int
-game_sync_players(const struct game *game, const struct player *new_player);
+ptGameSyncPlayers(const ptGame *game, const struct player *new_player);
 
 /**
  * @}

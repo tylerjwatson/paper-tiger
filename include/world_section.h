@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include "talloc.h"
+#include "talloc/talloc.h"
 #include <stdint.h>
 
 #define Z_CHUNK 65535

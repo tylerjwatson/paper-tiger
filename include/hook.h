@@ -22,6 +22,7 @@
 
 #include "talloc/talloc.h"
 #include "vector.h"
+#include "game.h"
 
 #define HOOK_DECL(type, cb)                                                                                            \
 	static inline void hook_##type##_register(struct hook_context *context, cb callback)                               \
@@ -38,32 +39,31 @@
 extern "C" {
 #endif
 
-struct game;
 struct vector;
 struct player;
 
-typedef int (*player_join_cb_t)(const struct game *game, const struct player *player);
-typedef int (*player_leave_cb_t)(const struct game *game, const struct player *player);
+typedef int (*player_join_cb_t)(const ptGame *game, const struct player *player);
+typedef int (*player_leave_cb_t)(const ptGame *game, const struct player *player);
 
 struct hook_context {
-	struct game *game;
+	ptGame *game;
 
 	struct vector *on_player_join_vec;
 	struct vector *on_player_leave_vec;
 };
 
 int
-hook_context_new(TALLOC_CTX *context, const struct game *game, struct hook_context **out_context);
+hook_context_new(TALLOC_CTX *context, const ptGame *game, struct hook_context **out_context);
 
 HOOK_DECL(player_join, player_join_cb_t)
 
 void
-hook_on_player_join(struct hook_context *hook_context, const struct game *game, const struct player *player);
+hook_on_player_join(struct hook_context *hook_context, const ptGame *game, const struct player *player);
 
 HOOK_DECL(player_leave, player_leave_cb_t)
 
 void
-hook_on_player_leave(struct hook_context *hook_context, const struct game *game, const struct player *player);
+hook_on_player_leave(struct hook_context *hook_context, const ptGame *game, const struct player *player);
 
 #ifdef __cplusplus
 }

@@ -21,14 +21,15 @@
 #pragma once
 
 #include <uv.h>
-
+#include "game.h"
+#include "util.h"
+#include "param.h"
+#include "player.h"
 #include "server.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-struct game;
 
 /**
  * @defgroup console Console subsystem
@@ -57,7 +58,7 @@ struct console {
 	/**
 	 * Backpointer to the game which owns the instance of the console context.
 	 */
-	struct game *game;
+	ptGame *game;
 };
 
 /**
@@ -78,7 +79,7 @@ struct console_command {
 /**
  * Describes a function to be called when a command is entered into the console.
  */
-typedef int (*console_command_cb)(struct game *game, struct console_command *command);
+typedef int (*console_command_cb)(ptGame *game, struct console_command *command);
 
 /**
  * Describes a console command handler which is entered into the table of command
@@ -104,7 +105,7 @@ struct console_command_handler {
  * return successfully, paper tiger will be unable to process console input.
  */
 int
-console_init(struct console *console, struct game *game);
+console_init(struct console *console, ptGame *game);
 
 void
 console_vsprintf(const struct console *console, const char *fmt, ...);

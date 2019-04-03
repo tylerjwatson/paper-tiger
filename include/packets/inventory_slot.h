@@ -8,7 +8,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * paper-tiger is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -25,12 +25,11 @@
 
 #include <uv.h>
 
-#include "../item.h"
-#include "../talloc/talloc.h"
+#include "item.h"
+#include "talloc/talloc.h"
 
 struct player;
 struct packet;
-struct game;
 
 #ifdef __cplusplus
 extern "C" {

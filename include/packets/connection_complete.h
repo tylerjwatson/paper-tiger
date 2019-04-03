@@ -25,7 +25,8 @@
 #define PACKET_LEN_CONNECTION_COMPLETE 0
 
 #include <uv.h>
-#include "../talloc/talloc.h"
+#include "talloc/talloc.h"
+#include "game.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,11 +34,10 @@ extern "C" {
 
 struct player;
 struct packet;
-struct game;
-	
+
 int connection_complete_new(TALLOC_CTX *ctx, const struct player *player, struct packet **out_packet);
 
-int connection_complete_write(const struct game *game, struct packet *packet);
+int connection_complete_write(const ptGame *game, struct packet *packet);
 
 #ifdef __cplusplus
 }

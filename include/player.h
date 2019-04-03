@@ -23,6 +23,7 @@
 #include <stdint.h>
 #include <uv.h>
 
+#include "game.h"
 #include "colour.h"
 #include "item.h"
 #include "talloc/talloc.h"
@@ -31,7 +32,6 @@
 extern "C" {
 #endif
 
-struct game;
 struct packet;
 
 struct player_stats {
@@ -60,7 +60,7 @@ struct player {
 	char *uuid;
 	char *remote_addr;
 	uint16_t remote_port;
-	struct game *game;
+	ptGame *game;
 	uv_tcp_t *handle;
 
 	uint16_t life;
@@ -76,7 +76,7 @@ struct player {
 };
 
 int
-player_new(TALLOC_CTX *context, const struct game *game, int id, struct player **out_player);
+player_new(TALLOC_CTX *context, const ptGame *game, int id, struct player **out_player);
 
 void
 player_close(struct player *player);

@@ -39,7 +39,6 @@
 extern "C" {
 #endif
 
-struct game;
 struct rect;
 struct tile;
 struct binary_reader_context;
@@ -103,8 +102,8 @@ enum relogic_file_type {
  * Structure which describes a Terraria world.  The structure contains a pointer to
  * all the tiles and everything the world needs to operate correctly.
  */
-struct world {
-	struct game *game;
+typedef struct world {
+	ptGame *game;
 	/**
 	 * Internal unique world identifier.
 	 */
@@ -280,7 +279,7 @@ struct world {
 	int _is_loaded;
 
 	uv_timer_t section_compress_worker;
-};
+} ptWorld;
 
 int
 world_init(TALLOC_CTX *context, struct world *world, const char *world_path);

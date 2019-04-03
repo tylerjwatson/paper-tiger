@@ -18,17 +18,19 @@
  * along with paper-tiger.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef _WIN32
+#include <unistd.h>
+#else
+#include <WinSock2.h>
+#include <Windows.h>
+//#define PROTOBUF_USE_DLLS
+#endif
+
 #include <errno.h>
 #include <stdbool.h>
 #include <string.h>
 #include <time.h>
 #include <uv.h>
-
-#ifndef _WIN32
-#include <unistd.h>
-#else
-//#define PROTOBUF_USE_DLLS
-#endif
 
 #include "console.h"
 #include "game.h"
@@ -37,6 +39,7 @@
 #include "talloc/talloc.h"
 #include "util.h"
 #include "world.h"
+#include "game_properties.h"
 
 #define OPTIONS "sw:"
 
@@ -52,31 +55,6 @@ extern "C" {
  * manner.
  */
 
-static const char *options_worldPath = NULL;
-static bool options_console = true;
-
-static int
-parse_command_line(int argc, char **argv)
-{
-	int c;
-
-	opterr = 0;
-
-	while ((c = getopt(argc, argv, OPTIONS)) != -1) {
-		switch (c) {
-		case 's':
-			options_console = false;
-			break;
-		case 'w':
-			options_worldPath = optarg;
-			break;
-		default:
-			break;
-		}
-	}
-
-	return 0;
-}
 
 static void
 __close_handle(uv_handle_t *handle, void *context)
@@ -87,94 +65,112 @@ __close_handle(uv_handle_t *handle, void *context)
 int
 main(int argc, char **argv)
 {
-	int ret = 0;
-	struct game *game;
+	int c, ret = 0;
+
+    ptGameProperties gameProperties;
+	ptGame game;
+
 	struct world world;
-	clock_t start;
-	clock_t diff;
+	clock_t start, diff;
 	int loop_close_result = 0;
+
+	opterr = 0;
+
+	start = clock();
 
 	printf("Paper Tiger Terraria Server\n");
 	printf(" by Tyler W. <tyler@tw.id.au>\n\n");
 
-	parse_command_line(argc, argv);
-	// talloc_enable_leak_report_full();
-	// talloc_set_log_stderr();
+	while ((c = getopt(argc, argv, OPTIONS)) != -1) {
+		switch (c) {
+        case 'p':
+			gameProperties.maxPlayers = atoi(optarg);
+		case 's':
+			gameProperties.enableConsole = false;
+			break;
+		case 'w':
+			gameProperties.worldFilePath = optarg;
+			break;
+		default:
+			break;
+		}
+	}
 
-	start = clock();
+	gameProperties.msPerFrame = 16.667; // 60 fps; TODO: put this shit inside getopt
 
 	printf("%s: initializing game context... ", __FUNCTION__);
+    if (ptGameInitialize(&game) != 0) {
+		_ERROR(
+			"%s: game initialization failed.  The process cannot continue.\n",
+			__FUNCTION__);
+    }
 
-	if (game_new(NULL, &game) < 0) {
-		printf("failed.\n");
-		_ERROR("%s: game initialization failed.  The process cannot continue.\n", __FUNCTION__);
-		return 2;
-	}
+	printf("done. %ld bytes.\n", sizeof(game));
 
-	printf("done.\n");
+	// printf("%s: loading world from %s... ", __FUNCTION__, options_worldPath);
 
-	printf("%s: loading world from %s... ", __FUNCTION__, options_worldPath);
+	// world.game = game;
 
-	world.game = game;
+	// if (world_init(game, &world, options_worldPath) < 0) {
+	//	ret = -1;
+	//	printf("World init failed: %d\n", ret);
+	//	goto out;
+	//}
 
-	if (world_init(game, &world, options_worldPath) < 0) {
-		ret = -1;
-		printf("World init failed: %d\n", ret);
-		goto out;
-	}
+	// game->world = &world; //TODO: Fix this obvious segfault
 
-	game->world = world;
+	// if (uv_timer_init(&game->event_loop, &world.section_compress_worker) < 0)
+	// { 	_ERROR("%s: initializing section compress worker failed.\n",
+	//__FUNCTION__); 	goto out;
+	//}
 
-	if (uv_timer_init(&game->event_loop, &world.section_compress_worker) < 0) {
-		_ERROR("%s: initializing section compress worker failed.\n", __FUNCTION__);
-		goto out;
-	}
+	// diff = clock() - start;
+	// printf("done (%dms).\n", (int)(diff * 1000 / CLOCKS_PER_SEC));
 
-	diff = clock() - start;
-	printf("done (%dms).\n", (int)(diff * 1000 / CLOCKS_PER_SEC));
+	// if (server_init(game, game->server, "0.0.0.0", 7777) < 0) {
+	//	_ERROR("Initializing TCP server for game context failed.\n");
+	//	ret = -1;
+	//	goto out;
+	//}
 
-	if (server_init(game, &game->server, "0.0.0.0", 7777) < 0) {
-		_ERROR("Initializing TCP server for game context failed.\n");
-		ret = -1;
-		goto out;
-	}
+	//   game->server->game = game; // TODO: Fix this obvious segfault
 
-    game->server.game = game;
+	// if (server_start(game->server) < 0) {
+	//	_ERROR("Starting server for game context failed.\n");
+	//	ret = -1;
+	//	goto out;
+	//}
 
-	if (server_start(&game->server) < 0) {
-		_ERROR("Starting server for game context failed.\n");
-		ret = -1;
-		goto out;
-	}
+	// ptGameInitializeUpdateLoop(game);
 
-	game_update_loop_init(game);
+	// printf("\nStarted successfully on %s:%d\n", game->server->listen_address,
+	// game->server->port);
 
-	printf("\nStarted successfully on %s:%d\n", game->server.listen_address, game->server.port);
+	// printf(" * %s (%dx%d)\n", world.world_name, world.max_tiles_x,
+	// world.max_tiles_y);
 
-	printf(" * %s (%dx%d)\n", world.world_name, world.max_tiles_x, world.max_tiles_y);
+	// printf(" * Expert: %s, Crimson: %s\n", game->world->expert_mode ? "Yes" :
+	// "No", 	   game->world->flags.crimson ? "Yes" : "No");
 
-	printf(" * Expert: %s, Crimson: %s\n", game->world.expert_mode ? "Yes" : "No",
-		   game->world.flags.crimson ? "Yes" : "No");
+	// printf("\n");
 
-	printf("\n");
+	// if (options_console == true && console_init(game->console, game) < 0) {
+	//	_ERROR("Initializing console failed.\n");
+	//	ret = -1;
+	//	goto out;
+	//}
 
-	if (options_console == true && console_init(&game->console, game) < 0) {
-		_ERROR("Initializing console failed.\n");
-		ret = -1;
-		goto out;
-	}
+	// ptGameStartEventLoop(game);
 
-	game_start_event_loop(game);
+	// uv_walk(&game->event_loop, __close_handle, NULL);
+	// uv_run(&game->event_loop, UV_RUN_DEFAULT);
 
-	uv_walk(&game->event_loop, __close_handle, NULL);
-	uv_run(&game->event_loop, UV_RUN_DEFAULT);
-
-	if (uv_loop_close(&game->event_loop) == UV_EBUSY) {
-		printf("%s: warning: event loop has not signalled a close.", __FUNCTION__);
-	}
+	// if (uv_loop_close(&game->event_loop) == UV_EBUSY) {
+	//	printf("%s: warning: event loop has not signalled a close.",
+	//__FUNCTION__);
+	//}
 
 out:
-	talloc_free(game);
 	return ret;
 }
 

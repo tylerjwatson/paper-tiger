@@ -20,12 +20,11 @@
 
 #include <string.h>
 
-#include "continue_connecting.h"
-#include "../game.h"
-#include "../player.h"
-#include "../packet.h"
-#include "../binary_reader.h"
-#include "../util.h"
+#include "packets/continue_connecting.h"
+#include "player.h"
+#include "packet.h"
+#include "binary_reader.h"
+#include "util.h"
 
 int continue_connecting_new(TALLOC_CTX *ctx, uint8_t id, struct packet **out_packet)
 {
@@ -70,10 +69,10 @@ out:
 	return ret;
 }
 
-int continue_connecting_write(const struct game *game, struct packet *packet)
+int continue_connecting_write(const ptGame *game, struct packet *packet)
 {
 	const struct continue_connecting *data = (const struct continue_connecting *)packet->data;
-	
+
 	packet->data_buffer[0] = data->id;
 
 	return 1;

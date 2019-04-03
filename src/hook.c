@@ -20,7 +20,6 @@
 
 #include "hook.h"
 
-#include "game.h"
 #include "player.h"
 #include "util.h"
 
@@ -47,7 +46,7 @@ out:
 }
 
 int
-hook_context_new(TALLOC_CTX *context, const struct game *game, struct hook_context **out_context)
+hook_context_new(TALLOC_CTX *context, const ptGame *game, struct hook_context **out_context)
 {
 	int ret = -1;
 	TALLOC_CTX *temp_context;
@@ -68,7 +67,7 @@ hook_context_new(TALLOC_CTX *context, const struct game *game, struct hook_conte
 		goto out;
 	}
 
-	hook_context->game = (struct game *)game;
+	hook_context->game = (ptGame *)game;
 
 	if (hook_context_vectors_init(hook_context) < 0) {
 		_ERROR("%s: error initializing hook subsystem.\n", __FUNCTION__);
@@ -86,7 +85,7 @@ out:
 }
 
 void
-hook_on_player_leave(struct hook_context *hook_context, const struct game *game, const struct player *player)
+hook_on_player_leave(struct hook_context *hook_context, const ptGame *game, const struct player *player)
 {
 	size_t i = 0;
 	int cb_ret = 0;
@@ -106,7 +105,7 @@ hook_on_player_leave(struct hook_context *hook_context, const struct game *game,
 }
 
 void
-hook_on_player_join(struct hook_context *hook_context, const struct game *game, const struct player *player)
+hook_on_player_join(struct hook_context *hook_context, const ptGame *game, const struct player *player)
 {
 	size_t i = 0;
 	int cb_ret = 0;

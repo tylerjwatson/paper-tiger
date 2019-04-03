@@ -19,7 +19,6 @@
  */
 
 #include "player.h"
-#include "game.h"
 #include "hook.h"
 #include "util.h"
 
@@ -41,7 +40,7 @@ __player_destructor(struct player *player)
 }
 
 int
-player_new(TALLOC_CTX *context, const struct game *game, int id, struct player **out_player)
+player_new(TALLOC_CTX *context, const ptGame *game, int id, struct player **out_player)
 {
 	int ret = -1;
 	TALLOC_CTX *temp_context;
@@ -59,7 +58,7 @@ player_new(TALLOC_CTX *context, const struct game *game, int id, struct player *
 	}
 
 	player->id = id;
-	player->game = (struct game *)game;
+	player->game = (ptGame *)game;
 	talloc_set_destructor(player, __player_destructor);
 
 	*out_player = talloc_steal(context, player);

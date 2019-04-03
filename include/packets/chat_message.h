@@ -28,9 +28,10 @@
 #define PACKET_LEN_CHAT_MESSAGE 3
 
 #include <uv.h>
+#include "talloc/talloc.h"
 
-#include "../colour.h"
-#include "../talloc/talloc.h"
+#include "colour.h"
+#include "game.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,8 +39,7 @@ extern "C" {
 
 struct packet;
 struct player;
-struct game;
-  
+
 struct chat_message {
 	uint8_t id;
 	struct colour colour;
@@ -53,7 +53,7 @@ int chat_message_read(struct packet *packet);
 
 int chat_message_handle(struct player *player, struct packet *packet);
 
-int chat_message_write(const struct game *game, struct packet *packet);
+int chat_message_write(const ptGame *game, struct packet *packet);
 
 #ifdef __cplusplus
 }

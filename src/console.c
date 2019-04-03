@@ -24,17 +24,11 @@
 #include <string.h>
 #include <time.h>
 
-#include "game.h"
-#include "param.h"
-#include "player.h"
-#include "tile.h"
-#include "util.h"
-#include "world.h"
 
 #include "packets/disconnect.h"
 
 static int
-__handle_memdump(struct game *game, struct console_command *command)
+__handle_memdump(ptGame *game, struct console_command *command)
 {
 	FILE *fp;
 	char file_path[48];
@@ -64,7 +58,7 @@ __handle_memdump(struct game *game, struct console_command *command)
 }
 
 static int
-__handle_test(struct game *game, struct console_command *command)
+__handle_test(ptGame *game, struct console_command *command)
 {
 	struct param *params;
 
@@ -82,14 +76,14 @@ __handle_test(struct game *game, struct console_command *command)
 }
 
 static int
-__handle_quit(struct game *game, struct console_command *command)
+__handle_quit(ptGame *game, struct console_command *command)
 {
 	uv_stop(&game->event_loop);
 	return 0;
 }
 
 static int
-__handle_disconnect(struct game *game, struct console_command *command)
+__handle_disconnect(ptGame *game, struct console_command *command)
 {
 	int slot;
 	struct player *player;
@@ -113,7 +107,7 @@ __handle_disconnect(struct game *game, struct console_command *command)
 		return -2;
 	}
 
-	server_send_packet(&player->game->server, player, disconnect);
+	server_send_packet(player->game->server, player, disconnect);
 
 	talloc_free(disconnect);
 
@@ -182,7 +176,7 @@ __on_read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 {
 	char *command_copy, *command_copy_base;
 	char *parameters;
-	struct game *game = (struct game *)stream->data;
+	ptGame *game = (ptGame *)stream->data;
 	struct console_command_handler *handler;
 	struct console_command command;
 
@@ -244,14 +238,14 @@ out:
 		talloc_free(buf->base);
 	}
 
-	__print_prompt((uv_stream_t *)&game->console.console_write_handle);
+	__print_prompt((uv_stream_t *)&game->console->console_write_handle);
 }
 
 static void
 __alloc_buffer(uv_handle_t *handle, size_t suggested_size, uv_buf_t *buf)
 {
 	TALLOC_CTX *temp_context = talloc_new(NULL);
-	struct game *context = (struct game *)handle->data;
+	ptGame *context = (ptGame *)handle->data;
 	char *buffer;
 
 	if ((buffer = talloc_zero_size(temp_context, suggested_size)) == NULL) {
@@ -265,7 +259,7 @@ out:
 }
 
 int
-console_init(struct console *console, struct game *game)
+console_init(struct console *console, ptGame *game)
 {
 	console->game = game;
 	uv_tty_init(&console->game->event_loop, &console->console_handle, 0, 1);

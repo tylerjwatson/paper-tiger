@@ -25,7 +25,9 @@
 #define PACKET_LEN_CONTINUE_CONNECTING 1
 
 #include <uv.h>
-#include "../talloc/talloc.h"
+#include "talloc/talloc.h"
+#include "game.h"
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,15 +35,14 @@ extern "C" {
 
 struct player;
 struct packet;
-struct game;
 
 struct continue_connecting {
 	uint8_t id;
 };
-	
+
 int continue_connecting_new(TALLOC_CTX *ctx, uint8_t id, struct packet **out_packet);
 
-int continue_connecting_write(const struct game *game, struct packet *packet);
+int continue_connecting_write(const ptGame *game, struct packet *packet);
 
 #ifdef __cplusplus
 }

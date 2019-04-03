@@ -20,23 +20,22 @@
 
 #include <string.h>
 
-#include "player_info.h"
+#include "packets/player_info.h"
 
-#include "../packet.h"
-#include "../player.h"
-#include "../game.h"
+#include "packet.h"
+#include "player.h"
 
-#include "../binary_writer.h"
-#include "../binary_reader.h"
+#include "binary_writer.h"
+#include "binary_reader.h"
 
-#include "../util.h"
+#include "util.h"
 
 int player_info_handle(struct player *player, struct packet *packet)
 {
 	struct player_info *player_info = (struct player_info *)packet->data;
-	
+
 	player->name = talloc_strdup(player, player_info->name);
-	
+
 	player->stats.difficulty = player_info->difficulty;
 	player->stats.eye_colour = player_info->eye_colour;
 	player->stats.hair = player_info->hair;
@@ -45,9 +44,9 @@ int player_info_handle(struct player *player, struct packet *packet)
 	player->stats.hide_misc = player_info->hide_misc;
 	player->stats.hide_visuals = player_info->hide_visuals;
 	player->stats.hide_visuals2 = player_info->hide_visuals2;
-	
+
 	printf("%s (%s) has joined to slot %d.\n", player->name, player->remote_addr, player->id);
-	
+
 	return 0;
 }
 
@@ -76,14 +75,14 @@ int player_info_new(TALLOC_CTX *ctx, const struct player *player, struct packet 
 	packet->type = PACKET_TYPE_PLAYER_INFO;
 	packet->len = PACKET_HEADER_SIZE;
 	packet->data = NULL;
-	
+
 	player_info = talloc(temp_context, struct player_info);
 	if (player_info == NULL) {
 		_ERROR("%s: out of memory allocating player_info structure.\n", __FUNCTION__);
 		ret = -ENOMEM;
 		goto out;
 	}
-	
+
 	name_copy = talloc_strdup(temp_context, player->name);
 	if (name_copy == NULL) {
 		_ERROR("%s: out of memory copying name to player_info struct\n", __FUNCTION__);
@@ -106,11 +105,11 @@ int player_info_new(TALLOC_CTX *ctx, const struct player *player, struct packet 
 	player_info->skin_colour = player->stats.skin_colour;
 	player_info->skin_variant = player->stats.skin_variant;
 	player_info->under_shirt_colour = player->stats.under_shirt_colour;
-	
+
 	player_info->name = talloc_steal(player_info, name_copy);
-	
+
 	packet->data = talloc_steal(packet, player_info);
-	
+
 	*out_packet = (struct packet *)talloc_steal(ctx, packet);
 
 	ret = 0;
@@ -153,7 +152,7 @@ int player_info_read(struct packet *packet)
 	player_info->name[name_len] = '\0';
 
 	pos += name_len + 1;
-	
+
 	player_info->hair_dye = packet->data_buffer[pos++];
 	player_info->hide_visuals = packet->data_buffer[pos++];
 	player_info->hide_visuals2 = packet->data_buffer[pos++];
@@ -185,11 +184,11 @@ out:
 	return ret;
 }
 
-int player_info_write(const struct game *game, struct packet *packet)
+int player_info_write(const ptGame *game, struct packet *packet)
 {
 	int pos = 0;
 	struct player_info *player_info = (struct player_info *)packet->data;
-	
+
 	pos += binary_writer_write_value(packet->data_buffer + pos, player_info->id);
 	pos += binary_writer_write_value(packet->data_buffer + pos, player_info->skin_variant);
 	pos += binary_writer_write_value(packet->data_buffer + pos, player_info->hair);
@@ -206,6 +205,6 @@ int player_info_write(const struct game *game, struct packet *packet)
 	pos += binary_writer_write_value(packet->data_buffer + pos, player_info->pants_colour);
 	pos += binary_writer_write_value(packet->data_buffer + pos, player_info->shoe_colour);
 	pos += binary_writer_write_value(packet->data_buffer + pos, player_info->difficulty);
-	
+
 	return pos;
 }

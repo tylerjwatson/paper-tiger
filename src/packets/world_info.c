@@ -21,24 +21,23 @@
 #include <string.h>
 #include <stdbool.h>
 
-#include "world_info.h"
+#include "packets/world_info.h"
 
-#include "../world.h"
-#include "../game.h"
-#include "../packet.h"
-#include "../player.h"
+#include "world.h"
+#include "packet.h"
+#include "player.h"
 
-#include "../talloc/talloc.h"
-#include "../binary_reader.h"
-#include "../binary_writer.h"
-#include "../util.h"
+#include "talloc/talloc.h"
+#include "binary_reader.h"
+#include "binary_writer.h"
+#include "util.h"
 
 #define ARRAY_SIZEOF(a) sizeof(a)/sizeof(a[0])
 
 static int __fill_world_info_buffer(struct world_info *world_info, uint8_t *buffer)
 {
 	int pos = 0;
-	
+
 	pos += binary_writer_write_value(buffer + pos, world_info->time);
 	pos += binary_writer_write_value(buffer + pos, world_info->day_info);
 	pos += binary_writer_write_value(buffer + pos, world_info->moon_phase);
@@ -64,23 +63,23 @@ static int __fill_world_info_buffer(struct world_info *world_info, uint8_t *buff
 	pos += binary_writer_write_value(buffer + pos, world_info->style_hell_back);
 	pos += binary_writer_write_value(buffer + pos, world_info->wind_speed_set);
 	pos += binary_writer_write_value(buffer + pos, world_info->num_clouds);
-	
+
 	for(int i = 0; i < ARRAY_SIZEOF(world_info->tree_x); i++) {
 		pos += binary_writer_write_value(buffer + pos, world_info->tree_x[i]);
 	}
-	
+
 	for(int i = 0; i < ARRAY_SIZEOF(world_info->tree_style); i++) {
 		pos += binary_writer_write_value(buffer + pos, world_info->tree_style[i]);
 	}
-	
+
 	for(int i = 0; i < ARRAY_SIZEOF(world_info->cave_back_x); i++) {
 		pos += binary_writer_write_value(buffer + pos, world_info->cave_back_x[i]);
 	}
-	
+
 	for(int i = 0; i < ARRAY_SIZEOF(world_info->cave_back_style); i++) {
 		pos += binary_writer_write_value(buffer + pos, world_info->cave_back_style[i]);
 	}
-	
+
 	pos += binary_writer_write_value(buffer + pos, world_info->max_raining);
 	pos += binary_writer_write_value(buffer + pos, world_info->flags_1);
 	pos += binary_writer_write_value(buffer + pos, world_info->flags_2);
@@ -168,7 +167,7 @@ static void __fill_world_info(struct world *world, struct world_info *world_info
 	if (world->flags.downed_plant) {
 		BIT_SET(world_info->flags_1, 7);
 	}
-	
+
 	if (world->flags.downed_mech_1) {
 		BIT_SET(world_info->flags_2, 0);
 	}
@@ -248,7 +247,7 @@ static void __fill_world_info(struct world *world, struct world_info *world_info
 	world_info->lobby_id = 0;
 }
 
-int world_info_write(const struct game *game, struct packet *packet)
+int world_info_write(const ptGame *game, struct packet *packet)
 {
 	struct world_info *world_info = (struct world_info *)packet->data;
 	int packet_len = __fill_world_info_buffer(world_info, packet->data_buffer);
@@ -262,7 +261,7 @@ int world_info_new(TALLOC_CTX *ctx, const struct player *player, struct packet *
 	TALLOC_CTX *temp_context;
 	struct packet *packet;
 	struct world_info *world_info;
-	struct world *world = &player->game->world;
+	struct world *world = player->game->world;
 
 	temp_context = talloc_new(NULL);
 	if (temp_context == NULL) {
