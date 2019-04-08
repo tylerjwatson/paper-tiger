@@ -21,9 +21,13 @@
 #ifndef _WIN32
 #include <unistd.h>
 #else
+
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
 #include <WinSock2.h>
 #include <Windows.h>
-//#define PROTOBUF_USE_DLLS
 #endif
 
 #include <errno.h>
@@ -31,17 +35,15 @@
 #include <string.h>
 #include <time.h>
 #include <uv.h>
+#include "talloc/talloc.h"
 
-#include "console.h"
 #include "game.h"
 #include "getopt.h"
-#include "server.h"
-#include "talloc/talloc.h"
-#include "util.h"
-#include "world.h"
 #include "game_properties.h"
 
-#define OPTIONS "sw:"
+#include "log.h"
+
+#define OPTIONS "p:P:a:sw:"
 
 #ifdef __cplusplus
 extern "C" {
@@ -67,10 +69,8 @@ main(int argc, char **argv)
 {
 	int c, ret = 0;
 
-    ptGameProperties gameProperties;
 	ptGame game;
 
-	struct world world;
 	clock_t start, diff;
 	int loop_close_result = 0;
 
@@ -78,34 +78,43 @@ main(int argc, char **argv)
 
 	start = clock();
 
-	printf("Paper Tiger Terraria Server\n");
-	printf(" by Tyler W. <tyler@tw.id.au>\n\n");
+	log_info("Paper Tiger Terraria Server by Tyler W. <tyler@tw.id.au>");
 
-	while ((c = getopt(argc, argv, OPTIONS)) != -1) {
-		switch (c) {
-        case 'p':
-			gameProperties.maxPlayers = atoi(optarg);
-		case 's':
-			gameProperties.enableConsole = false;
-			break;
-		case 'w':
-			gameProperties.worldFilePath = optarg;
-			break;
-		default:
-			break;
-		}
+
+	//while ((c = getopt(argc, argv, OPTIONS)) != -1) {
+	//	switch (c) {
+ //       case 'a': {
+	//		gameProperties.listenAddr = optarg;
+	//	} break;
+ //       case 'P':
+	//		gameProperties.listenPort = atoi(optarg);
+	//		break;
+	//	case 'p':
+	//		gameProperties.maxPlayers = atoi(optarg);
+	//		break;
+	//	case 's':
+	//		gameProperties.enableConsole = false;
+	//		break;
+	//	case 'w':
+	//		gameProperties.worldFilePath = optarg;
+	//		break;
+	//	default:
+	//		break;
+	//	}
+	//}
+
+	if ((ret = ptGameInitialize(&game, uv_default_loop())) < 0) {
+        
+		log_fatal("Game initialization failed.");
+		return ret;
 	}
+    
+    diff = clock() - start;
 
-	gameProperties.msPerFrame = 16.667; // 60 fps; TODO: put this shit inside getopt
+	log_debug("game context %llu bytes in %dms.\n", sizeof(game), diff);
 
-	printf("%s: initializing game context... ", __FUNCTION__);
-    if (ptGameInitialize(&game) != 0) {
-		_ERROR(
-			"%s: game initialization failed.  The process cannot continue.\n",
-			__FUNCTION__);
-    }
-
-	printf("done. %ld bytes.\n", sizeof(game));
+	log_info("Game is running");
+    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
 
 	// printf("%s: loading world from %s... ", __FUNCTION__, options_worldPath);
 
@@ -119,7 +128,7 @@ main(int argc, char **argv)
 
 	// game->world = &world; //TODO: Fix this obvious segfault
 
-	// if (uv_timer_init(&game->event_loop, &world.section_compress_worker) < 0)
+	// if (uv_timer_init(&game->eventLoop, &world.section_compress_worker) < 0)
 	// { 	_ERROR("%s: initializing section compress worker failed.\n",
 	//__FUNCTION__); 	goto out;
 	//}
@@ -162,15 +171,16 @@ main(int argc, char **argv)
 
 	// ptGameStartEventLoop(game);
 
-	// uv_walk(&game->event_loop, __close_handle, NULL);
-	// uv_run(&game->event_loop, UV_RUN_DEFAULT);
+	// uv_walk(&game->eventLoop, __close_handle, NULL);
+	// uv_run(&game->eventLoop, UV_RUN_DEFAULT);
 
-	// if (uv_loop_close(&game->event_loop) == UV_EBUSY) {
+	// if (uv_loop_close(&game->eventLoop) == UV_EBUSY) {
 	//	printf("%s: warning: event loop has not signalled a close.",
 	//__FUNCTION__);
 	//}
 
-out:
+	_CrtDumpMemoryLeaks();
+
 	return ret;
 }
 

@@ -26,7 +26,6 @@
 
 #include "bitmap.h"
 #include "colour.h"
-#include "game_properties.h"
 
 #include "talloc/talloc.h"
 
@@ -34,13 +33,16 @@
 //#define GAME_PROTOCOL_VERSION 156 << this is for 1.3.0
 #define GAME_PROTOCOL_VERSION 169 // this is for 1.3.1
 
+#ifdef _WIN32
+#include <WinSock2.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-    struct world;
 
-    /**
+/**
  * @defgroup game Game system
  * @ingroup paper-tiger
  *
@@ -62,67 +64,44 @@ extern "C" {
  * @{
  */
 
-    /**
+/**
  * Describes a game context.  Contains all references and information that a game needs
  * in order to run.
  */
-    typedef struct ptGame
-    {
-        ptGameProperties properties;
+typedef struct ptGame
+{
+    /**
+	* Array of players.
+	*
+	* @remarks
+	* Due to the limitations of the official Terraria server, the maximum number of
+	* players supported is 255.
+	*/
+    //struct player players[GAME_MAX_PLAYERS];
 
-        /**
-	 * Time in milliseconds that an update frame may run for.  Defaults to 60 ticks per
-	 * second.
-	 */
-        double msPerFrame;
+    /**
+        * Bitmap of connected players, decides which slot ID connecting clients receive
+        */
+    word_t player_slots[GAME_MAX_PLAYERS / sizeof(word_t)];
 
-        /**
-	 * Pointer to the world running under this game context.
-	 */
-        struct world *world;
+    /**
+	* Main libuv event loop for the game.
+	*/
+    uv_loop_t *eventLoop;
 
-        /**
-	 * Pointer to the TCP server subsystem which accepts TCP clients and deals with
-	 * packet communication to and from connected clients.
-	 */
-        struct server *server;
+    /**
+	* libuv timer which fires every @a msPerFrame ms.  Serves as the game update loop.
+	*/
+    uv_timer_t *update_handle;
 
-        /**
-	 * Array of players.
-	 *
-	 * @remarks
-	 * Due to the limitations of the official Terraria server, the maximum number of
-	 * players supported is 255.
-	 */
-        struct player *players[GAME_MAX_PLAYERS];
+    /**
+	* Array of tile frame important data.
+	*/
+    bool tileFrameImportant[419];
 
-        struct console *console;
 
-        /**
-         * Bitmap of connected players, decides which slot ID connecting clients receive
-         */
-        word_t player_slots[GAME_MAX_PLAYERS / sizeof(word_t)];
-
-        /**
-	 * Main libuv event loop for the game.
-	 */
-        uv_loop_t event_loop;
-
-        /**
-	 * libuv timer which fires every @a msPerFrame ms.  Serves as the game update loop.
-	 */
-        uv_timer_t *update_handle;
-
-        /**
-	 * Array of tile frame important data.
-	 */
-        bool tileFrameImportant[419];
-
-        /**
-	 * Hook subsystem, that provides hooking callbacks for parts of the system that
-	 * wish to listen for pre-programmed events.
-	 */
-        struct hook_context *hooks;
+    /** libuv handle for TCP server. */
+    uv_tcp_t tcpHandle;
 } ptGame;
 
 /**
@@ -131,7 +110,8 @@ extern "C" {
  * @param {ptGame} game
  * A pointer to a ptGame instance to initialize
  */
-int ptGameInitialize(ptGame *game);
+int ptGameInitialize(ptGame* game, ptGameProperties properties, uv_loop_t *loop);
+
 
 /**
  * @brief finds the next free slot from the game's player slot bitmap
@@ -188,19 +168,16 @@ ptGameAlloc(TALLOC_CTX *context, ptGame **out_context);
  */
 int
 ptGameInitializeUpdateLoop(ptGame *game);
-
-int
-ptGameSendWorld(const ptGame *game, const struct player *player);
-
-int
-ptGameSendMessageToPlayer(const ptGame *game, const struct player *player,
-                          const struct colour colour, const char *fmt, ...);
+//
+//int
+//ptGameSendMessageToPlayer(const ptGame *game, const struct player *player,
+//                          const struct colour colour, const char *fmt, ...);
 
 int
 ptGameOnlinePlayerSlots(const ptGame *game, uint8_t *out_ids);
-
-int
-ptGameSyncPlayers(const ptGame *game, const struct player *new_player);
+//
+//int
+//ptGameSyncPlayers(const ptGame *game, const struct player *new_player);
 
 /**
  * @}

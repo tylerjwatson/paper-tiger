@@ -20,8 +20,6 @@
 
 #pragma once
 
-#define _ERROR(x, ...) fprintf(stderr, x, ##__VA_ARGS__)
-
 #include <stdint.h>
 
 #define BIT_SET(a, b) ((a) |= (1 << (b)))

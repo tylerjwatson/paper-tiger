@@ -21,21 +21,43 @@
 #pragma once
 
 #include <stdint.h>
+#include <stdbool.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 /**
- * Describes the configuration that makes up a paper tiger server instance.
- *
- * After calling ptGameSetProperties(), the memory occupied by this structure
- * must live for the life of the game instance.
- */
+  * Describes the configuration that makes up a paper tiger server instance.
+  *
+  * After calling ptGameSetProperties(), the memory occupied by this structure
+  * must live for the life of the game instance.
+  */
 typedef struct ptGameProperties {
     /** Specifies how often the game engine ticks in milliseconds */
     double msPerFrame;
     /** Specifies a path to the world file. */
-    char *worldFilePath;
+    char* worldFilePath;
     /** Specifies the maximum number of players on a world at once */
     uint8_t maxPlayers;
     /** Specifies whether to enable captive console output */
     bool enableConsole;
 
+    char* listenAddr;
+
+    uint16_t listenPort;
 } ptGameProperties;
+
+/**
+  * Populates a ptGameProperties structure pointed to by @a gameProperties
+  * with sane default values.
+  *
+  * Caller owns all memory allocated by this function.
+  */
+void
+ptGamePropertiesDefaultProperties(ptGameProperties* gameProperties);
+
+#ifdef __cplusplus
+}
+#endif

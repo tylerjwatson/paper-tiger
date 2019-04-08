@@ -41,45 +41,51 @@ endif()
 
 
 add_executable(paper-tiger
+    src/main.c
+    src/var.c
 	src/game.c
-	src/packet.c
-
-	src/packets/status.c
-	src/packets/world_info.c
-	src/packets/client_uuid.c
-	src/packets/continue_connecting2.c
-	src/packets/continue_connecting.c
-	src/packets/player_info.c
-	src/packets/connect_request.c
-	src/packets/disconnect.c
-	src/packets/get_section.c
-	src/packets/player_hp.c
-	src/packets/player_mana.c
-	src/packets/tile_section.c
-	src/packets/section_tile_frame.c
-	src/packets/inventory_slot.c
-	src/packets/chat_message.c
-	src/packets/connection_complete.c
+    src/getopt.c
+    src/log.c
 
 
-	src/binary_writer.c
-	src/binary_reader.c
-	src/param.cc
-	src/console.c
-	src/getopt.c
-	src/main.cc
-	src/player.c
-	src/server.c
-	src/tile.c
-	src/world_section.c
-	src/world.c
 
-	src/vector.c
-	src/hook.c)
+#	src/packet.c
+# src/packets/status.c
+# src/packets/world_info.c
+# src/packets/client_uuid.c
+# src/packets/continue_connecting2.c
+# src/packets/continue_connecting.c
+# src/packets/player_info.c
+# src/packets/connect_request.c
+# src/packets/disconnect.c
+# src/packets/get_section.c
+# src/packets/player_hp.c
+# src/packets/player_mana.c
+# src/packets/tile_section.c
+# src/packets/section_tile_frame.c
+# src/packets/inventory_slot.c
+# src/packets/chat_message.c
+# src/packets/connection_complete.c
+
+
+#	src/binary_writer.c
+#	src/binary_reader.c
+#	src/param.cc
+#	src/console.c
+#	src/player.c
+#	src/server.c
+#	src/tile.c
+#	src/world_section.c
+#	src/world.c
+#
+#	src/vector.c
+#	src/hook.c
+    )
 	
 set_property(TARGET paper-tiger PROPERTY C_STANDARD 11)
 
 
+add_compile_definitions(LOG_USE_COLOR)
 
 if(WIN32)
     target_link_libraries(paper-tiger 
