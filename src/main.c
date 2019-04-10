@@ -41,7 +41,7 @@
 
 #include "game.h"
 #include "getopt.h"
-#include "game_properties.h"
+#include "console.h"
 
 #include "log.h"
 
@@ -50,8 +50,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-static uv_tty_t console;
 
 /**
  * @defgroup paper-tiger The Paper Tiger API
@@ -84,17 +82,6 @@ main(int argc, char **argv)
 
 	start = clock();
 
-
-	uv_tty_t out;
-
-	uv_tty_init((uv_loop_t *)loop, &console, 0, 1);
-	uv_tty_set_mode(&console, UV_TTY_MODE_NORMAL);
-	uv_tty_init((uv_loop_t *)loop, &out, 1, 1);
-	uv_tty_set_mode(&console, UV_TTY_MODE_NORMAL);
-	uv_tty_init((uv_loop_t *)loop, &out, 2, 1);
-	uv_tty_set_mode(&console, UV_TTY_MODE_NORMAL);
-
-
 	log_info("Paper Tiger Terraria Server by Tyler W. <tyler@tw.id.au>");
 
 	//while ((c = getopt(argc, argv, OPTIONS)) != -1) {
@@ -119,7 +106,7 @@ main(int argc, char **argv)
 	//	}
 	//}
 
-	if ((ret = ptGameInitialize(&game, loop)) < 0) {
+	if ((ret = ptGameInitialize(&game, (uv_loop_t *)loop)) < 0) {
 
 		log_fatal("Game initialization failed.");
 		return ret;
@@ -127,9 +114,8 @@ main(int argc, char **argv)
 
     diff = clock() - start;
 
-	log_debug("game context %llu bytes in %dms.\n", sizeof(game), diff);
+    ptConsoleInitialize(&game);
 
-	log_info("Game is running");
     uv_run(uv_default_loop(), UV_RUN_DEFAULT);
 
 	// printf("%s: loading world from %s... ", __FUNCTION__, options_worldPath);

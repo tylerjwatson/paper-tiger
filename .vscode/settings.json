@@ -39,7 +39,8 @@
         "game_properties.h": "c",
         "stdint.h": "c",
         "packet.h": "c",
-        "server.h": "c"
+        "server.h": "c",
+        "pthread.h": "c"
     },
     "C_Cpp.configurationWarnings": "Disabled"
 }

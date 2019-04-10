@@ -102,6 +102,9 @@ typedef struct ptGame
 
     /** libuv handle for TCP server. */
     uv_tcp_t tcpHandle;
+
+    /** libub handle for working with the console */
+    uv_work_t consoleThread;
 } ptGame;
 
 /**

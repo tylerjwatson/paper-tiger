@@ -34,11 +34,16 @@ include_directories("${PROJECT_SOURCE_DIR}/include"
 					"${ZLIB_INCLUDE_DIRS}")
 
 
-add_library(talloc STATIC src/talloc/talloc.c)		
+add_library(talloc STATIC src/talloc/talloc.c)
 
 if(WIN32)
     add_library(mmap STATIC win32/mmap/windows-mmap.c)		
 endif()
+
+find_library(linenoise
+        NAMES linenoise linenoised
+        HINTS "${CMAKE_PREFIX_PATH}/lib"
+)
 
 
 add_executable(paper-tiger
@@ -47,7 +52,7 @@ add_executable(paper-tiger
 	src/game.c
     src/getopt.c
     src/log.c
-
+    src/console.c
 
 
 #	src/packet.c
@@ -93,6 +98,7 @@ if(WIN32)
         mmap
         talloc
         ws2_32
+        "${linenoise}"
         "${LIBUV_LIBRARIES}"
         "${ZLIB_LIBRARY_DEBUG}")
 else()
