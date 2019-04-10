@@ -1,18 +1,19 @@
 cmake_minimum_required(VERSION 3.1)
-project(paper-tiger)
+project(paper-tiger C)
 
-set(CMAKE_CXX_STANDARD 11)
+# set(CMAKE_CXX_STANDARD 11)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/CMakeModules")
-
 
 if(NOT CMAKE_LIBRARY_ARCHITECTURE)
 	set(CMAKE_LIBRARY_ARCHITECTURE "x64")
 endif()
 
 if(WIN32)
+
 	set(CMAKE_PREFIX_PATH "${PROJECT_SOURCE_DIR}/win32")
-	include(FindLibUV-Win32)
+	include(FindLibUV)
+#	include(FindLibUV-Win32)
 else()
 	include(FindLibUV)
 endif()

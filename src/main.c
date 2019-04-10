@@ -22,9 +22,11 @@
 #include <unistd.h>
 #else
 
+#ifdef _MSC_VER
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
+#endif
 
 #include <WinSock2.h>
 #include <Windows.h>
@@ -49,6 +51,8 @@
 extern "C" {
 #endif
 
+static uv_tty_t console;
+
 /**
  * @defgroup paper-tiger The Paper Tiger API
  *
@@ -67,7 +71,9 @@ __close_handle(uv_handle_t *handle, void *context)
 int
 main(int argc, char **argv)
 {
-	int c, ret = 0;
+	const uv_loop_t *loop = uv_default_loop();
+
+	int ret = 0;
 
 	ptGame game;
 
@@ -78,8 +84,18 @@ main(int argc, char **argv)
 
 	start = clock();
 
-	log_info("Paper Tiger Terraria Server by Tyler W. <tyler@tw.id.au>");
 
+	uv_tty_t out;
+
+	uv_tty_init((uv_loop_t *)loop, &console, 0, 1);
+	uv_tty_set_mode(&console, UV_TTY_MODE_NORMAL);
+	uv_tty_init((uv_loop_t *)loop, &out, 1, 1);
+	uv_tty_set_mode(&console, UV_TTY_MODE_NORMAL);
+	uv_tty_init((uv_loop_t *)loop, &out, 2, 1);
+	uv_tty_set_mode(&console, UV_TTY_MODE_NORMAL);
+
+
+	log_info("Paper Tiger Terraria Server by Tyler W. <tyler@tw.id.au>");
 
 	//while ((c = getopt(argc, argv, OPTIONS)) != -1) {
 	//	switch (c) {
@@ -103,12 +119,12 @@ main(int argc, char **argv)
 	//	}
 	//}
 
-	if ((ret = ptGameInitialize(&game, uv_default_loop())) < 0) {
-        
+	if ((ret = ptGameInitialize(&game, loop)) < 0) {
+
 		log_fatal("Game initialization failed.");
 		return ret;
 	}
-    
+
     diff = clock() - start;
 
 	log_debug("game context %llu bytes in %dms.\n", sizeof(game), diff);

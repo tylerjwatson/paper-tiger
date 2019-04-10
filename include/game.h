@@ -110,7 +110,7 @@ typedef struct ptGame
  * @param {ptGame} game
  * A pointer to a ptGame instance to initialize
  */
-int ptGameInitialize(ptGame* game, ptGameProperties properties, uv_loop_t *loop);
+int ptGameInitialize(ptGame* game, uv_loop_t *loop);
 
 
 /**

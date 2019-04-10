@@ -93,13 +93,13 @@ ptGameInitializeServer(ptGame *game)
 	}
 
 	uv_tcp_nodelay(&game->tcpHandle, true);
-	uv_ip4_addr((const char *)game->properties.listenAddr,
-				game->properties.listenPort, (struct sockaddr_in *)&addr);
+	uv_ip4_addr("127.0.0.1", //TODO: cvar
+				7777 /* TODO: cvar */, (struct sockaddr_in *)&addr);
 
 	if ((r = uv_tcp_bind(&game->tcpHandle, (const struct sockaddr *)&addr,
 						 0U)) < 0) {
-		log_fatal("Cannot bind TCP socket to %s:%d: %d",
-			   game->properties.listenAddr, game->properties.listenPort, r);
+		// log_fatal("Cannot bind TCP socket to %s:%d: %d",
+			//    game->properties.listenAddr, game->properties.listenPort, r);
 		goto out;
 	}
 
@@ -137,8 +137,11 @@ ptGameServerListen(ptGame *game)
 		return ret;
 	}
 
-    log_info("TCP server listening on %s:%d", game->properties.listenAddr,
-			 game->properties.listenPort);
+	ret = 0;
+
+	return ret;
+	// log_info("TCP server listening on %s:%d", game->properties.listenAddr,
+	// 		 game->properties.listenPort);
 }
 
 int
@@ -152,7 +155,6 @@ ptGameInitialize(ptGame *game, uv_loop_t *loop)
 
 	memcpy(game->tileFrameImportant, tileFrameImportant,
 		   sizeof(tileFrameImportant));
-	game->properties = properties;
 	game->eventLoop = loop;
 
 	if ((ret = ptGameInitializeServer(game)) < 0) {
@@ -211,7 +213,7 @@ ptGameOnlinePlayerSlots(const ptGame *game, uint8_t *out_ids)
 	int count = 0;
 
 	for (uint8_t i = 0; i < GAME_MAX_PLAYERS; i++) {
-		if (bitmap_get(game->player_slots, (const int)i) == true) {
+		if (!bitmap_get(game->player_slots, i)) {
 			out_ids[count++] = i;
 		}
 	}

@@ -48,7 +48,7 @@ bitmap_clear(word_t *words, int n)
 }
 
 static inline bool
-bitmap_get(word_t *words, const int n)
+bitmap_get(const word_t *words, const int n)
 {
 	word_t bit = words[WORD_OFFSET(n)] & (1 << BIT_OFFSET(n));
 	return bit != 0;

@@ -40,5 +40,6 @@
         "stdint.h": "c",
         "packet.h": "c",
         "server.h": "c"
-    }
+    },
+    "C_Cpp.configurationWarnings": "Disabled"
 }
